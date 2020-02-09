@@ -2,6 +2,7 @@
 	<view class="addRoomNum">
 		<view class="communityName">{{communityName}}</view>
 		<view class="section1">
+			<choose-list v-if="listShow" v-on:close="hideList" :currentChooseIndex="chooseIndex" :list="list" v-on:emitClick = "returnEmit"></choose-list>
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form" :model="info">
 					<evan-form-item label="楼栋号" prop="houseNo">
 						<template v-slot:main>
@@ -19,11 +20,11 @@
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 						</template>
 					</evan-form-item>
-					<evan-form-item label="户型" prop="houseType">
+					<evan-form-item label="户型" prop="houseType" >
 						<!-- :style_Container="'height: 50px; font-size: 16px;'" -->
 						<!-- :initValue="''" -->
 						<template v-slot:main>
-							<my-select
+							<!-- <my-select
 							ref="mainindex"
 							:propSelect="placeContent"
 							:list="list"
@@ -36,12 +37,12 @@
 							v-on:blur="blur"
 							v-on:change="change"
 							:selectHideType="'hideAll'">
-							</my-select>
-							<input v-show="false" class="form-input" placeholder-class="form-input-placeholder" v-model="info.houseType" placeholder="请输入户型" />
+							</my-select> -->
+							<input  class="form-input" placeholder-class="form-input-placeholder" v-model="info.houseType" placeholder="请选择户型" @click="showList()"/>
 						</template>
-						<!-- <template v-slot:tip>
+						<template v-slot:tip>
 							<image class="inpArrow" src="../../static/triangle.png" mode="aspectFit"></image>
-						</template> -->
+						</template>
 					</evan-form-item>
 			</evan-form>
 			
@@ -85,7 +86,7 @@
 
 <script>
 	import chnToNumber from '../../util/index'
-	
+	import chooseList from '../../components/chooseList.vue'
 	import { mapState, mapMutations } from "vuex";
 	import evanFormItem from '../../components/evan-form/evan-form-item.vue'
 	import evanForm from '../../components/evan-form/evan-form.vue'
@@ -98,13 +99,15 @@
 			facilityBar,
 			evanFormItem,
 			evanForm,
-			mySelect
+			mySelect,
+			chooseList
 		},
 		data() {
 			return {
+				chooseIndex:null,
 				list: [
-					'一室一厅一卫',
-					'二室一厅一卫'
+					'1室1厅1卫',
+					'2室1厅1卫'
 				],
 				inEdit:false,
 				placeContent:'',
@@ -157,10 +160,27 @@
 			}
 		},
 		methods: {
-			getChildNode(data,index){
-				console.log(this.$refs.mainindex)
-				this.$refs.mainindex.addMethod(data,index);
+			showList(){
+				this.listShow = true;
 			},
+			hideList(){
+				this.listShow = false;
+			},
+			returnEmit(e){
+				console.log(e);
+				this.roomList = []
+				this.housePar.length = chnToNumber.chnToNumber(e.newVal)[0]
+				for(let i = 0;i<this.housePar.length;i++){
+					this.housePar[i] = chnToNumber.chnToNumber(e.newVal)[0]
+				}
+				this.housePar.forEach((item,index)=>{
+					this.roomList.push(String.fromCharCode(index+65))
+				})
+				this.chooseIndex = e.index
+				this.info.houseType = e.newVal
+				this.listShow = false;
+			},
+			
 			getHouseInfo(id){
 				let _this = this;
 				this.$request.post('/house/findById',{id}).then(res=>{
@@ -168,16 +188,15 @@
 					this.info.houseNo = res.data.data.buildingNo;
 					this.info.roomNo = res.data.data.houseNo;
 					this.rentType = res.data.data.rentType;
+					this.returnHouseId = res.data.data.id
 					let temp = {
-						// oldVal:'请选择',
-						// orignItem:res.data.data.bedroomNum+'室1厅1卫',
-						// index:parseInt(res.data.data.bedroomNum) - 1,
+						
+						index:parseInt(res.data.data.bedroomNum) - 1,
 						newVal:res.data.data.bedroomNum+'室1厅1卫'
 					}
 					let index = parseInt(res.data.data.bedroomNum) - 1;
-					_this.getChildNode(res.data.data.bedroomNum+'室1厅1卫',index)
-					// _this.placeContent = res.data.data.bedroomNum+'室1厅1卫'
-					_this.change(temp)
+					
+					_this.returnEmit(temp)
 					
 					let par = {
 						detail:{
@@ -195,27 +214,11 @@
 					res.data.data.forEach(item =>{
 						this.list.push(item.name)
 					})
+					console.log(this.list)
 				})
 			},
-			blur(){
-				this.listShow = false
-			},
-			focus(e){
-				console.log(e)
-				this.listShow = true
-			},
-			change(e){
-				console.log(e)
-				this.roomList = []
-				this.housePar.length = chnToNumber.chnToNumber(e.newVal)[0]
-				for(let i = 0;i<this.housePar.length;i++){
-					this.housePar[i] = chnToNumber.chnToNumber(e.newVal)[0]
-				}
-				this.housePar.forEach((item,index)=>{
-					this.roomList.push(String.fromCharCode(index+65))
-				})
-				this.info.houseType = e.newVal
-			},
+			
+			
 			save(){
 				let _this = this;
 				uni.showLoading({
@@ -257,12 +260,13 @@
 				
 			},
 			goRoomDetail(item){
+				console.log(item)
 				let houseInfo = this.info;
 				houseInfo.communityName = this.communityName;
 				houseInfo.communityId = this.communityId;
 				this.$refs.form.validate((res) => {
 					if (res) {
-						if(this.returnHouseId == null){
+						if(this.returnHouseId == null && !this.inEdit){
 							uni.showToast({
 								title:'请先保存房屋信息',
 						icon:'none'
