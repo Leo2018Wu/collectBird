@@ -1,7 +1,8 @@
 <template>
 	<view class="">
+		<choose-list v-if="listShow" v-on:close="hideList" :currentChooseIndex="chooseIndex" :list="list" v-on:emitClick = "returnEmit"></choose-list>
 		<view class="roomDetail" v-if="!isEditRoom">
-			<choose-list v-if="listShow" v-on:close="hideList" :currentChooseIndex="chooseIndex" :list="list" v-on:emitClick = "returnEmit"></choose-list>
+			
 			<view class="bannerBox">
 				<span>上传图片</span>
 				<view class="changeBtn" @click="deleteImg">修改</view>
@@ -44,7 +45,7 @@
 								v-on:change="change"
 								:selectHideType="'hideAll'">
 								</my-select> -->
-								<input  class="form-input" @click="showList()" placeholder-class="form-input-placeholder" v-model="info.rentCycle" placeholder="请选择收租周期" />
+								<input  class="form-input" disabled="true" @click="showList()" placeholder-class="form-input-placeholder" v-model="info.rentCycle" placeholder="请选择收租周期"  />
 							</template>
 							<template v-slot:tip>
 								<image class="inpArrow" src="../../static/triangle.png" mode="aspectFit"></image>
@@ -125,7 +126,7 @@
 								v-on:change="change"
 								:selectHideType="'hideAll'">
 								</my-select> -->
-								<input  class="form-input" placeholder-class="form-input-placeholder" v-model="info.rentCycle" placeholder="请输入户型" @click="showList"/>
+								<input  class="form-input" disabled="true" placeholder-class="form-input-placeholder" v-model="info.rentCycle" placeholder="请选择收租周期" @click="showList"/>
 							</template>
 							<template v-slot:tip>
 								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -280,7 +281,8 @@
 					console.log(res.data.data.roomList)
 							if(res.data.data.roomList.length != 0){
 						//处于编辑房间状态  
-						let depositNumIndex = parseInt(res.data.data.roomList[0].depositNum) - 1
+						let depositNumIndex = parseInt(res.data.data.roomList[0].depositNum) - 1;
+						this.chooseIndex = depositNumIndex;
 						console.log(this.list,depositNumIndex)
 						this.isEditRoom = true
 						this.info.rentPrice = res.data.data.roomList[0].roomPrice;
