@@ -38,7 +38,7 @@
 							v-on:change="change"
 							:selectHideType="'hideAll'">
 							</my-select> -->
-							<input  class="form-input" placeholder-class="form-input-placeholder" v-model="info.houseType" placeholder="请选择户型" @click="showList()"/>
+							<input  class="form-input" disabled="true" placeholder-class="form-input-placeholder" v-model="info.houseType" placeholder="请选择户型" @click="showList()"/>
 						</template>
 						<template v-slot:tip>
 							<image class="inpArrow" src="../../static/triangle.png" mode="aspectFit"></image>
