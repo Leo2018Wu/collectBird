@@ -1,0 +1,154 @@
+{
+	"pages": [
+		{
+			"path": "pages/home/home",
+			"style": {
+				"navigationBarTitleText": "收租鸟",
+				"enablePullDownRefresh": false,
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/renterManage/renterManage",
+			"style": {
+				"navigationBarTitleText": "租客管理"
+			}
+		},
+		{
+			"path": "pages/houseList/houseList",
+			"style": {
+				"navigationBarTitleText": "房源",
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/addRenter/addRenter",
+			"style": {
+				"navigationBarTitleText": "添加租客"
+			}
+		},
+		{
+			"path": "pages/roomDetail/roomDetail",
+			"style": {
+				"navigationBarTextStyle": "black",
+				"navigationBarTitleText": "房间详情",
+				"navigationBarBackgroundColor": "#FFFFFF"
+			}
+		},
+		{
+			"path": "pages/addRoomNum/addRoomNum",
+			"style": {
+				"navigationBarTitleText": "添加房号"
+			}
+		},
+		{
+			"path": "pages/addCommunity/addCommunity",
+			"style": {
+				"navigationBarTitleText": "添加房源"
+			}
+		},
+		{
+			"path": "pages/renter/renter",
+			"style": {
+				"navigationBarTextStyle": "white",
+				"navigationBarTitleText": "租客",
+				"backgroundColor": "#FFFFFF"
+			}
+		},
+		{
+			"path": "pages/billDetail/billDetail",
+			"style": {
+				"navigationBarTitleText": "账单明细"
+			}
+		},
+		{
+			"path": "pages/billRecord/billRecord",
+			"style": {
+				"navigationBarTitleText": "账单"
+			}
+		},
+		{
+			"path": "pages/houseDetail/houseDetail",
+			"style": {
+				"navigationBarTextStyle": "black",
+				"navigationBarTitleText": "房号",
+				"navigationBarBackgroundColor": "#FFFFFF"
+			}
+		},
+		{
+			"path": "pages/feedback/feedback",
+			"style": {
+				"navigationBarTextStyle": "black",
+				"navigationBarTitleText": "意见反馈",
+				"navigationBarBackgroundColor": "#FFFFFF"
+			}
+		},
+		{
+			"path": "pages/chooseLocation/chooseLocation",
+			"style": {}
+		},
+		{
+			"path": "pages/message/message",
+			"style": {}
+		},
+		{
+			"path": "pages/mine/mine",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"enablePullDownRefresh": false,
+				"disableScroll": true
+			}
+		},
+		{
+			"path": "pages/billManage/billManage",
+			"style": {
+				"navigationBarTextStyle": "#fff",
+				"navigationBarTitleText": "账单",
+				"navigationBarBackgroundColor": "#F09A42"
+			}
+		}
+	    ,{
+            "path" : "pages/aboutUs/aboutUs",
+            "style" : {
+				"navigationBarTextStyle": "#fff",
+				"navigationBarTitleText": "关于收租鸟",
+				"navigationBarBackgroundColor": "#F09A42"
+			}
+        }
+    ],
+	"permission": {
+		"scope.userLocation": {
+			"desc": "地图测试"
+		}
+	},
+	"globalStyle": {
+		"navigationBarTextStyle": "white",
+		"navigationBarTitleText": "收租鸟",
+		"navigationBarBackgroundColor": "#F09A42",
+		"backgroundColor": "#FAFAFA"
+	},
+	"tabBar": {
+		"selectedColor": "#FFA044",
+		"list": [
+			{
+				"pagePath": "pages/home/home",
+				"text": "首页",
+				"iconPath": "static/home0.png",
+				"selectedIconPath": "static/home1.png"
+			},
+			{
+				"pagePath": "pages/message/message",
+				"text": "消息",
+				"iconPath": "static/message0.png",
+				"selectedIconPath": "static/message1.png"
+			},
+			{
+				"pagePath": "pages/mine/mine",
+				"text": "我的",
+				"iconPath": "static/my0.png",
+				"selectedIconPath": "static/my1.png"
+			}
+		],
+		"color": "#777777"
+	}
+}
