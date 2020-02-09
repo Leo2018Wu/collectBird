@@ -1,24 +1,24 @@
 <template>
-	<view class="billDetail">
+	<view class="billDetail" v-if="init">
 		<view class="section0">
 			<view class="profitContainer">
 				<view class="profitBox">
 					<view class="profitBar">应收(元)</view>
 					<span>{{billInfo.total}}</span>
 				</view>
-				<view v-if="hasCheck" class="profitBox">
+				<view v-if="billInfo.billStatus == 4" class="profitBox">
 					<view class="profitBar">实收(元)</view>
-					<span>{{billInfo.takeMoney}}</span>
+					<span>{{billInfo.total}}</span>
 				</view>
 			</view>
 			<view class="houseAddr">新德公寓-202-快乐时光</view>
 		</view>
 		<view class="section1">
 			<view class="billStatus">
-				<image v-if="hasCheck" class="billStatusBg" src="../../static/hasCheck.png" mode="aspectFit"></image>
+				<image v-if="billInfo.billStatus == 4" class="billStatusBg" src="../../static/hasCheck.png" mode="aspectFit"></image>
 				<span class="billTitle">账单状态</span>
-				<span v-if="!hasCheck" class="statusDes0">未到账</span>
-				<span v-if="hasCheck" class="statusDes1">已到账</span>
+				<span v-if="billInfo.billStatus != 4" class="statusDes0">未到账</span>
+				<span v-if="billInfo.billStatus == 4" class="statusDes1">已到账</span>
 			</view>
 			<view class="billDateBox">
 				<view class="billDateLi">
@@ -29,11 +29,11 @@
 					<span class="billDateTitle">缴费周期</span>
 					<span class="billDate">{{billInfo.startDate.substr(0,10)}} ~ {{billInfo.endDate.substr(0,10)}}</span>
 				</view>
-					<view class="billDateLi" v-if="hasCheck">
+					<view class="billDateLi" v-if="billInfo.billStatus == 4">
 						<span class="billDateTitle">到账日期</span>
 						<span>{{billInfo.payRentDate.substr(0,10)}}</span>
 					</view>
-					<view class="billDateLi" v-if="hasCheck">
+					<view class="billDateLi" v-if="billInfo.billStatus == 4">
 						<span class="billDateTitle">收款方式</span>
 						<span class="billDate">现金</span>
 					</view>
@@ -77,7 +77,7 @@
 				<image class="sendIcon" src="../../static/sendBill.png" mode="aspectFit"></image>
 				<view>发送账单</view>
 			</view>
-			<view class="sureBtn">到账</view>
+			<view class="sureBtn" @click="checkMoney">到账</view>
 		</view>
 	</view>
 </template>
@@ -86,12 +86,14 @@
 	export default {
 		data() {
 			return {
-				hasCheck:true,
+				init:false,
+				billId:null,
 				billInfo:{}
 			}
 		},
 		onLoad(option) {
 			console.log(option)
+			this.billId = option.billId
 			this.getBillDetail(option.billId)
 		},
 		methods: {
@@ -103,7 +105,22 @@
 					_this.billInfo = res.data.data
 					console.log(_this.billInfo)
 					console.log(_this.billInfo.items)
-					_this.hasCheck = _this.billInfo.billStatus == 4 ? true : false
+					_this.init = true;
+				})
+			},
+			checkMoney(){
+				let _this = this;
+				_this.$request.post('/bill/updateStatus',{
+					id:_this.billId,
+					billStatus:'4',
+				}).then((res) =>{
+					console.log(res)
+					if(res.data.code == '200'){
+						uni.showToast({
+							title:'到账成功'
+						})
+					}
+					_this.getBillDetail(this.billId)
 				})
 			}
 		},
