@@ -126,6 +126,7 @@ export default {
 .mine {
 	height: 100vh;
 	width: 100%;
+	background-color: #FAFAFA;
 }
 .myContainer {
 	height: 114rpx;
@@ -150,7 +151,9 @@ export default {
 	justify-content: flex-start;
 	
 }
-
+.emptyBackground{
+	background-color: #FAFAFA;
+}
 .myPhoto {
 	width: 115rpx;
 	height: 115rpx;
@@ -417,7 +420,8 @@ export default {
 .modalLine {
 	width: 1rpx;
 	height: 89rpx;
-	border: 1rpx solid rgba(238, 238, 238, 1);
+	/* border: 1rpx solid rgba(238, 238, 238, 1); */
+	background-color: rgba(238, 238, 238, 1);
 	position: absolute;
 	top: 0%;
 	left: 50%;

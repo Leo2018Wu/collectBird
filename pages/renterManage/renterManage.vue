@@ -6,6 +6,7 @@
 			      在租租客
 			      <span>{{inRentTenantNum}}</span>
 			    </view>
+				<view class="headBarItemLine"></view>
 			    <view class="headBarItem">
 			      即将到期
 			      <span>{{aboutToExpire}}</span>
@@ -133,12 +134,17 @@
 	  margin-left: 20rpx;
 	  color: #f09a42;
 	}
-	.headBarItem:first-of-type {
+	.headBarItemLine{
+		width:1rpx;
+		height:65rpx;
+		background-color:rgba(223,220,220,1);
+	}
+/* 	.headBarItem:first-of-type {
 	  border-right: 1rpx solid #dfdcdc80;
 	}
 	.headBarItem:last-of-type {
 	  border-left: 1rpx solid #dfdcdc80;
-	}
+	} */
 	.section{
 		width: 100%;
 		background-color: #FFFFFF;

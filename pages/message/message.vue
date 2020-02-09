@@ -52,7 +52,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: flex-start;
-		border-bottom: 2rpx solid #F5F5F580;
+		
 
 	}
 	.content{
@@ -60,7 +60,8 @@
 		height:84rpx;
 		display: flex;
 		flex-direction: column;
-		justify-content: space-between
+		justify-content: space-between;
+		border-bottom: 2rpx solid rgba(245,245,245,1);
 	}
 	.messageIcon{
 		margin-right: 30rpx;

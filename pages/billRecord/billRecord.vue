@@ -1,6 +1,6 @@
 <template>
 	<view class="billRecord">
-		<view class="section1">
+		<view class="section1" @click="toRenter">
 			<renter-info-bar :userInfo="userInfo" v-on:emitUserId="getEmit"></renter-info-bar>
 		</view>
 		<!-- <view class="addBar">
@@ -50,12 +50,18 @@
 				userInfo:{},
 				// isHaveLatestBill:false,
 				returnBillRecord:[],
-				latestBill:[]
+				latestBill:[],
+				roomId:''
 			}
 		},
 		computed:{
 			
 			
+		},
+		onLoad(option) {
+			// this.communityInfo = JSON.parse(option.communityInfo)
+			// this.getRoomInfo(option.id)
+			this.roomId =option.id 
 		},
 		methods: {
 			getEmit(e){
@@ -95,6 +101,11 @@
 					// _this.checkIsHaveLatestBill(_this.returnBillRecord[0].endDate)
 				}).catch(err=>{
 					
+				})
+			},
+			toRenter(){
+				uni.navigateTo({
+					url:'../addRenter/addRenter?roomId='+this.roomId
 				})
 			}
 		},
