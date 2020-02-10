@@ -463,7 +463,7 @@ export default {
 
 .modalInput {
 	padding: 25rpx 0rpx 10rpx 0rpx;
-	border-bottom: 1rpx solid #eeeeee;
+	/* border-bottom: 1rpx solid #eeeeee; */
 	width: 80%;
 	text-align: center;
 	margin: 0 auto;

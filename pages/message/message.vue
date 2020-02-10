@@ -49,7 +49,7 @@
 
 <style scoped>
 	.message{
-		height: 100hv;
+		height: 100vh;
 		width: 100%;
 	}
 	.messageItem{
@@ -67,6 +67,7 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
+		padding: 10rpx;
 		/* border-bottom: 2rpx solid rgba(245,245,245,1); */
 	}
 	.messageIcon{
@@ -91,7 +92,7 @@
 	.bottom{
 		color: #999999;
 		font-size: 24rpx;
-		margin-bottom: 20rpx;
+		/* margin-bottom: 20rpx; */
 	}
 	.line{
 		width:618rpx;
