@@ -4,7 +4,8 @@
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form" :model="info">
 					<evan-form-item label="小区名" prop="name">
 						<template v-slot:main>
-							<input @click="chooseLocation" class="form-input" placeholder-class="form-input-placeholder" v-model="info.name" placeholder="请输入小区名" />
+							<view @click="chooseLocation(false)" class="form-input" :class="{'form-input-placeholder': myName == '请输入小区名'}">{{myName}}</view>
+							<!-- <input @click="chooseLocation(false)" class="form-input" placeholder-class="form-input-placeholder" v-model="info.name" placeholder="请输入小区名" /> -->
 						</template>
 						<template v-slot:tip>
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -12,7 +13,8 @@
 					</evan-form-item>
 					<evan-form-item label="详细地址" prop="addr">
 						<template v-slot:main>
-							<input @click="chooseLocation" class="form-input" placeholder-class="form-input-placeholder" v-model="info.addr" placeholder="请填写" />
+							<view @click="chooseLocation(true)" class="form-input textOverFlow" :class="{'form-input-placeholder': myAddr == '请输入地址'}">{{myAddr}}</view>
+							<!-- <input @click="chooseLocation(true)" class="form-input" placeholder-class="form-input-placeholder" :value="info.addr"  placeholder="请填写" /> -->
 						</template>
 						<template v-slot:tip>
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -108,14 +110,32 @@
 			})
 		},
 		computed:{
+			myName(){
+				if(this.isEdit){
+					return this.communityInfo.communityName
+				}else{
+					return this.$store.state.chooseLocationInfo.name ? this.$store.state.chooseLocationInfo.name : '请输入小区名';
+				}
+				
+			},
+			myAddr(){
+				if(this.isEdit){
+					return this.communityInfo.communityAddress
+				}else{
+					return this.$store.state.chooseLocationInfo.addr ? this.$store.state.chooseLocationInfo.addr : '请输入地址';
+				}
+				
+			}
 		},
+		
 		onUnload(){
 			this.$store.commit('chooseLocationInfo',{})
 		},
 		methods: {
-			chooseLocation(){
+			chooseLocation(e){
+					let url = e ? '../chooseLocation/chooseLocation?type='+'addr' : '../chooseLocation/chooseLocation'
 					uni.navigateTo({
-						url:'../chooseLocation/chooseLocation'
+						url
 					})
 			},
 			deleteComm(){
@@ -174,14 +194,14 @@
 				let postUrl = this.isEdit ? '/community/updateCommunity' : "/community/addCommunity"
 				let postPar = this.isEdit ? {
 							landlordId:_this.$store.state.landladyInfo.id,
-							communityAddress:_this.info.addr,
-							communityName:_this.info.name,
+							communityAddress:_this.myAddr,
+							communityName:_this.myName,
 							communityImgs:_this.imgArr.join(','),
 							id:this.communityInfo.id
 						} : {
 							landlordId:_this.$store.state.landladyInfo.id,
-							communityAddress:_this.info.addr,
-							communityName:_this.info.name,
+							communityAddress:_this.myAddr,
+							communityName:_this.myName,
 							communityImgs:_this.imgArr.join(','),
 						}
 						_this.$request.post(postUrl,postPar).then((data)=>{
@@ -190,6 +210,7 @@
 								title: '添加成功',
 								duration:1500,
 							})
+								this.$store.commit('chooseLocationInfo',{})
 							_this.refreshLastPage()
 							 
 						})
@@ -222,6 +243,7 @@
 		background-color: #FAFAFA;
 		position: relative;
 	}
+	
 	.content{
 		background-color: #FFFFFF;
 		padding: 0 40rpx;
@@ -238,6 +260,8 @@
 		height: 100%;
 		margin-left: auto;
 		text-align: right;
+		overflow: hidden;
+		max-width: 500rpx;
 	}
 	.uploadBlock{
 		width: 100%;

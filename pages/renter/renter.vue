@@ -105,8 +105,13 @@
 			},
 			getEmit(e){
 				console.log(e)
+				let communInfo = {
+					name:this.communityInfo.name,
+					houseNo:this.communityInfo.houseNo,
+					roomNo:this.communityInfo.roomNo
+				}
 				uni.navigateTo({
-					url:"../billRecord/billRecord?userInfo="+JSON.stringify(e)
+					url:"../billRecord/billRecord?userInfo="+JSON.stringify(e)+'&commInfo='+JSON.stringify(communInfo)+'&roomId='+this.roomId
 				})
 			},
 			addRenter(){
