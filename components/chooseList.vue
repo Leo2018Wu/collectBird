@@ -1,8 +1,9 @@
 <template>
 	<view class="chooseContainer" @click="aa">
+		<view class="mask"></view>
 			<view class="list">
 				<view class="title">
-					选择户型
+					{{title}}
 				</view>
 				<view class="chooseLi" :class="{active: currentIndex == index}" v-for="(item,index) in list" :key="index" @click="chooseLi(item,index)">
 					{{item}}
@@ -15,7 +16,14 @@
 <script>
 	export default {
 		props:{
-			list:[],
+			title:{
+				type:String,
+				"default":'选择户型'
+			},
+			list:{
+				type:Array,
+				"default":[]
+			},
 			currentChooseIndex:null
 		},
 		computed:{
@@ -51,10 +59,16 @@
 		position: fixed;
 		top: 0;
 		left: 0;
-		right: 0;
 		bottom: 0;
-		background-color: #00000030;
+		right: 0;
 		z-index: 99;
+	}
+	.mask{
+		position: absolute;
+		width: 100%;
+		height: 100%;
+		background-color: #000000;
+		opacity: 0.3;
 	}
 	.list{
 		text-align: center;
@@ -63,6 +77,7 @@
 		background-color: #FFFFFF;
 		border-radius: 20rpx;
 		position: absolute;
+		z-index: 100;
 		top: 50%;
 		left: 75rpx;
 		transform: translateY(-50%);

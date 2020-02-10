@@ -1,6 +1,6 @@
 <template>
 	<view class="">
-		<choose-list v-if="listShow" v-on:close="hideList" :currentChooseIndex="chooseIndex" :list="list" v-on:emitClick = "returnEmit"></choose-list>
+		<choose-list v-if="listShow" v-on:close="hideList" :currentChooseIndex="chooseIndex" :list="list" :title="'选择收租周期'" v-on:emitClick = "returnEmit"></choose-list>
 		<view class="roomDetail" v-if="!isEditRoom">
 			
 			<view class="bannerBox">
@@ -45,7 +45,7 @@
 								v-on:change="change"
 								:selectHideType="'hideAll'">
 								</my-select> -->
-								<input  class="form-input" disabled="true" @click="showList()" placeholder-class="form-input-placeholder" v-model="info.rentCycle" placeholder="请选择收租周期"  />
+								<input  class="form-input" disabled="true" @click="showList()" placeholder-class="form-input-placeholder" v-model="info.rentCycle"  placeholder="请选择收租周期"  />
 							</template>
 							<template v-slot:tip>
 								<image class="inpArrow" src="../../static/triangle.png" mode="aspectFit"></image>
@@ -126,7 +126,7 @@
 								v-on:change="change"
 								:selectHideType="'hideAll'">
 								</my-select> -->
-								<input  class="form-input" disabled="true" placeholder-class="form-input-placeholder" v-model="info.rentCycle" placeholder="请选择收租周期" @click="showList"/>
+								<input  class="form-input" disabled="true" placeholder-class="form-input-placeholder"  v-model="info.rentCycle" placeholder="请选择收租周期" @click="showList"/>
 							</template>
 							<template v-slot:tip>
 								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
