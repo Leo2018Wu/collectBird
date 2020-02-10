@@ -94,6 +94,14 @@
 			}
 		},
 		{
+			"path": "pages/help/help",
+			"style": {
+				"navigationBarTextStyle": "black",
+				"navigationBarTitleText": "帮助",
+				"navigationBarBackgroundColor": "#FFFFFF"
+			}
+		},
+		{
 			"path": "pages/mine/mine",
 			"style": {
 				"navigationBarTitleText": "我的",
