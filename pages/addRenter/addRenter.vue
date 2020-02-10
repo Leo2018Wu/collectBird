@@ -97,7 +97,7 @@
 				</view>
 				<evan-form-item label="收租周期" prop="rentCycle">
 					<template v-slot:main>
-								<my-select
+								<!-- <my-select
 								:list="list"
 								:clearable="false"
 								:showItemNum="5" 
@@ -108,8 +108,12 @@
 								v-on:blur="blur"
 								v-on:change="change"
 								:selectHideType="'hideAll'">
-								</my-select>
-								<input v-show="false" class="form-input" placeholder-class="form-input-placeholder" v-model="info2.rentCycle" placeholder="请输入户型" />
+								</my-select> -->
+								<choose-list v-if="listShow" v-on:close="hideList"  :list="list" :title="'选择收租周期'" v-on:emitClick = "returnEmit"></choose-list>
+								<input  class="form-input" disabled="true" placeholder-class="form-input-placeholder" v-model="info2.rentCycle"  placeholder="请选择收租周期" @click="showList"/>
+							</template>
+							<template v-slot:tip>
+								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 							</template>
 				</evan-form-item>
 				<evan-form-item label="每期交租" prop="rentUnitPrice">
@@ -170,6 +174,7 @@
 </template>
 
 <script>
+	import chooseList from '../../components/chooseList.vue'
 	import uImg from '../../components/uploadImg/uploadImg.vue'
 	import chnToNumber from '../../util/index'
 	import mySelect from '../../components/mySelect/mySelect.vue'
@@ -181,7 +186,8 @@
 			evanFormItem,
 			evanForm,
 			mySelect,
-			uImg
+			uImg,
+			chooseList
 		},
 		watch:{
 			
@@ -192,6 +198,7 @@
 		data() {
 			const currentDate = this.getDate()
 			return {
+				isEdit:false,
 				currentSex:0,
 				sexList:[
 					{
@@ -320,6 +327,12 @@
 			
 		},
 		onLoad(options) {
+			console.log(options)
+			if(options.userId){
+				console.log('我处于编辑状态',options.userId)
+				this.isEdit = true;
+				this.getUserInfo(options.userId);
+			}
 			this.commInfo = JSON.parse(options.commInfo) 
 			this.roomId = options.roomId;
 			this.$nextTick(() => {
@@ -330,6 +343,38 @@
 			this.getRentCycleList()
 		},
 		methods: {
+			getUserInfo(id){
+				this.$request.post('user/findOne',{id}).then((res)=>{
+					console.log('用户信息',res)
+					let data = res.data.data
+					this.info1.name = data.userName
+					this.info1.tel = data.phoneNumber
+					this.info1.IDNum     =data.idNumber
+					this.imgSideUrl      =data.idCardImg1
+					this.imgOtherSideUrl =data.idCardImg2
+					// this.info3.eleCost   =data.
+					// this.info3.waterCost =data.
+					// this.info3.netCost   =data.
+					// this.info2.startDate =data.
+					// this.info2.keepDate  =data.
+					// this.info2.rentUnitPrice =data.
+					// this.info2.deposit       =data.
+					// this.info2.rentCycle     =data.
+				})
+			},
+			showList(){
+				this.listShow = true;
+			},
+			hideList(){
+				this.listShow = false;
+			},
+			returnEmit(e){
+				console.log(e)
+				this.rentCycleList = chnToNumber.chnToNumber(e.newVal)
+				this.info2.rentCycle = e.newVal
+				this.chooseIndex = e.index
+				this.listShow = false;
+			},
 			radioChange(evt){
 				    for (let i = 0; i < this.sexList.length; i++) {
 				                if (this.sexList[i].value === evt.target.value) {
