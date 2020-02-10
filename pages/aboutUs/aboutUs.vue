@@ -12,7 +12,7 @@
 				</view>
 		</view>
 		<!-- 弹窗 -->
-		<view class="modal" v-show="flag"></view>
+		<view class="modal" v-show="flag" @click="closeModal"></view>
 		<view class="modalBox" v-show="flag">
 			<view class="modalTitle">通过微信联系我们</view>
 			<view class="wechatName">{{wechat}}</view>
@@ -43,9 +43,11 @@
 				        wx.showToast({
 				          title: '复制成功',
 				        });
-						this.flag = false;
 				      }
 				    });
+			},
+			closeModal(){
+				this.flag = false;
 			}
 		}
 	}
@@ -91,6 +93,7 @@
 		font-weight:500;
 		color:rgba(102,102,102,1);
 		line-height:36rpx;
+		margin-left: 15rpx;
 	}
 	/* 弹窗 */
 	.modal {

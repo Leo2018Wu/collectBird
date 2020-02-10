@@ -32,8 +32,10 @@
 				</view>
 			</view>
 		</view> -->
+		
+		<!-- v-if="isShowAddBtn" -->
 		<view class="section3" v-for="(item,index) in roomInfo.tenants" :key="index" >
-			<renter-info-bar v-if="!isShowAddBtn" :userInfo = "item" v-on:emitUserId="getEmit"></renter-info-bar>
+			<renter-info-bar :userInfo = "item" v-on:emitUserId="getEmit"></renter-info-bar>
 			
 		</view>
 		<view class="addRenterBox1"	v-if="isShowAddBtn">
@@ -61,7 +63,7 @@
 		},
 		data() {
 			return {
-				isShowAddBtn:true,
+				isShowAddBtn:false,
 				roomId:'',
 				communityInfo:{},
 				roomInfo:{},
@@ -89,10 +91,10 @@
 					console.log(res)
 					// _this.commonFacBarList = res.data.data.houseConfigure.split(',')
 					_this.roomInfo = res.data.data
-					if(_this.roomInfo.tenants){
-						if(_this.roomInfo.tenants.length != 0){
-						this.isShowAddBtn = false
-					}
+					if(_this.roomInfo.tenants && _this.roomInfo.tenants.length == 0){
+							this.isShowAddBtn = true;
+					}else{
+						this.isShowAddBtn = false;
 					}
 					console.log(_this.roomInfo)
 				})
@@ -123,6 +125,7 @@
 					url:'../addRenter/addRenter?roomId='+this.roomId+'&commInfo='+JSON.stringify(communInfo)
 				})
 			}
+			
 		}
 	}
 </script>

@@ -1,6 +1,6 @@
 <template>
 	<view class="billRecord">
-		<view class="section1">
+		<view class="section1" @click="toRenter">
 			<renter-info-bar :userInfo="userInfo" v-on:emitUserId="getEmit"></renter-info-bar>
 		</view>
 		<!-- <view class="addBar">
@@ -63,7 +63,6 @@
 			this.communityInfo = JSON.parse(options.commInfo)
 			this.getBillRecord(this.userInfo.id)
 		},
-		
 		methods: {
 			getEmit(e){
 				console.log(e)
@@ -103,7 +102,6 @@
 				}).catch(err=>{
 					
 				})
-
 			},
 		},
 	

@@ -89,7 +89,17 @@
 		},
 		{
 			"path": "pages/message/message",
-			"style": {}
+			"style": {
+				"navigationBarTitleText": "消息"
+			}
+		},
+		{
+			"path": "pages/help/help",
+			"style": {
+				"navigationBarTextStyle": "black",
+				"navigationBarTitleText": "帮助",
+				"navigationBarBackgroundColor": "#FFFFFF"
+			}
 		},
 		{
 			"path": "pages/mine/mine",

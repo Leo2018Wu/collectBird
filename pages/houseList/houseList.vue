@@ -6,6 +6,7 @@
           在租房间
           <span>{{!landladyInfo.rentNum ? 0 : landladyInfo.rentNum }}</span>
         </view>
+		<view class="secBarItemLine"></view>
         <view class="secBarItem">
           闲置房间
           <span>{{!landladyInfo.idleNum ? 0 : landladyInfo.idleNum}}</span>
@@ -234,9 +235,16 @@ export default {
   font-weight: 800;
   margin-left: 20rpx;
 }
-.secBarItem:first-of-type {
-  border-right: 1rpx solid #dfdcdc80;
+.secBarItemLine{
+	width:1rpx;
+	height:65rpx;
+	/* border:3px solid rgba(223,220,220,1); */
+	background-color: rgba(223,220,220,1);
 }
+
+/* .secBarItem:first-of-type {
+  border-right: 1rpx solid #dfdcdc80;
+} */
 .secBarItem:first-of-type span {
   color: #f09a42;
 }
