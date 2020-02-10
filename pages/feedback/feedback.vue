@@ -5,7 +5,7 @@
  			<view class="feedbackTypes">
  				<view
  				    class="feedbackType"
- 				    @click="changeIndex(index)"
+ 				    @click="changeIndex(item,index)"
  				    v-for="(item,index) in arr1"
  					:key="index"
  				    :class="{active : currentIndex == index}">{{item}}
@@ -17,7 +17,7 @@
  						<evan-form-item  prop="questionCommit">
  							<template v-slot:main>
  								<!-- <input @click="chooseLocation" class="form-input" placeholder-class="form-input-placeholder" v-model="info.name" placeholder="请输入小区名" /> -->
- 								<textarea value="" class="form-textarea" placeholder="请输入内容最多300字" maxlength="300"  placeholder-class="form-input-placeholder"/>
+ 								<textarea value="" class="form-textarea" v-model="info.questionCommit" placeholder="请输入内容最多300字" maxlength="300"  placeholder-class="form-input-placeholder"/>
  							</template>
  						</evan-form-item>
  				</evan-form>
@@ -42,14 +42,17 @@
  		data() {
  			return {
  				arr1:['打不开页面','闪退问题','支付问题','登录与注册','其他问题','新建议'],
- 				// arr2:[],
  				currentIndex: 0,
+				feedbackType:'打不开页面',
  				questionCommit:'',
+				info:{
+					questionCommit:'',
+				},
  				rules:{
  					questionCommit:{
  						required:true,
  						message:"请输入你在使用收租鸟时的问题"
- 					},
+ 					}
  				}
  			}
  		},
@@ -59,30 +62,39 @@
  			})
  		},
  		methods: {
- 			changeIndex(index){
- 				console.log(index);
+ 			changeIndex(item,index){
+ 				console.log(item,index);
+				this.feedbackType = item
  				this.currentIndex = index;
  			},
  			commit(){
- 				let _this = this;
- 				uni.showLoading({
- 					title:'正在提交'
- 				})
- 				this.$refs.form.validate((res) => {
- 					if (res) {
- 						_this.$request.post().then(res=>{
- 							console.log(res)
- 							uni.showToast({
- 								title:'提交成功',
- 							})
- 						}).catch(()=>{
- 							uni.hideLoading()
- 						})
- 					}
- 				})
- 			}
+				let _this = this;
+				uni.showLoading({
+					title:'正在提交'
+				})
+				this.$refs.form.validate((res) => {
+					console.log();
+					let v={
+						createUser:"ab8afaed-31f7-11ea-91b8-525400bc2088",
+						type:this.feedbackType,
+						reason:this.info.questionCommit
+					}
+					console.log(v);
+					if (res) {
+						_this.$request.post('/feedback/addFeedBack',v).then(res=>{
+							console.log(res)
+							uni.showToast({
+								title:'提交成功',
+							});
+							this.feedbackType='打不开页面';
+							this.info.questionCommit = '';
+						}).catch(()=>{
+							uni.hideLoading()
+						})
+					}
+				})
+			}
  		}
- 		
  	}
  </script>
  

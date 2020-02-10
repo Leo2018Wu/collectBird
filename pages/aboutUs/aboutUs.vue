@@ -93,6 +93,7 @@
 		font-weight:500;
 		color:rgba(102,102,102,1);
 		line-height:36rpx;
+		margin-left: 15rpx;
 	}
 	/* 弹窗 */
 	.modal {

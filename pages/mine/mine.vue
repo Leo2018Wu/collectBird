@@ -6,13 +6,13 @@
 					<view class=""><image class="myPhoto" src="../../static/el.jpg"></image></view>
 					<view class="detail">
 						<view class="detailTop">
-							<view class="myName">{{ mine }}</view>
+							<view class="myName">{{ userName }}</view>
 							<view class="myLevel">
 								<image class="levelIcon" src="../../static/queen.png"></image>
 								<view class="levelText">{{ myLevel }}</view>
 							</view>
 						</view>
-						<view class="detailBottom">邀请码: {{ invitationCode }}</view>
+						<view class="detailBottom">邀请码: {{ usedInviCode }}</view>
 					</view>
 				</view>
 			</view>
@@ -35,7 +35,7 @@
 				<view class="leftPart">
 					<image class="jumpPortalImg" src="../../static/myIcon1.png" mode=""></image>
 					<view class="jumpPortalText">填写邀请码</view>
-					<view class="modalNum">{{modalNum}}</view>
+					<view class="modalNum">{{usedInviCode}}</view>
 				</view>
 				<view class="rightPart"><image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image></view>
 			</view>
@@ -53,7 +53,7 @@
 				</view>
 				<view class="rightPart"><image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image></view>
 			</view>
-			<view class="jumpPortalitem">
+			<view class="jumpPortalitem" @click="openHelp">
 				<view class="leftPart">
 					<image class="jumpPortalImg" src="../../static/myIcon3.png" mode=""></image>
 					<view class="jumpPortalText">帮助</view>
@@ -73,15 +73,28 @@
 		<view class="modalBox" v-show="flag">
 			<view class="modalTitle">填写邀请码</view>
 			<view class="modalContent">
-				<view class="modalInput"><input type="text" value="" placeholder="请输入邀请码" style="font-size: 30rpx;" /></view>
-				<view class="reminder">
-					<view class="reminderSymbol">!</view>
-					<view class="reminderText">邀请码仅填写一次</view>
+				<!-- <view class="modalInput">
+					<input type="text" value="" placeholder="请输入邀请码" style="font-size: 30rpx;" />
+				</view> -->
+				<view class="modalInput">
+					<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form" :model="info">
+							<evan-form-item  prop="invitationCode">
+								<template v-slot:main>
+									<!-- <input @click="chooseLocation" class="form-input" placeholder-class="form-input-placeholder" v-model="info.name" placeholder="请输入小区名" /> -->
+									<input type="text" value="" v-model="info.invitationCode" placeholder="请输入邀请码" style="font-size: 30rpx;" />
+								</template>
+							</evan-form-item>
+					</evan-form>
+					<view class="reminder">
+						<view class="reminderSymbol">!</view>
+						<view class="reminderText">邀请码仅填写一次</view>
+					</view>
+					
 				</view>
 				<view class="button">
-					<view class="btn_cancle" @click="powerDrawer" data-statu="close">取消</view>
+					<view class="btn_cancle" @click="cancle()" data-statu="close">取消</view>
 					<view class="modalLine"></view>
-					<view class="btn_ok active" @click="powerDrawer" data-statu="open">确定</view>
+					<view class="btn_ok active" @click="submit()" data-statu="open">确定</view>
 				</view>
 			</view>
 		</view>
@@ -89,20 +102,69 @@
 </template>
 
 <script>
+	import evanFormItem from '../../components/evan-form/evan-form-item.vue'
+	import evanForm from '../../components/evan-form/evan-form.vue'
+	
 export default {
+	components:{
+		evanFormItem,
+		evanForm
+	},
 	data() {
 		return {
-			mine: '璐璐',
+			userName: '璐璐',
+			usedInviCode:'',
 			myLevel: 'LV 1',
-			invitationCode: '2568',
 			residue: '89',
 			dateDue: '2020-09-05到期',
-			flag: false,
-			modalNum:'2568',
+			flag: false,  // 是否显示弹窗
+			// modalNum:'2568',
+			info:{
+				invitationCode: '',
+			},
+			rules:{
+				invitationCode:{
+					required:true,
+					message:"请填写邀请码"
+				}
+			}
 		};
 	},
+	onLoad(options){
+		this.getMineMsg()
+		this.$nextTick(() => {
+			this.$refs.form.setRules(this.rules)
+		})
+	},
+	onShow() {
+	  this.getMineMsg()
+	},
 	methods: {
-		powerDrawer() {
+		getMineMsg() {
+		  let _this = this;
+		  _this.$request
+		    .post("/user/findOne", {
+		      id: "ab8afaed-31f7-11ea-91b8-525400bc2088"
+		    })
+		    .then(res => {
+		      console.log(res.data.data);
+			  let myMsgs = res.data.data
+			  this.userName = myMsgs.userName
+			  this.usedInviCode=myMsgs.usedInviCode
+			  // this.myLevel=myMsgs.myLevel
+			  // this.residue=myMsgs.residue
+			  // this.ateDue=myMsgs.ateDue
+		      // _this.unIncome = res.data.data.unIncome;
+		      // _this.income = res.data.data.income;
+		    })
+		    .catch(err => {
+		      console.log(err);
+		    });
+		},
+		isNumber(value){
+			return typeof value === 'number' && !isNaN(value)
+		},
+		cancle() {
 			this.flag = false;
 		},
 		openNewsInvitationCode(e) {
@@ -117,9 +179,42 @@ export default {
 			uni.navigateTo({
 				url: '../aboutUs/aboutUs'
 			});
+		},
+		openHelp(e){
+			uni.navigateTo({
+				url: '../help/help'
+			});
+		},
+		submit(){
+			let _this = this;
+			uni.showLoading({
+				title:'正在提交'
+			})
+			// console.log(this.info.invitationCode && isNumber(this.info.invitationCode))
+			this.$refs.form.validate(res => {
+				let v= {
+					id:"ab8afaed-31f7-11ea-91b8-525400bc2088",
+					usedInviCode:this.info.invitationCode
+				}
+				this.$request.post('/user/useInviCode',v).then(res=>{
+					console.log(res);
+					if(res){
+						uni.showToast({
+							title:'提交成功',
+						});
+						this.info.invitationCode = '';
+						this.flag = false;
+						this.getMineMsg();
+					}
+					
+				}).catch(()=>{
+					uni.hideLoading()
+				})
+			})
 		}
+			
 	}
-};
+}
 </script>
 
 <style>
@@ -367,7 +462,7 @@ export default {
 }
 
 .modalInput {
-	padding: 60rpx 40rpx 10rpx 40rpx;
+	padding: 25rpx 0rpx 10rpx 0rpx;
 	border-bottom: 1rpx solid #eeeeee;
 	width: 80%;
 	text-align: center;

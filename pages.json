@@ -89,7 +89,9 @@
 		},
 		{
 			"path": "pages/message/message",
-			"style": {}
+			"style": {
+				"navigationBarTitleText": "消息"
+			}
 		},
 		{
 			"path": "pages/mine/mine",
