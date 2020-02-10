@@ -12,7 +12,8 @@
 			<image class="locationImg1" src="../../static/location.png" mode="aspectFit"></image>
 			<span>{{currentCity}}</span>
 			<image class="locationImg2" src="../../static/locationRIght.png" mode="aspectFit"></image>
-			<input class="inputClass textOverFlow" auto-focus="true" @input="getsuggest" v-model="inputValue"  placeholder="小区/公寓名" placeholder-class="inputPlaceHolder"/>
+			<input v-if="!isCommunity" class="inputClass textOverFlow" auto-focus="true" @input="getsuggest" v-model="inputValue"  placeholder="小区/公寓名" placeholder-class="inputPlaceHolder"/>
+			<input v-else class="inputClass textOverFlow" auto-focus="true" @input="getsuggest" v-model="inputValue"  placeholder="地址" placeholder-class="inputPlaceHolder"/>
 		</view>
 	</view>
     <view v-for="(item,index) in suggestion" :key="index" class="locationList">
@@ -31,6 +32,7 @@ import QQMapWX from "../../libs/qqmap-wx-jssdk.js";
 export default {
   data() {
     return {
+		isCommunity:false,
       inputValue: "",
       suggestion: [],
       currentCity: "",
@@ -55,7 +57,11 @@ export default {
 	  
     };
   },
-  onLoad() {
+  onLoad(options) {
+	  console.log(options)
+	  if(options.type == 'addr'){
+		  this.isCommunity = true
+	  }
     let _this = this;
     // 实例化API核心类
     qqmapsdk = new QQMapWX({

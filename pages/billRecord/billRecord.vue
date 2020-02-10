@@ -51,24 +51,24 @@
 				// isHaveLatestBill:false,
 				returnBillRecord:[],
 				latestBill:[],
-				roomId:''
+				roomId:'',
+				communityInfo:{}
 			}
 		},
-		computed:{
-			
-			
-		},
-		onLoad(option) {
-			// this.communityInfo = JSON.parse(option.communityInfo)
-			// this.getRoomInfo(option.id)
-			this.roomId =option.id 
+
+		onLoad(options) {
+			console.log(options)
+			this.roomId = options.roomId;
+			this.userInfo = JSON.parse(options.userInfo) 
+			this.communityInfo = JSON.parse(options.commInfo)
+			this.getBillRecord(this.userInfo.id)
 		},
 		methods: {
 			getEmit(e){
 				console.log(e)
-				// uni.navigateTo({
-				// 	url:"../billRecord/billRecord?userInfo="+JSON.stringify(e)
-				// })
+				uni.navigateTo({
+					url:'../addRenter/addRenter?commInfo='+JSON.stringify(this.communityInfo)+'&roomId='+this.roomId+'&userId='+this.userInfo.id
+				})
 			},
 			showBillDetail(id){
 				uni.navigateTo({
@@ -103,17 +103,8 @@
 					
 				})
 			},
-			toRenter(){
-				uni.navigateTo({
-					url:'../addRenter/addRenter?roomId='+this.roomId
-				})
-			}
 		},
-		onLoad(options) {
-			console.log(options)
-			this.userInfo = JSON.parse(options.userInfo) 
-			this.getBillRecord(this.userInfo.id)
-		}
+	
 	}
 </script>
 
