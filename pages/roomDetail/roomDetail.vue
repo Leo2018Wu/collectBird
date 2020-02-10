@@ -1,6 +1,8 @@
 <template>
 	<view class="">
+		<choose-list v-if="listShow" v-on:close="hideList" :currentChooseIndex="chooseIndex" :list="list" v-on:emitClick = "returnEmit"></choose-list>
 		<view class="roomDetail" v-if="!isEditRoom">
+			
 			<view class="bannerBox">
 				<span>上传图片</span>
 				<view class="changeBtn" @click="deleteImg">修改</view>
@@ -31,7 +33,7 @@
 					</evan-form-item>
 					<evan-form-item label="收租周期" prop="rentCycle">
 							<template v-slot:main>
-								<my-select
+								<!-- <my-select
 								:list="list"
 								:clearable="false"
 								:showItemNum="5" 
@@ -42,8 +44,11 @@
 								v-on:blur="blur"
 								v-on:change="change"
 								:selectHideType="'hideAll'">
-								</my-select>
-								<input v-show="false" class="form-input" placeholder-class="form-input-placeholder" v-model="info.rentCycle" placeholder="请输入户型" />
+								</my-select> -->
+								<input  class="form-input" disabled="true" @click="showList()" placeholder-class="form-input-placeholder" v-model="info.rentCycle" placeholder="请选择收租周期"  />
+							</template>
+							<template v-slot:tip>
+								<image class="inpArrow" src="../../static/triangle.png" mode="aspectFit"></image>
 							</template>
 					</evan-form-item>
 				</view>
@@ -108,7 +113,7 @@
 					</evan-form-item>
 					<evan-form-item label="收租周期" prop="rentCycle">
 							<template v-slot:main>
-								<my-select
+								<!-- <my-select
 								:list="list"
 								:clearable="false"
 								:showItemNum="5" 
@@ -120,8 +125,11 @@
 								v-on:blur="blur"
 								v-on:change="change"
 								:selectHideType="'hideAll'">
-								</my-select>
-								<input v-show="false" class="form-input" placeholder-class="form-input-placeholder" v-model="info.rentCycle" placeholder="请输入户型" />
+								</my-select> -->
+								<input  class="form-input" disabled="true" placeholder-class="form-input-placeholder" v-model="info.rentCycle" placeholder="请选择收租周期" @click="showList"/>
+							</template>
+							<template v-slot:tip>
+								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 							</template>
 					</evan-form-item>
 				</view>
@@ -165,15 +173,18 @@
 	import evanFormItem from '../../components/evan-form/evan-form-item.vue'
 	import evanForm from '../../components/evan-form/evan-form.vue'
 	import inputBar from '../../components/inputBar.vue'
+	import chooseList from '../../components/chooseList.vue'
 	export default {
 		components:{
 			inputBar,
 			evanFormItem,
 			evanForm,
-			mySelect
+			mySelect,
+			chooseList
 		},
 		data() {
 			return {
+				chooseIndex:null,
 				list: [      //要展示的数据
 					'押一付一',
 					'押二付一',
@@ -232,9 +243,25 @@
 			this.getRentCycleList()
 		},
 		onShow(){
-			this.getHouseInfo(this.houseInfo.houseId)
+			let _this = this
+			setTimeout(()=>{
+				_this.getHouseInfo(this.houseInfo.houseId)
+			},800)
+			
 		},
 		methods: {
+			showList(){
+				this.listShow = true;
+			},
+			hideList(){
+				this.listShow = false;
+			},
+			returnEmit(e){
+				this.rentCycleList = chnToNumber.chnToNumber(e.newVal)
+				this.info.rentCycle = e.newVal
+				this.chooseIndex = e.index
+				this.listShow = false;
+			},
 			//查询以保存的房号信息
 			getHouseInfo(id){
 				this.$request.post('/house/findById',{
@@ -254,15 +281,18 @@
 					console.log(res.data.data.roomList)
 							if(res.data.data.roomList.length != 0){
 						//处于编辑房间状态  
+						let depositNumIndex = parseInt(res.data.data.roomList[0].depositNum) - 1;
+						this.chooseIndex = depositNumIndex;
+						console.log(this.list,depositNumIndex)
 						this.isEditRoom = true
 						this.info.rentPrice = res.data.data.roomList[0].roomPrice;
 						this.rentCycleList[0]="1";//付月租数量
 						this.rentCycleList[1] = res.data.data.roomList[0].depositNum;//押金数量
-						this.info.rentCycle = this.list[res.data.data.roomList[0].depositNum - 1];
-						this.initValue = this.list[res.data.data.roomList[0].depositNum - 1];
+						// this.initValue = this.list[res.data.data.roomList[0].depositNum - 1];
 						this.info.elecCost = res.data.data.roomList[0].eleUnitPrice;
 						this.info.waterCost = res.data.data.roomList[0].waterUnitPrice;
 						this.info.netCost = res.data.data.roomList[0].netCost;
+						this.info.rentCycle = this.list[depositNumIndex];
 						console.log(this.info,this.isEditRoom)
 						console.log('dsdnadnasi',this.list,res.data.data.roomList[0].depositNum)
 						console.log(this.rentCycleList)
