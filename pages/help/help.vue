@@ -103,7 +103,7 @@
 	.question{
 		font-size:32rpx;
 		font-family:PingFang SC;
-		font-weight:500;
+		font-weight:400;
 		color:rgba(51,51,51,1);
 		line-height:36rpx;
 	}
@@ -137,7 +137,7 @@
 	.detailText{
 		font-size:30rpx;
 		font-family:PingFang SC;
-		font-weight:500;
+		font-weight:400;
 		color:rgba(51,51,51,1);
 		line-height:40rpx;
 		display: inline-block;
