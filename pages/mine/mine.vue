@@ -3,16 +3,17 @@
 		<view class="topContent">
 			<view class="myMsg">
 				<view class="myContainer">
-					<view class=""><image class="myPhoto" src="../../static/el.jpg"></image></view>
+					 <!-- ../../static/el.jpg -->
+					<view class=""><image class="myPhoto" :src="userImg"></image></view>
 					<view class="detail">
 						<view class="detailTop">
 							<view class="myName">{{ userName }}</view>
 							<view class="myLevel">
 								<image class="levelIcon" src="../../static/queen.png"></image>
-								<view class="levelText">{{ myLevel }}</view>
+								<view class="levelText">LV{{ level }}</view>
 							</view>
 						</view>
-						<view class="detailBottom">邀请码: {{ usedInviCode }}</view>
+						<view class="detailBottom">邀请码: {{ inviCode }}</view>
 					</view>
 				</view>
 			</view>
@@ -20,13 +21,13 @@
 			<view class="houseTotalMsg">
 				<view class="leftMsg">
 					<view class="leftMsgTitle">剩余天数</view>
-					<view class="leftMsgValue">{{ residue }}</view>
-					<view class="leftMsgDate">{{ dateDue }}</view>
+					<view class="leftMsgValue">{{ remainDay }}</view> 
+					<view class="leftMsgDate">{{ trialDate }}到期</view>
 				</view>
 				<view class="line"></view>
 				<view class="rightMsg">
 					<view class="rightMsgTitle">房号容量</view>
-					<view class="rightMsgValue">28</view>
+					<view class="rightMsgValue">{{roomNum}}</view>
 				</view>
 			</view>
 		</view>
@@ -35,7 +36,7 @@
 				<view class="leftPart">
 					<image class="jumpPortalImg" src="../../static/myIcon1.png" mode=""></image>
 					<view class="jumpPortalText">填写邀请码</view>
-					<view class="modalNum">{{usedInviCode}}</view>
+					<view class="modalNum">{{inviCode}}</view>
 				</view>
 				<view class="rightPart"><image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image></view>
 			</view>
@@ -112,13 +113,15 @@ export default {
 	},
 	data() {
 		return {
-			userName: '璐璐',
-			usedInviCode:'',
-			myLevel: 'LV 1',
-			residue: '89',
-			dateDue: '2020-09-05到期',
+			userName: '',
+			userImg:'',
+			roomNum:'28',
+			inviCode:'', // 我的邀请码
+			usedInviCode:'',//填写邀请码
+			level: '',
+			remainDay: '', //剩余天数
+			trialDate: '',
 			flag: false,  // 是否显示弹窗
-			// modalNum:'2568',
 			info:{
 				invitationCode: '',
 			},
@@ -148,21 +151,18 @@ export default {
 		    })
 		    .then(res => {
 		      console.log(res.data.data);
-			  let myMsgs = res.data.data
-			  this.userName = myMsgs.userName
-			  this.usedInviCode=myMsgs.usedInviCode
-			  // this.myLevel=myMsgs.myLevel
-			  // this.residue=myMsgs.residue
-			  // this.ateDue=myMsgs.ateDue
-		      // _this.unIncome = res.data.data.unIncome;
-		      // _this.income = res.data.data.income;
+			  let myMsgs = res.data.data;
+			  this.userName = myMsgs.userName;
+			  this.usedInviCode=myMsgs.usedInviCode;
+			  this.level=myMsgs.level;
+			  this.userImg = myMsgs.userImg;
+			  this.inviCode = myMsgs.inviCode;
+			  this.trialDate = myMsgs.trialDate;
+			  this.remainDay = myMsgs.remainDay;
 		    })
 		    .catch(err => {
 		      console.log(err);
 		    });
-		},
-		isNumber(value){
-			return typeof value === 'number' && !isNaN(value)
 		},
 		cancle() {
 			this.flag = false;
