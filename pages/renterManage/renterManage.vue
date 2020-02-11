@@ -63,6 +63,7 @@
 				})
 			},
 			goRenter(item,name){
+				console.log(item)
 				let communityInfo = {}
 				communityInfo.name = name
 				communityInfo.houseNo = item.map.houseNo
@@ -71,7 +72,7 @@
 				communityInfo.toiletNum = item.map.toiletNum
 				communityInfo.roomNo = item.map.roomNo
 				communityInfo.roomPrice = item.map.roomPrice
-				let id = item.id
+				let id = item.map.roomId
 				uni.navigateTo({
 					url:'../renter/renter?id='+id+'&communityInfo='+JSON.stringify(communityInfo)
 				})
@@ -83,6 +84,12 @@
 				}).then((res)=>{
 					console.log(res)
 					this.renterList = res.data.data;
+					this.renterList.forEach((item,index)=>{
+						item.tenantList.sort(function(newVal,oldVal){
+							console.log(newVal,oldVal)
+							return newVal.map.buildingNo - oldVal.map.buildingNo
+						})
+					})
 				})
 			},
 			showRenterList(index){

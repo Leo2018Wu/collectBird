@@ -7,7 +7,7 @@
 				<view class="infoTop">
 					<span>{{userInfo.userName}}</span>
 					<image class="renterSex" v-if="userInfo.userSex == 0" src="../static/male.png" mode="aspectFit"></image>
-					<image class="renterSex" v-else src="../static/male.png" mode="aspectFit"></image>
+					<image class="renterSex" v-else src="../static/female.png" mode="aspectFit"></image>
 				</view>
 				<view class="infoBottom textOverFlow">
 					{{userInfo.phoneNumber}}
