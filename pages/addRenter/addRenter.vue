@@ -109,7 +109,7 @@
 								v-on:change="change"
 								:selectHideType="'hideAll'">
 								</my-select> -->
-								<choose-list v-if="listShow" v-on:close="hideList"  :list="list" :title="'选择收租周期'" v-on:emitClick = "returnEmit"></choose-list>
+								<choose-list v-if="listShow" :currentChooseIndex="chooseIndex" v-on:close="hideList"  :list="list" :title="'选择收租周期'" v-on:emitClick = "returnEmit"></choose-list>
 								<input  class="form-input" disabled="true" placeholder-class="form-input-placeholder" v-model="info2.rentCycle"  placeholder="请选择收租周期" @click="showList"/>
 							</template>
 							<template v-slot:tip>
@@ -118,7 +118,7 @@
 				</evan-form-item>
 				<evan-form-item label="每期交租" prop="rentUnitPrice">
 					<template v-slot:main>
-								<input class="form-input" placeholder-class="form-input-placeholder" v-model="info2.rentUnitPrice" placeholder="请输入" @input="espInput" />
+								<input class="form-input" type="number" placeholder-class="form-input-placeholder" v-model="info2.rentUnitPrice" placeholder="请输入" @input="espInput" />
 							</template>
 							<template v-slot:tip>
 								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -198,6 +198,9 @@
 		data() {
 			const currentDate = this.getDate()
 			return {
+				userId:null,
+				renterId:null,
+				chooseIndex:null,
 				isEdit:false,
 				currentSex:0,
 				sexList:[
@@ -298,6 +301,7 @@
 					},
 				},
 				info3:{
+					ele:'1元/度',
 					eleCost:'',
 					waterCost:'30',
 					netCost:'30',
@@ -326,11 +330,24 @@
 			}
 			
 		},
+		watch:{
+			rentCycleList(newVal,oldVal){
+				console.log(newVal,oldVal)
+				this.espInput()
+				// this.info2.deposit = this.info2.rentUnitPrice / this.newVal[0]
+				// console.log(this.info2.rentUnitPrice)
+				// console.log(this.info2.deposit)
+			}
+		},
 		onLoad(options) {
 			console.log(options)
 			if(options.userId){
 				console.log('我处于编辑状态',options.userId)
 				this.isEdit = true;
+				this.userId = options.userId
+				uni.setNavigationBarTitle({
+				    title: '编辑租客'
+				});
 				this.getUserInfo(options.userId);
 			}
 			this.commInfo = JSON.parse(options.commInfo) 
@@ -344,22 +361,35 @@
 		},
 		methods: {
 			getUserInfo(id){
-				this.$request.post('user/findOne',{id}).then((res)=>{
+				this.$request.post('roomUser/findById',{
+					tenantId:id
+				}).then((res)=>{
 					console.log('用户信息',res)
 					let data = res.data.data
-					this.info1.name = data.userName
-					this.info1.tel = data.phoneNumber
-					this.info1.IDNum     =data.idNumber
+					console.log(data.tenantIdNumber)
+					let rentIndex = parseInt(data.payRentCycle) - 1; 
+					console.log(rentIndex)
+					this.chooseIndex = rentIndex;
+					this.renterId = data.id;
+					this.info1.name = data.tenantName;
+					this.info1.tel = data.tenantPhone;
+					this.info1.IDNum     =data.tenantIdNumber;
 					this.imgSideUrl      =data.idCardImg1
 					this.imgOtherSideUrl =data.idCardImg2
-					// this.info3.eleCost   =data.
-					// this.info3.waterCost =data.
-					// this.info3.netCost   =data.
-					// this.info2.startDate =data.
-					// this.info2.keepDate  =data.
-					// this.info2.rentUnitPrice =data.
-					// this.info2.deposit       =data.
-					// this.info2.rentCycle     =data.
+					this.info3.eleCost   =data.eleUnitPrice;//
+					this.info3.waterCost =data.waterPrice;//
+					this.info3.netCost   =data.netPrice;//
+					this.info2.startDate =data.startDate.substr(0,10); 
+					this.info2.keepDate  =data.endDate.substr(0,10); 
+					this.info2.rentUnitPrice =data.rentPrice; 
+					this.info2.deposit       =data.depositAmount; 
+					this.info2.rentCycle     = this.list[rentIndex]; 
+					this.rentCycleList[0] = data.payRentCycle;
+					this.rentCycleList[1] = data.depositNum;
+					// this.currentSex = data.tenantSex;
+					this.radioChange({target:{value:data.tenantSex}})
+					this.chooseLi(data.rentMonthNum)
+					this.rentMonthNum = data.rentMonthNum
 				})
 			},
 			showList(){
@@ -371,20 +401,25 @@
 			returnEmit(e){
 				console.log(e)
 				this.rentCycleList = chnToNumber.chnToNumber(e.newVal)
+				console.log('大家好啊',this.rentCycleList)
 				this.info2.rentCycle = e.newVal
 				this.chooseIndex = e.index
 				this.listShow = false;
 			},
 			radioChange(evt){
+				console.log(evt)
 				    for (let i = 0; i < this.sexList.length; i++) {
-				                if (this.sexList[i].value === evt.target.value) {
-				                    this.currentSex = i;
+				                if (this.sexList[i].value == evt.target.value) {
+				                    this.currentSex = this.sexList[i].value;
 				                    break;
 				                }
 				            }
+							// this.currentSex = evt.target.value;
 			},
 			save(){
 				let _this = this;
+				
+				let postUrl = this.isEdit ? '/roomUser/update' : '/roomUser/signTenant'
 				let par = {
 					roomId:_this.roomId,
 					tenantName:_this.info1.name,
@@ -394,7 +429,7 @@
 					tenantIdNumber:_this.info1.IDNum,
 					idCardImg1:_this.imgSideUrl,
 					idCardImg2:_this.imgOtherSideUrl,
-					eleUnitPrice:_this.info3.ele,
+					eleUnitPrice:'1',
 					elePrevNum:_this.info3.eleCost,
 					waterPrice:_this.info3.waterCost,
 					netPrice:_this.info3.netCost,
@@ -405,7 +440,11 @@
 					rentPrice:_this.info2.rentUnitPrice,
 					depositAmount:_this.info2.deposit,
 					depositNum:_this.rentCycleList[1],
-					sex:this.currentSex,//性别字段
+					tenantSex:this.currentSex,//性别字段
+				}
+				if(this.isEdit){
+					par.id = this.renterId;
+					par.tenantId = this.userId;
 				}
 				if(!(_this.imgSideUrl && _this.imgOtherSideUrl)){
 					uni.showToast({
@@ -421,21 +460,23 @@
 							if(res2){
 								_this.$refs.form3.validate((res3) =>{
 									if(res3){
-										_this.$request.post('/roomUser/signTenant',par).then((responce)=>{
+										_this.$request.post(postUrl,par).then((responce)=>{
+											let tipContent = this.isEdit ? '编辑成功' : '添加成功'
 											uni.showToast({
-												title:'添加成功'
+												title:tipContent
 											})
-											setTimeout(() => {
-																			let pages = getCurrentPages();
-																		    if (pages.length > 1) {
-																		        let beforePage = pages[pages.length - 2];
-																					console.log(beforePage)
-																		            beforePage.$vm.updateData()
-																		            uni.navigateBack({
-																		                delta: 1,
-																		            })
-																		        }
-																		}, 1500);
+												setTimeout(() => {
+																				let pages = getCurrentPages();
+																			    if (pages.length > 1) {
+																			        let beforePage = pages[pages.length - 2];
+																						console.log(beforePage)
+																			            beforePage.$vm.updateData()
+																			            uni.navigateBack({
+																			                delta: 1,
+																			            })
+																			        }
+																			}, 1500);
+											
 										})
 									}
 								})
@@ -484,9 +525,8 @@
 			espInput(e){
 				console.log(this.rentCycleList)
 				
-				if(this.rentCycleList.length != 0 && this.info2.rentUnitPrice * this.rentCycleList[1] !=0){
-					console.log('aaa',this.info2.rentUnitPrice,this.rentCycleList[1])
-					this.info2.deposit = this.info2.rentUnitPrice * this.rentCycleList[1]
+				if(this.rentCycleList.length != 0 && this.info2.rentUnitPrice / this.rentCycleList[0] !=0){
+					this.info2.deposit = Math.ceil((this.info2.rentUnitPrice / this.rentCycleList[0]))
 				}
 			},
 			blur(){
@@ -497,6 +537,7 @@
 			},
 			change(e){
 				this.rentCycleList = chnToNumber.chnToNumber(e.newVal)
+				
 				this.info2.rentCycle = e.newVal
 			},
 			getRentCycleList(){
@@ -510,8 +551,12 @@
 				})
 			},
 			chooseLi(index){
-				this.currentLiIndex = index
-				this.info2.keepDate = this.getKeepDate(index)
+				if(this.isEdit){
+					this.currentLiIndex = index == 6 ? 0 : (index == 12 ? 1 : 2)
+				}else{
+					this.currentLiIndex = index
+					this.info2.keepDate = this.getKeepDate(index)
+				}
 			},
 			getKeepDate(index){
 				let keepDate;

@@ -106,8 +106,11 @@ export default {
 			  name:this.suggestion[i].title,
 			  addr:this.suggestion[i].addr
 		  }
+		  
 		  this.$store.commit('chooseLocationInfo',par);
-		  // uni.navigateBack()
+		  setTimeout(()=>{
+			  uni.navigateBack()
+		  },800)
 		  console.log(this.$store)
         }
       }

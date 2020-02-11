@@ -262,6 +262,7 @@
 		text-align: right;
 		overflow: hidden;
 		max-width: 500rpx;
+		font-size: 30rpx;
 	}
 	.uploadBlock{
 		width: 100%;

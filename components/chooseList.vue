@@ -31,6 +31,7 @@
 				return this.currentChooseIndex
 			}
 		},
+		
 		data() {
 			return {
 				// currentIndex:null,

@@ -1,6 +1,6 @@
 <template>
 	<view class="billRecord">
-		<view class="section1" @click="toRenter">
+		<view class="section1">
 			<renter-info-bar :userInfo="userInfo" v-on:emitUserId="getEmit"></renter-info-bar>
 		</view>
 		<!-- <view class="addBar">
@@ -64,10 +64,14 @@
 			this.getBillRecord(this.userInfo.id)
 		},
 		methods: {
+			updateData(){
+				
+			},
 			getEmit(e){
 				console.log(e)
 				uni.navigateTo({
-					url:'../addRenter/addRenter?commInfo='+JSON.stringify(this.communityInfo)+'&roomId='+this.roomId+'&userId='+this.userInfo.id
+					url:'../addRenter/addRenter?commInfo='+JSON.stringify(this.communityInfo)
+					+'&roomId='+this.roomId+'&userId='+this.userInfo.id
 				})
 			},
 			showBillDetail(id){
