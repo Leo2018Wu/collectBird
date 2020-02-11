@@ -11,7 +11,7 @@
 			<view class="content" @click="showBillDetail(item.id)" v-for="(item,index) in latestBill" :key="index">
 				<view class="inner">
 					<view class="contentRight" >
-					<view class="billTitle">{{item.endDate.substr(0,10)}}账单</view>
+					<view class="billTitle">{{item.startDate.substr(0,10)}}账单</view>
 					<view class="checkDate textOverFlow active">收租日期：{{item.payRentDate.substr(0,10)}}</view>
 				</view>
 				<view>{{item.total}}</view>

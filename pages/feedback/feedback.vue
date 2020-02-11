@@ -84,10 +84,16 @@
 						_this.$request.post('/feedback/addFeedBack',v).then(res=>{
 							console.log(res)
 							uni.showToast({
-								title:'提交成功',
+								title:'提交成功，感谢您的反馈',
 							});
-							this.feedbackType='打不开页面';
-							this.info.questionCommit = '';
+							// this.feedbackType='打不开页面';
+							// this.info.questionCommit = '';
+							setTimeout(()=>{
+								uni.navigateBack({
+								  delta: 1
+								})
+							},1000);
+							
 						}).catch(()=>{
 							uni.hideLoading()
 						})
@@ -164,15 +170,14 @@
  	}
  
  	.questionInput {
+		width: 100%;
  		padding: 134rpx 40rpx 0rpx;
  		font-size: 26rpx;
  		font-family: PingFang SC;
  		color: rgba(153, 153, 153, 1);
- 		border-bottom: 1rpx solid rgba(238, 238, 238, 1);
+ 		/* border-bottom: 1rpx solid rgba(238, 238, 238, 1); */
  	}
- 	.questionInput textarea{
- 		width: 100%;
- 	}
+
  	.active {
  		background-color: #F09A42;
  		color: #fff;
