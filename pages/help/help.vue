@@ -12,8 +12,7 @@
 			<view class="detail" :class="{active:isShow && currentIndex == index}">
 				<view class="" v-for="(p,index) in item.detail" :key="index">
 					<view class="detailItem">
-						<view class="dot"></view>
-						<view class="detailText">{{p}}</view>
+						<view class="detailText"><view class="dot"></view>{{p}}</view>
 					</view>
 				</view>
 			</view>
@@ -119,7 +118,6 @@
 		border-bottom: 1rpx solid #ECECEC;
 	}
 	.detailItem{
-		position: relative;
 		margin-top: 20rpx;
 	}
 	.dot{
@@ -141,7 +139,8 @@
 		color:rgba(51,51,51,1);
 		line-height:40rpx;
 		display: inline-block;
-		margin-left: 30rpx;
+		position: relative;
+		padding-left: 30rpx;
 	}
 	
 	.active{

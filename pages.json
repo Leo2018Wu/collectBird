@@ -105,9 +105,9 @@
 		{
 			"path": "pages/help/help",
 			"style": {
-				"navigationBarTextStyle": "black",
+				"navigationBarTextStyle": "#FFF",
 				"navigationBarTitleText": "帮助",
-				"navigationBarBackgroundColor": "#FFFFFF"
+				"navigationBarBackgroundColor": "#F09A42"
 			}
 		},
 		{

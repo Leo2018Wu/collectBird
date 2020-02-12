@@ -3,8 +3,12 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 const store = new Vuex.Store({  
-    state: {  
-        isLogin: false,  
+    state: {
+		loginSwitch:'',
+		isloginStatus: false,
+		userName: "",
+		userImg: "",
+		openCode:"",
         landladyInfo: {},
 		tempRoomInfo:{},
 		chooseLocationInfo:{}
@@ -19,6 +23,16 @@ const store = new Vuex.Store({
 		chooseLocationInfo(state,data){
 			state.chooseLocationInfo = data
 		},
+		userName(state,data){
+			state.userName = data
+		},
+		userImg(state,data){
+			state.userImg = data
+		},
+		openCode(state,data){
+			console.log(data)
+			state.openCode = data
+		}
     }  
 })
 export default store

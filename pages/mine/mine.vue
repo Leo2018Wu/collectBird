@@ -3,9 +3,9 @@
 		<view class="topContent">
 			<view class="myMsg">
 				<view class="myContainer">
-					 <!-- ../../static/el.jpg -->
 					<view class=""><image class="myPhoto" :src="userImg"></image></view>
-					<view class="detail">
+					<view class="login" v-if="!show" @click="openLogin">点击登录</view>
+					<view class="detail" v-if="show">
 						<view class="detailTop">
 							<view class="myName">{{ userName }}</view>
 							<view class="myLevel">
@@ -21,13 +21,13 @@
 			<view class="houseTotalMsg">
 				<view class="leftMsg">
 					<view class="leftMsgTitle">剩余天数</view>
-					<view class="leftMsgValue">{{ remainDay }}</view> 
+					<view class="leftMsgValue">{{ remainDay }}</view>
 					<view class="leftMsgDate">{{ trialDate }}到期</view>
 				</view>
 				<view class="line"></view>
 				<view class="rightMsg">
 					<view class="rightMsgTitle">房号容量</view>
-					<view class="rightMsgValue">{{roomNum}}</view>
+					<view class="rightMsgValue">{{ roomNum }}</view>
 				</view>
 			</view>
 		</view>
@@ -36,7 +36,7 @@
 				<view class="leftPart">
 					<image class="jumpPortalImg" src="../../static/myIcon1.png" mode=""></image>
 					<view class="jumpPortalText">填写邀请码</view>
-					<view class="modalNum">{{inviCode}}</view>
+					<view class="modalNum">{{ usedInviCode }}</view>
 				</view>
 				<view class="rightPart"><image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image></view>
 			</view>
@@ -69,100 +69,250 @@
 				<view class="rightPart"><image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image></view>
 			</view>
 		</view>
-		<!-- 弹窗 -->
-		<view class="modal" v-show="flag"></view>
-		<view class="modalBox" v-show="flag">
+		<!-- 填写邀请码弹窗 -->
+		<view class="modal" v-show="invitationCodeFlag" @click="cancle"></view>
+		<view class="modalBox" v-show="invitationCodeFlag">
 			<view class="modalTitle">填写邀请码</view>
 			<view class="modalContent">
-				<!-- <view class="modalInput">
-					<input type="text" value="" placeholder="请输入邀请码" style="font-size: 30rpx;" />
-				</view> -->
 				<view class="modalInput">
 					<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form" :model="info">
-							<evan-form-item  prop="invitationCode">
-								<template v-slot:main>
-									<!-- <input @click="chooseLocation" class="form-input" placeholder-class="form-input-placeholder" v-model="info.name" placeholder="请输入小区名" /> -->
-									<input type="text" value="" v-model="info.invitationCode" placeholder="请输入邀请码" style="font-size: 30rpx;" />
-								</template>
-							</evan-form-item>
+						<evan-form-item prop="invitationCode">
+							<template v-slot:main>
+								<input type="text" value="" maxlength="4" v-model="info.invitationCode" placeholder="请输入邀请码" style="font-size: 30rpx;" />
+							</template>
+						</evan-form-item>
 					</evan-form>
 					<view class="reminder">
 						<view class="reminderSymbol">!</view>
 						<view class="reminderText">邀请码仅填写一次</view>
 					</view>
-					
 				</view>
 				<view class="button">
-					<view class="btn_cancle" @click="cancle()" data-statu="close">取消</view>
+					<view class="btn_cancle" @click="cancle" data-statu="close">取消</view>
 					<view class="modalLine"></view>
-					<view class="btn_ok active" @click="submit()" data-statu="open">确定</view>
+					<view class="btn_ok active" @click="submit" data-statu="open">确定</view>
 				</view>
+			</view>
+		</view>
+
+		<!-- 授权弹窗 -->
+		<view class="isloginModal" v-show="loginFlag" @click="cancleLogin"></view>
+		<view class="isloginBox" v-show="loginFlag">
+			<image class="bgcImg" src="../../static/authorization.png" mode=""></image>
+			<view class="deleteImg" @click="cancleLogin"><image src="../../static/delete.png" mode=""></image></view>
+			<view class="loginTxt">授权登录体验完整功能</view>
+			<view class="loginImg">
+				<view class="notLogin" @click="cancleLogin"><image src="../../static/notLogin.png" mode=""></image></view>
+				<button class="loginButton" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true">
+					<!-- <view class="isLogin"><image src="../../static/login.png" mode=""></image></view> -->
+				</button>
 			</view>
 		</view>
 	</view>
 </template>
 
 <script>
-	import evanFormItem from '../../components/evan-form/evan-form-item.vue'
-	import evanForm from '../../components/evan-form/evan-form.vue'
-	
+import evanFormItem from '../../components/evan-form/evan-form-item.vue';
+import evanForm from '../../components/evan-form/evan-form.vue';
+import { mapState, mapMutations } from 'vuex';
 export default {
-	components:{
+	components: {
 		evanFormItem,
 		evanForm
+		// isLogin
 	},
 	data() {
 		return {
-			userName: '',
-			userImg:'',
-			roomNum:'28',
-			inviCode:'', // 我的邀请码
-			usedInviCode:'',//填写邀请码
+			invitationCodeFlag: false, // 是否显示填写邀请码弹窗
+			loginFlag: false, //登录弹窗
+			haveUser: false, //用户是否授权
+			userImg: this.$store.state.userImg, //用户头像
+			userName: this.$store.state.userName, //用户昵称
+			show: false, //是否显示点击登录
+			roomNum: '28',
+			inviCode: '', // 我的邀请码
+			usedInviCode: '', //填写邀请码
 			level: '',
 			remainDay: '', //剩余天数
 			trialDate: '',
-			flag: false,  // 是否显示弹窗
-			info:{
-				invitationCode: '',
+			info: {
+				invitationCode: ''
 			},
-			rules:{
-				invitationCode:{
-					required:true,
-					message:"请填写邀请码"
+			rules: {
+				invitationCode: {
+					required: true,
+					message: '请填写邀请码'
 				}
-			}
+			},
+			loginingStatus: false //登录状态
 		};
 	},
-	onLoad(options){
-		this.getMineMsg()
-		this.$nextTick(() => {
-			this.$refs.form.setRules(this.rules)
-		})
+	onLoad(options) {
+		if (this.$store.state.openCode) {
+			// this.show = true;
+			this.getMineMsg();
+			this.$nextTick(() => {
+				this.$refs.form.setRules(this.rules);
+			});
+		}
 	},
 	onShow() {
-	  this.getMineMsg()
+		this.getMineMsg();
 	},
+	// mounted() {
+	// 	this.setting();
+	// },
+	// computed: {
+	// 	...mapState('userName':userName,'userImg':userImg,'openCode':openCode)
+	// },
 	methods: {
+		getUserInfo() {
+			this.loginFlag = false;
+			console.log(11111);
+			let self = this;
+			uni.login({
+				provider: 'weixin',
+				success: function(loginRes) {
+					console.log(loginRes, '1111');
+					self.$store.commit('openCode', loginRes.code);
+					let openCode = loginRes.code; //js_code可以给后台获取unionID或openID作为用户标识
+					// 获取用户信息
+					uni.getUserInfo({
+						provider: 'weixin',
+						success: function(infoRes) {
+							if (infoRes.userInfo) {	
+								self.show= true;
+								self.$store.commit('userName', infoRes.userInfo.nickName);
+								self.$store.commit('userImg', infoRes.userInfo.avatarUrl);
+								self.userName = infoRes.userInfo.nickName;
+								self.userImg = infoRes.userInfo.avatarUrl;
+								console.log(infoRes);
+								//infoRes里面有用户信息需要的话可以取一下
+								// let username = infoRes.userInfo.nickName; //用户名
+								// let userImg = infoRes.userInfo.userImg; //用户头像
+							}
+							// let formdata = { code: openCode, username: username, userImg: userImg };
+							// //login是接口地址，看下面PHP代码
+							// this.post("/login",formdata).then(res=>{//这是我封装的请求方法
+							// 	if(res.code==200){
+							// 		//登录成功
+							// 	}
+							// })
+						},
+						fail: function(res) {
+							uni.showToast({
+								title: '微信授权不成功！',
+								duration: 2000
+							});
+						}
+					});
+				},
+				fail: function(res) {}
+			});
+		},
+		// bindGetUserInfo(e) {
+		//           const that = this;
+		//           if (e.mp.detail.rawData){
+		//               //用户按了允许授权按钮
+		//               // that.setting();
+		// 			  uni.getStorage({
+		// 			  	key: 'loginSwitch',
+		// 				success(e) {
+		// 					if (e.data == 1) {
+		// 						uni.showToast({
+		// 							title: '您已经授权过了！',
+		// 							duration: 2000
+		// 						})
+		// 					} else {
+		// 						that.setting()
+		// 					}
+		// 				},
+		// 				fail() {
+		// 					that.setting()
+		// 				}
+		// 			  })
+		//           } else {
+		//               //用户按了拒绝按钮
+		//               wx.showModal({
+		//                 title: '提示',
+		//                 content: '您拒绝授权，无法进行操作哦！',
+		//                 showCancel: false,
+		//                 confirmText: '返回授权',
+		//                 success: function (res) {
+		//                   // 用户没有授权成功，不需要改变 isHide 的值
+		//                   if (res.confirm) {
+		// 						console.log('用户点击了“返回授权”');
+		//                   }
+		//                 }
+		//               })
+		// 			  uni.setStorage({
+		// 			  	key: 'loginSwitch',
+		// 			  	data: '0'
+		// 			  })
+		//           }
+		//       },
+		// wxLogin(e) {
+		//        const that = this;
+		//        that.logining = true;
+		//        let userInfo = e.detail.userInfo;
+		//        uni.login({
+		//            provider:"weixin",
+		//            success:(login_res => {
+		//                let code = login_res.code;
+		//                uni.getUserInfo({
+		//                    success(info_res) {
+		//                        console.log(info_res)
+		//                        uni.request({
+		//                            url:'http://localhost:8080/wxlogin',
+		//                            method:"POST",
+		//                            header: {
+		//                                              'content-type': 'application/x-www-form-urlencoded'
+		//                                            },
+		//                            data:{
+		//                                code : code,
+		//                                rawData : info_res.rawData
+		//                            },
+		//                            success(res) {
+		//                                if(res.data.status == 200){
+		//                                    that.$store.commit('login',userInfo);
+		//                                }else{
+		//                                    console.log('服务器异常')
+		//                                }
+		//                            },
+		//                            fail(error) {
+		//                                console.log(error)
+		//                            }
+		//                        })
+		//                        uni.hideLoading()
+		//                        uni.navigateBack()
+		//                    }
+		//                })
+
+		//            })
+		//            })
+		//        }
+		//    },
+
 		getMineMsg() {
-		  let _this = this;
-		  _this.$request
-		    .post("/user/findOne", {
-		      id: "ab8afaed-31f7-11ea-91b8-525400bc2088"
-		    })
-		    .then(res => {
-		      console.log(res.data.data);
-			  let myMsgs = res.data.data;
-			  this.userName = myMsgs.userName;
-			  this.usedInviCode=myMsgs.usedInviCode;
-			  this.level=myMsgs.level;
-			  this.userImg = myMsgs.userImg;
-			  this.inviCode = myMsgs.inviCode;
-			  this.trialDate = myMsgs.trialDate;
-			  this.remainDay = myMsgs.remainDay;
-		    })
-		    .catch(err => {
-		      console.log(err);
-		    });
+			let _this = this;
+			_this.$request
+				.post('/user/findOne', {
+					id: 'ab8afaed-31f7-11ea-91b8-525400bc2088'
+				})
+				.then(res => {
+					console.log(res.data.data);
+					let myMsgs = res.data.data;
+					this.userName = myMsgs.userName;
+					this.usedInviCode = myMsgs.usedInviCode;
+					this.level = myMsgs.level;
+					this.userImg = myMsgs.userImg;
+					this.inviCode = myMsgs.inviCode;
+					this.trialDate = myMsgs.trialDate;
+					this.remainDay = myMsgs.remainDay;
+				})
+				.catch(err => {
+					console.log(err);
+				});
 		},
 		cancle() {
 			this.flag = false;
@@ -175,53 +325,65 @@ export default {
 				url: '../feedback/feedback'
 			});
 		},
-		openAboutUs(e){
+		openAboutUs(e) {
 			uni.navigateTo({
 				url: '../aboutUs/aboutUs'
 			});
 		},
-		openHelp(e){
+		openHelp(e) {
 			uni.navigateTo({
 				url: '../help/help'
 			});
 		},
-		submit(){
+		submit() {
 			let _this = this;
-			uni.showLoading({
-				title:'正在提交'
-			})
-			// console.log(this.info.invitationCode && isNumber(this.info.invitationCode))
 			this.$refs.form.validate(res => {
-				let v= {
-					id:"ab8afaed-31f7-11ea-91b8-525400bc2088",
-					usedInviCode:this.info.invitationCode
-				}
-				this.$request.post('/user/useInviCode',v).then(res=>{
-					console.log(res);
-					if(res){
-						uni.showToast({
-							title:'提交成功',
+				if (isNaN(this.info.invitationCode) && this.info.invitationCode.length <= 4) {
+					uni.showToast({
+						title: '请填写4位数字邀请码!'
+					});
+				} else {
+					uni.showLoading({
+						title: '正在提交'
+					});
+					let v = {
+						id: 'ab8afaed-31f7-11ea-91b8-525400bc2088',
+						usedInviCode: this.info.invitationCode
+					};
+					this.$request
+						.post('/user/useInviCode', v)
+						.then(res => {
+							console.log(res);
+							if (res) {
+								uni.showToast({
+									title: '提交成功'
+								});
+								this.info.invitationCode = '';
+								this.flag = false;
+								this.getMineMsg();
+							}
+						})
+						.catch(() => {
+							uni.hideLoading();
 						});
-						this.info.invitationCode = '';
-						this.flag = false;
-						this.getMineMsg();
-					}
-					
-				}).catch(()=>{
-					uni.hideLoading()
-				})
-			})
+				}
+			});
+		},
+		cancleLogin(e) {
+			this.loginFlag = false;
+		},
+		openLogin(e) {
+			this.loginFlag = true;
 		}
-			
 	}
-}
+};
 </script>
 
 <style>
 .mine {
 	height: 100vh;
 	width: 100%;
-	background-color: #FAFAFA;
+	background-color: #fafafa;
 }
 .myContainer {
 	height: 114rpx;
@@ -236,7 +398,9 @@ export default {
 	position: relative;
 	overflow: hidden;
 }
-
+.login {
+	margin-left: 50rpx;
+}
 .myMsg {
 	height: 72%;
 	/* background:linear-gradient(-56deg,rgba(244,183,74,1) 0%,rgba(240,153,66,1) 100%); */
@@ -244,10 +408,9 @@ export default {
 	padding: 20rpx 30rpx;
 	display: flex;
 	justify-content: flex-start;
-	
 }
-.emptyBackground{
-	background-color: #FAFAFA;
+.emptyBackground {
+	background-color: #fafafa;
 }
 .myPhoto {
 	width: 115rpx;
@@ -279,10 +442,10 @@ export default {
 }
 
 .levelIcon {
-		width: 20rpx;
-		height: 20rpx;
-		color: #fff;
-	}
+	width: 20rpx;
+	height: 20rpx;
+	color: #fff;
+}
 
 .levelText {
 	color: #fff;
@@ -371,7 +534,6 @@ export default {
 	top: 57rpx;
 	left: 50%;
 	background-color: rgba(190, 190, 190, 1);
-
 }
 
 .jumpPortal {
@@ -379,7 +541,6 @@ export default {
 	height: 65%;
 	padding: 20rpx 40rpx;
 }
-
 .jumpPortalImg {
 	width: 48rpx;
 	height: 48rpx;
@@ -387,10 +548,10 @@ export default {
 
 .jumpPortalitem {
 	height: 15%;
-	border-bottom: 3rpx solid #F5F5F5;
+	border-bottom: 3rpx solid #f5f5f5;
 	display: flex;
-	justify-content:space-between;
-	align-items:center;
+	justify-content: space-between;
+	align-items: center;
 	position: relative;
 }
 
@@ -410,14 +571,14 @@ export default {
 	font-family: PingFang SC;
 	/* font-weight: 500; */
 }
-.modalNum{
+.modalNum {
 	position: absolute;
-	font-size:28rpx;
-	font-family:PingFang SC;
-	font-weight:500;
-	color:rgba(153,153,153,1);
-	top:34%;
-	right:40rpx;
+	font-size: 28rpx;
+	font-family: PingFang SC;
+	font-weight: 500;
+	color: rgba(153, 153, 153, 1);
+	top: 34%;
+	right: 40rpx;
 }
 
 /* 弹窗 */
@@ -495,7 +656,6 @@ export default {
 	margin-right: 10rpx;
 	line-height: 24rpx;
 	text-align: center;
-
 }
 
 .button {
@@ -524,5 +684,92 @@ export default {
 
 .active {
 	color: #ffa044;
+}
+
+/* 登录弹窗 */
+.isloginModal {
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 1000;
+	background: #000;
+	opacity: 0.5;
+	overflow: hidden;
+	z-index: 500;
+}
+.isloginBox {
+	width: 513rpx;
+	height: 537rpx;
+	overflow: hidden;
+	position: fixed;
+	top: 28%;
+	left: 15%;
+	z-index: 1001;
+}
+.bgcImg {
+	width: 100%;
+	height: 100%;
+	z-index: 9000;
+}
+.loginTxt {
+	font-size: 30rpx;
+	font-family: PingFang SC;
+	font-weight: 400;
+	color: rgba(102, 102, 102, 1);
+	line-height: 36px;
+	text-align: center;
+	z-index: 9000;
+	position: absolute;
+	bottom: 79px;
+	left: 106rpx;
+}
+.deleteImg {
+	width: 38rpx;
+	height: 38rpx;
+	position: absolute;
+	top: 15rpx;
+	right: 15rpx;
+	z-index: 9000;
+}
+.deleteImg image {
+	width: 100%;
+	height: 100%;
+}
+.loginImg {
+	position: absolute;
+	z-index: 9000;
+	bottom: 60rpx;
+	left: 0rpx;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0rpx 52rpx;
+}
+.notLogin {
+	width: 185rpx;
+	height: 70rpx;
+}
+/* .isLogin {
+	margin-left: 37rpx;
+	width: 185rpx;
+	height: 70rpx;
+} */
+.notLogin image {
+	width: 100%;
+	height: 100%;
+}
+.isLogin image {
+	width: 100%;
+	height: 100%;
+}
+.loginButton {
+	width: 185rpx !important;
+	height: 70rpx !important;
+	background-image: url(../../static/login.png);
+	background-size: 100% 100%;
+	margin-left: 37rpx;
+	border: none !important;
 }
 </style>
