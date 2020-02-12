@@ -48,7 +48,8 @@
 								<input  class="form-input" disabled="true" @click="showList()" placeholder-class="form-input-placeholder" v-model="info.rentCycle"  placeholder="请选择收租周期"  />
 							</template>
 							<template v-slot:tip>
-								<image class="inpArrow" src="../../static/triangle.png" mode="aspectFit"></image>
+								<view class="inputSpan"></view>
+								<!-- <image class="inpArrow" src="../../static/triangle.png" mode="aspectFit"></image> -->
 							</template>
 					</evan-form-item>
 				</view>
@@ -129,7 +130,8 @@
 								<input  class="form-input" disabled="true" placeholder-class="form-input-placeholder"  v-model="info.rentCycle" placeholder="请选择收租周期" @click="showList"/>
 							</template>
 							<template v-slot:tip>
-								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
+								<!-- <image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image> -->
+								<view class="inputSpan"></view>
 							</template>
 					</evan-form-item>
 				</view>
@@ -184,6 +186,7 @@
 		},
 		data() {
 			return {
+				id:null,//处于编辑状态的房间id
 				chooseIndex:null,
 				list: [      //要展示的数据
 					'押一付一',
@@ -281,21 +284,19 @@
 					console.log(res.data.data.roomList)
 							if(res.data.data.roomList.length != 0){
 						//处于编辑房间状态  
-						let depositNumIndex = parseInt(res.data.data.roomList[0].depositNum) - 1;
+						let depositNumIndex = parseInt(res.data.data.roomList[0].rentNum) - 1;
 						this.chooseIndex = depositNumIndex;
+						this.id = res.data.data.roomList[0].id;
 						console.log(this.list,depositNumIndex)
 						this.isEditRoom = true
 						this.info.rentPrice = res.data.data.roomList[0].roomPrice;
-						this.rentCycleList[0]="1";//付月租数量
+						this.rentCycleList[0]=res.data.data.roomList[0].rentNum;//付月租数量
 						this.rentCycleList[1] = res.data.data.roomList[0].depositNum;//押金数量
 						// this.initValue = this.list[res.data.data.roomList[0].depositNum - 1];
 						this.info.elecCost = res.data.data.roomList[0].eleUnitPrice;
 						this.info.waterCost = res.data.data.roomList[0].waterUnitPrice;
 						this.info.netCost = res.data.data.roomList[0].netCost;
 						this.info.rentCycle = this.list[depositNumIndex];
-						console.log(this.info,this.isEditRoom)
-						console.log('dsdnadnasi',this.list,res.data.data.roomList[0].depositNum)
-						console.log(this.rentCycleList)
 					}	
 					}
 					this.newHouseInfo = res.data.data
@@ -387,10 +388,13 @@
 					eleUnitPrice:this.info.elecCost,
 					waterUnitPrice:this.info.waterCost,
 					netCost:this.info.netCost,
-					depositNum:this.rentCycleList[0],
-					rentNum:this.rentCycleList[1]
+					depositNum:this.rentCycleList[1],
+					rentNum:this.rentCycleList[0]
 				};
-				
+				if(this.isEditRoom){
+					par.id = this.id
+				}
+				let urlPar = this.isEditRoom ? 'room/update' : '/room/addRoom'
 				let _this = this
 				if(this.imgUrl){
 					par.roomImgs = _this.imgUrl
@@ -398,7 +402,7 @@
 				console.log(par)
 				this.$refs.form.validate((res) => {
 					if (res) {
-						_this.$request.post('/room/addRoom',par).then(data =>{
+						_this.$request.post(urlPar,par).then(data =>{
 							uni.showToast({
 								title:'房间保存成功',
 								duration:1500,
@@ -498,7 +502,6 @@
 		border-left: 8px transparent solid;
 		border-bottom: 8px transparent solid;
 		border-right: 8px transparent solid;
-		transform: translateY(4px);
 	}
 	.saveBtn{
 		width: 257rpx;
