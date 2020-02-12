@@ -1,5 +1,6 @@
 {
 	"pages": [
+		
 		{
 			"path": "pages/home/home",
 			"style": {
@@ -124,7 +125,15 @@
 				"navigationBarTitleText": "关于收租鸟",
 				"navigationBarBackgroundColor": "#F09A42"
 			}
-        }
+        },{
+		    "path" : "pages/reportForm/reportForm",
+		    "style" : {
+				"navigationBarTextStyle": "black",
+				"navigationBarTitleText": "报表",
+				"navigationBarBackgroundColor": "#FFFFFF"
+			}
+		}
+        
     ],
 	"permission": {
 		"scope.userLocation": {

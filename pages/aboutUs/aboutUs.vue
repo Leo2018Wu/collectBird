@@ -35,6 +35,7 @@
 				this.flag = true;
 			},
 			copy(){
+		
 				 var that = this;
 				    wx.setClipboardData({
 				     //准备复制的数据

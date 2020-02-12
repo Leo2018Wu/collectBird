@@ -2,7 +2,7 @@
 	<view>
 		<view class="section1 sectionBorderBottom">
 			<view class="houseName">
-				{{roomInfo.communityName}}
+				{{communityInfo.name}}
 			</view>
 			<view class="houseDetail" @click="toEditHouse">
 				<image class="houseArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
