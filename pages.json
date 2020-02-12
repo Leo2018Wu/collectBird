@@ -9,6 +9,15 @@
 			}
 		},
 		{
+		    "path" : "pages/meterRead/meterRead",
+		    "style" : {
+				"navigationBarTextStyle": "#fff",
+				"navigationBarTitleText": "抄表",
+				"navigationBarBackgroundColor": "#F09A42"
+			}
+		},
+		
+		{
 			"path": "pages/renterManage/renterManage",
 			"style": {
 				"navigationBarTitleText": "租客管理"
