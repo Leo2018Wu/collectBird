@@ -84,12 +84,13 @@
 			}
 		},
 		onShow(){
-			if(!this.isEdit){
+			console.log('测试使用',this.isEdit)
+			// if(!this.isEdit){
 				let chooseLocationInfo = this.$store.state.chooseLocationInfo;
 				console.log(chooseLocationInfo)
 				this.info.name = chooseLocationInfo.name;
 				this.info.addr = chooseLocationInfo.addr;
-			}
+			// }
 			
 		},
 		onLoad(options){
@@ -97,12 +98,22 @@
 				this.isEdit = true;
 				this.communityInfo = JSON.parse(options.communityInfo);
 				console.log(this.communityInfo)
-				this.info.name = this.communityInfo.communityName;
+				this.info.name = this.communityInfo.communityName,
 				this.info.addr = this.communityInfo.communityAddress;
 				this.uImgList.push(this.communityInfo.communityImgs[0]);
 				this.imgArr.push(this.communityInfo.communityImgs[0])
+				let storeInfo = {
+					name:this.communityInfo.communityName,
+					addr:this.communityInfo.communityAddress
+				}
+				this.$store.commit('chooseLocationInfo',storeInfo);
 			}else{
 				this.uImgList = []
+			}
+			if(this.isEdit){
+				uni.setNavigationBarTitle({
+					title:'编辑房源'
+				})
 			}
 			console.log(options)
 			this.$nextTick(() => {
@@ -111,19 +122,21 @@
 		},
 		computed:{
 			myName(){
-				if(this.isEdit){
-					return this.communityInfo.communityName
-				}else{
+				// if(this.isEdit){
+				// 	return this.communityInfo.communityName
+				// }else{
+					// info.name = this.$store.state.chooseLocationInfo.name
 					return this.$store.state.chooseLocationInfo.name ? this.$store.state.chooseLocationInfo.name : '请输入小区名';
-				}
+				// }
 				
 			},
 			myAddr(){
-				if(this.isEdit){
-					return this.communityInfo.communityAddress
-				}else{
+				// if(this.isEdit){
+				// 	return this.communityInfo.communityAddress
+				// }else{
+					// info.addr = this.$store.state.chooseLocationInfo.addr
 					return this.$store.state.chooseLocationInfo.addr ? this.$store.state.chooseLocationInfo.addr : '请输入地址';
-				}
+				// }
 				
 			}
 		},
@@ -132,6 +145,7 @@
 			this.$store.commit('chooseLocationInfo',{})
 		},
 		methods: {
+			
 			chooseLocation(e){
 					let url = e ? '../chooseLocation/chooseLocation?type='+'addr' : '../chooseLocation/chooseLocation'
 					uni.navigateTo({

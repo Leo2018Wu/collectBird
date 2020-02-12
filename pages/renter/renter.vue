@@ -2,9 +2,9 @@
 	<view>
 		<view class="section1 sectionBorderBottom">
 			<view class="houseName">
-				{{communityInfo.name}}
+				{{roomInfo.communityName}}
 			</view>
-			<view class="houseDetail">
+			<view class="houseDetail" @click="toEditHouse">
 				<image class="houseArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 				<view class="detailTop">
 					<span class="houseNum">{{communityInfo.houseNo}}</span>{{communityInfo.bedroomNum}}
@@ -36,7 +36,6 @@
 		<!-- v-if="isShowAddBtn" -->
 		<view class="section3" v-for="(item,index) in roomInfo.tenants" :key="index" >
 			<renter-info-bar :userInfo = "item" v-on:emitUserId="getEmit"></renter-info-bar>
-			
 		</view>
 		<view class="addRenterBox1"	v-if="isShowAddBtn">
 				<!-- <view class="invite">邀请入住</view> -->
@@ -63,6 +62,8 @@
 		},
 		data() {
 			return {
+				houseId:null,
+				communityId:null,
 				isShowAddBtn:false,
 				roomId:'',
 				communityInfo:{},
@@ -74,14 +75,35 @@
 		},
 		computed:{
 		},
+		onShow() {
+			this.getRoomInfo(this.roomId)
+			this.$request.post('/house/findById',{
+				id:this.houseId
+			}).then((res) =>{
+				console.log(res)
+				let data = res.data.data
+				this.communityInfo.houseNo = data.houseNo
+				this.communityInfo.bedroomNum = data.bedroomNum
+				this.communityInfo.livingroomNum = data.livingroomNum
+				this.communityInfo.toiletNum = data.toiletNum
+			})
+		},
 		onLoad(option) {
+			console.log(option)
 			this.communityInfo = JSON.parse(option.communityInfo)
-			this.getRoomInfo(option.id)
+			// this.getRoomInfo(option.id)
 			this.roomId =option.id 
+			this.houseId = option.houseId
+			this.communityId = option.communityId
 		},
 		methods: {
-			updateData(){
-				this.getRoomInfo(this.roomId)
+			// updateData(){
+			// 	this.getRoomInfo(this.roomId)
+			// },
+			toEditHouse(){
+				uni.navigateTo({
+					url:'../addRoomNum/addRoomNum?communityName='+this.communityInfo.name+'&communityId='+this.communityId+'&houseId='+this.houseId
+				})
 			},
 			getRoomInfo(id){
 				let _this = this;
@@ -105,6 +127,7 @@
 			},
 			getEmit(e){
 				console.log(e)
+				this.userInfo = e;
 				let communInfo = {
 					name:this.communityInfo.name,
 					houseNo:this.communityInfo.houseNo,

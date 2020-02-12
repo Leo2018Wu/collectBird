@@ -68,8 +68,14 @@
 			</view> -->
 		</view>
 		<view class="remarks">暂无备注</view>
-		<view class="section2">
+		<view class="section3" v-if="billInfo.billStatus == 4">
 			<view class="sendBillBox">
+				<image class="sendIcon" src="../../static/sendBill.png" mode="aspectFit"></image>
+				<view>发送账单</view>
+			</view>
+		</view>
+		<view class="section2" v-else>
+			<view class="sendBillBox" >
 				<image class="sendIcon" src="../../static/eleWater.png" mode="aspectFit"></image>
 				<view>抄表</view>
 			</view>
@@ -77,7 +83,7 @@
 				<image class="sendIcon" src="../../static/sendBill.png" mode="aspectFit"></image>
 				<view>发送账单</view>
 			</view>
-			<view class="sureBtn" @click="checkMoney">到账</view>
+			<view  class="sureBtn" @click="checkMoney">到账</view>
 		</view>
 	</view>
 </template>
@@ -287,6 +293,18 @@
 		background-color: #FFFFFF;
 		display: flex;
 		justify-content: flex-end;
+		align-items: center;
+		box-shadow:0px -5px 16px 0px rgba(0, 0, 0, 0.04);
+		position: fixed;
+		bottom: 0;
+		left: 0;
+	}
+	.section3{
+		height: 128rpx;
+		width: 100%;
+		background-color: #FFFFFF;
+		display: flex;
+		justify-content:center;
 		align-items: center;
 		box-shadow:0px -5px 16px 0px rgba(0, 0, 0, 0.04);
 		position: fixed;

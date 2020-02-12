@@ -145,7 +145,13 @@
 		computed:{
 			...mapState(["tempRoomInfo"])
 		},
-		
+		onShow() {
+			if(this.inEdit){
+				uni.setNavigationBarTitle({
+					title:'编辑房号'
+				})
+			}
+		},
 		onLoad(options){
 			this.$nextTick(() => {
 				this.$refs.form.setRules(this.rules)
@@ -160,6 +166,7 @@
 			}
 		},
 		methods: {
+			
 			showList(){
 				this.listShow = true;
 			},
@@ -225,6 +232,8 @@
 					title:'正在保存'
 				})
 				let requestPar = this.inEdit ? '/house/update' : '/house/addHouse'
+				this.info.houseNo = this.info.houseNo.replace(/\b(0+)/gi,"")
+				this.info.roomNo = this.info.roomNo.replace(/\b(0+)/gi,"")
 				let par ={
 					landlordId:this.$store.state.landladyInfo.id,
 					communityId:this.communityId,
@@ -334,11 +343,11 @@
 		display: flex;
 		justify-content: flex-end;
 		align-items: center;
-		padding-right: 18rpx;
+		padding-right: 10rpx;
 	}
 	.switchBox switch{
 		
-		margin-left: 13rpx;
+		/* margin-left: 13rpx; */
 	}
 	.section2{
 		padding: 32rpx 40rpx 0 40rpx;

@@ -388,7 +388,7 @@
 					this.rentCycleList[1] = data.depositNum;
 					// this.currentSex = data.tenantSex;
 					this.radioChange({target:{value:data.tenantSex}})
-					this.chooseLi(data.rentMonthNum)
+					this.chooseLi(data.rentMonthNum,true)
 					this.rentMonthNum = data.rentMonthNum
 				})
 			},
@@ -466,15 +466,15 @@
 												title:tipContent
 											})
 												setTimeout(() => {
-																				let pages = getCurrentPages();
-																			    if (pages.length > 1) {
-																			        let beforePage = pages[pages.length - 2];
-																						console.log(beforePage)
-																			            beforePage.$vm.updateData()
+																				// let pages = getCurrentPages();
+																			 //    if (pages.length > 1) {
+																			 //        let beforePage = pages[pages.length - 2];
+																				// 		console.log(beforePage)
+																			 //            beforePage.$vm.updateData()
 																			            uni.navigateBack({
 																			                delta: 1,
 																			            })
-																			        }
+																			        // }
 																			}, 1500);
 											
 										})
@@ -550,8 +550,8 @@
 					})
 				})
 			},
-			chooseLi(index){
-				if(this.isEdit){
+			chooseLi(index,temp){
+				if(temp){
 					this.currentLiIndex = index == 6 ? 0 : (index == 12 ? 1 : 2)
 				}else{
 					this.currentLiIndex = index

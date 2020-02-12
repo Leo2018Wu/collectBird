@@ -25,7 +25,7 @@ scroll-view {
   text-overflow: ellipsis;
 }
 switch {
-  transform: scale(0.5);
+  transform: scale(0.6);
 }
 radio{
 	transform: scale(0.7);

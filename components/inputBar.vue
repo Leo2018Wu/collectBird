@@ -55,6 +55,7 @@ export default {
 
 <style>
 .inputBar {
+	font-size: 30rpx;
   display: flex;
   align-items: center;
   justify-content: space-between;
