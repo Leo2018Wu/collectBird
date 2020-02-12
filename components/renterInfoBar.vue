@@ -1,8 +1,9 @@
 <template>
 	<view>
 		<view class="section" @click="emit()">
-			<image v-if="userInfo.userImg" class="renterAvatar" :src="userInfo.userImg" mode="aspectFill"></image>
-			<image v-else class="renterAvatar" src="../static/el.jpg" mode="aspectFill"></image>
+			<!-- <image v-if="userInfo.userImg" class="renterAvatar" :src="userInfo.userImg" mode="aspectFill"></image> -->
+			<image v-if="userInfo.userSex == 0" class="renterAvatar" src="../static/defaultMale.png" mode="aspectFill"></image>
+			<image v-else class="renterAvatar" src="../static/defaultFemale.png" mode="aspectFill"></image>
 			<view class="renterInfo">
 				<view class="infoTop">
 					<span>{{userInfo.userName}}</span>

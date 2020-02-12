@@ -348,7 +348,12 @@
 								})
 								return;
 							}
-							_this.imgUrl = data.data
+							console.log(data)
+							if(_this.isEditRoom){
+								_this.newHouseInfo.roomList[0].roomImgs = data.data
+							}else{
+								_this.imgUrl = data.data
+							}
 							reslove(data.data)
 							uni.hideLoading()
 						},

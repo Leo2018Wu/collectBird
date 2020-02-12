@@ -25,7 +25,7 @@
 				<image v-if="item.billStatus  == 4 " class="checkBg" src="../../static/hasCheck.png" mode="aspectFit"></image>
 
 					<view class="contentRight" >
-					<view class="billTitle">其他收入</view>
+					<view class="billTitle">租金收入</view>
 					<view class="checkDate textOverFlow">到账日期：{{item.payRentDate.substr(0,10)}}</view>
 				</view>
 				<view>{{item.total}}</view>
@@ -62,6 +62,13 @@
 			this.userInfo = JSON.parse(options.userInfo) 
 			this.communityInfo = JSON.parse(options.commInfo)
 			this.getBillRecord(this.userInfo.id)
+		},
+		onShow(){
+			this.$request.post('user/findOne',{
+				id:this.userInfo.id
+			}).then((res)=>{
+				this.userInfo = res.data.data
+			})
 		},
 		methods: {
 			updateData(){

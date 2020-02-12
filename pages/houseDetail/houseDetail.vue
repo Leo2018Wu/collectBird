@@ -104,8 +104,9 @@
 				communityInfo.roomNo = this.houseInfo[index].roomList[idx].roomNo
 				communityInfo.roomPrice = this.houseInfo[index].roomList[idx].roomPrice
 				console.log(communityInfo)
+				let houseId = this.houseInfo[index].id
 				uni.navigateTo({
-					url:'../renter/renter?id='+id+'&communityInfo='+JSON.stringify(communityInfo)
+					url:'../renter/renter?id='+id+'&communityInfo='+JSON.stringify(communityInfo)+'&houseId='+houseId+'&communityId='+this.houseId
 				})
 			},
 			getCommuny(id){
@@ -268,6 +269,6 @@
 	}
 	
 	.roomItem span:last-of-type{
-		font-size: 23rpx;
+		font-size: 24rpx;
 	}
 </style>

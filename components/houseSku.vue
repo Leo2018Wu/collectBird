@@ -89,7 +89,7 @@
 		justify-content: flex-start;
 		align-items: center;
 		color: #ABAAAA;
-		font-size: 22rpx;
+		font-size: 24rpx;
 		font-weight: normal;
 	}
 	.addressBox image{
