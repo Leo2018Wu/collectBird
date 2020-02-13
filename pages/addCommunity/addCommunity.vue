@@ -220,10 +220,17 @@
 						}
 						_this.$request.post(postUrl,postPar).then((data)=>{
 							// console.log(data)
-							uni.showToast({
-								title: '添加成功',
-								duration:1500,
-							})
+							if(this.isEdit){
+								uni.showToast({
+									title: '编辑成功',
+									duration:1500,
+								})
+							}else{
+								uni.showToast({
+									title: '添加成功',
+									duration:1500,
+								})
+							}
 								this.$store.commit('chooseLocationInfo',{})
 							_this.refreshLastPage()
 							 

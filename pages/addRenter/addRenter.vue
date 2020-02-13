@@ -48,16 +48,6 @@
 				<view class="">
 					身份证照片
 				</view>
-				<view class="uploadImg" v-show="false">
-				<uImg  ref="upimg"
-					:canUploadFile="true" 
-					:limit="10"
-					:uploadFileUrl="uploadFileUrl" 
-					:uImgList.sync="uImgList" 
-					@uploadSuccess="uploadSuccess"
-					:isJustUpload="true"
-					:parentPath="'idcard'"/>
-				</view>
 				<view class="chooseIdImg0" @click="chooseImg(false)">
 					<image v-if="imgSideUrl" :src="imgSideUrl" mode="aspectFill"></image>
 					<image v-if="!imgSideUrl" src="../../static/idImg0.png" mode="aspectFit"></image>
@@ -174,8 +164,8 @@
 </template>
 
 <script>
+	import myUploadImg from '../../util/myUpload.js'
 	import chooseList from '../../components/chooseList.vue'
-	import uImg from '../../components/uploadImg/uploadImg.vue'
 	import chnToNumber from '../../util/index'
 	import mySelect from '../../components/mySelect/mySelect.vue'
 	import moment from 'moment'
@@ -186,7 +176,6 @@
 			evanFormItem,
 			evanForm,
 			mySelect,
-			uImg,
 			chooseList
 		},
 		watch:{
@@ -511,16 +500,15 @@
 			},
 			chooseImg(type){
 				this.isChooseReverseImg = type
-				this.$refs.upimg.chooseFile()
-			},
-			uploadSuccess(result) {
-				console.log('只愿一生',result)
-				if(this.isChooseReverseImg){
-					this.imgOtherSideUrl = result[0];
-				}else{
-					this.imgSideUrl = result[0];
-				}
-				uni.hideLoading()
+				let returnUrl = myUploadImg.upload().then((res)=>{
+					console.log(res)
+					if(this.isChooseReverseImg){
+						this.imgOtherSideUrl = res;
+					}else{
+						this.imgSideUrl = res;
+					}
+				})
+				
 			},
 			espInput(e){
 				console.log(this.rentCycleList)

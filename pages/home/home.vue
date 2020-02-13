@@ -34,7 +34,7 @@
 					<view class="bannerItem"><image class="bannerImg" src="../../static/homeIcon3.png" mode=""></image></view>
 					<span class="bannerText">账单管理</span>
 				</view>
-				<view>
+				<view @click="goReportForm">
 					<view class="bannerItem"><image class="bannerImg" src="../../static/statistical.png" mode=""></image></view>
 					<span class="bannerText">统计报表</span>
 				</view>
@@ -101,6 +101,11 @@ export default {
 		goBillManage() {
 			uni.navigateTo({
 				url: '../billManage/billManage'
+			});
+		},
+		goReportForm(){
+			uni.navigateTo({
+				url: '../reportForm/reportForm'
 			});
 		}
 	}

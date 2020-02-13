@@ -21,7 +21,8 @@
 			</view>
 			<view class="renterListBox" :class="{active:isShow && currentIndex == index}">
 				<view class="renterLi" v-for="(p,idx) in item.tenantList" :key="idx" @click="goRenter(p,item.communityName)">
-					<image class="renterImg" src="../../static/el.jpg" mode="aspectFill"></image>
+					<image class="renterImg" v-if="p.userSex == 0" src="../../static/defaultMale.png" mode="aspectFill"></image>
+					<image class="renterImg" v-else src="../../static/defaultFemale.png" mode="aspectFill"></image>
 					<view class="renterInfoBox">
 						<view class="textOverFlow">{{p.userName}}</view>
 						<view class="renterTel textOverFlow">{{p.phoneNumber}}</view>
@@ -74,7 +75,7 @@
 				communityInfo.roomPrice = item.map.roomPrice
 				let id = item.map.roomId
 				uni.navigateTo({
-					url:'../renter/renter?id='+id+'&communityInfo='+JSON.stringify(communityInfo)
+					url:'../renter/renter?id='+id+'&communityInfo='+JSON.stringify(communityInfo)+'&houseId='+item.map.houseId
 				})
 			},
 			getRenterList(id){
