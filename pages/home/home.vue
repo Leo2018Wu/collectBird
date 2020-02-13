@@ -41,8 +41,8 @@
 			</view>
 		</view>
 		<!-- 授权弹窗 -->
-		<view class="isloginModal" v-show="loginFlag" @click="cancleLogin"></view>
-		<view class="isloginBox" v-show="loginFlag">
+		<view class="isloginModal" v-if="loginFlag" @click="cancleLogin"></view>
+		<view class="isloginBox" v-if="loginFlag">
 			<image class="bgcImg" src="../../static/authorization.png" mode=""></image>
 			<view class="deleteImg" @click="cancleLogin"><image src="../../static/delete.png" mode=""></image></view>
 			<view class="loginTxt">授权登录体验完整功能</view>
@@ -73,19 +73,22 @@ export default {
 		};
 	},
 	onShow(option) {
-		setTimeout(() => {
-			if (this.$store.state.openCode && this.$store.state.isloginStatus) {
-				console.log(this.$store.state.openCode);
-				this.getLandLadyInfo();
-				this.getMoneyInfo();
-			} else {
-				this.loginFlag = true;
-			}
-		}, 1000);
+		console.log(this.$store.state.isloginStatus);
+		if(this.$store.state.isloginStatus){
+			this.loginFlag = false
+			this.getMoneyInfo()
+		}else{
+			this.loginFlag = true
+		}
 	},
-	onLoad() {
-		// this.getLandLadyInfo();
-		// this.getMoneyInfo();
+	onLoad(option) {
+		// this.$store.state.isloginStatus? this.getMoneyInfo() : this.loginFlag = true
+		if(this.$store.state.isloginStatus){
+			this.loginFlag = false;
+			this.getMoneyInfo()
+		}else{
+			this.loginFlag = true;
+		}
 	},
 	methods: {
 		getMoneyInfo() {
@@ -102,17 +105,17 @@ export default {
 					this.todayReceived = data.todaySumTotal;
 				});
 		},
-		getLandLadyInfo() {
-			let _this = this;
-			this.$request
-				.post('/user/findOne', {
-					id: 'ab8afaed-31f7-11ea-91b8-525400bc2088'
-				})
-				.then(res => {
-					_this.$store.commit('landladyInfo', res.data.data);
-				})
-				.catch(err => {});
-		},
+		// getLandLadyInfo() {
+		// 	let _this = this;
+		// 	this.$request
+		// 		.post('/user/findOne', {
+		// 			id: 'ab8afaed-31f7-11ea-91b8-525400bc2088'
+		// 		})
+		// 		.then(res => {
+		// 			_this.$store.commit('landladyInfo', res.data.data);
+		// 		})
+		// 		.catch(err => {});
+		// },
 		toHouseList(e) {
 			uni.navigateTo({
 				url: '../houseList/houseList'
@@ -144,7 +147,7 @@ export default {
 					self.$store.commit('openCode', loginRes.code);
 					// 获取用户信息
 					self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
-						self.getLandLadyInfo();
+						// self.getLandLadyInfo();
 						self.getMoneyInfo();
 						self.$store.commit('isloginStatus', true);
 						console.log(res);

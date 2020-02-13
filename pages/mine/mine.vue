@@ -285,10 +285,8 @@ export default {
 				.then(res => {
 					console.log(res.data.data);
 					let myMsgs = res.data.data;
-					// this.userName = myMsgs.userName;
 					this.usedInviCode = myMsgs.usedInviCode;
 					this.level = myMsgs.level;
-					// this.userImg = myMsgs.userImg;
 					this.inviCode = myMsgs.inviCode;
 					this.trialDate = myMsgs.trialDate;
 					this.remainDay = myMsgs.remainDay;
