@@ -1,32 +1,52 @@
 <template>
     <view class="reportForm">
 		<view class="sectionOne whiteBg">
-			<view class="secDate" @click="showPicker">
-				2020年2月
+			<view class="secDate" @click="chooseDate">
+				{{choosedDate}}
 				<image class="trinagle" src="../../static/triangle.png" mode="aspectFit"></image>
 			</view>
 			<view class="secProfit">
-				纯利润10000
+				纯利润￥<span>10000</span>
 			</view>
 		</view>
 		<view class="sectionTwo whiteBg">
-			<view class="communityChoose">
-				全部房产
+			<view class="communityChoose" @click="chooseCommuinty">
+				{{choosedCommunity ? choosedCommunity : '全部房产'}}
 				<image class="trinagle" src="../../static/triangle.png" mode="aspectFit"></image>
 			</view>
-			<view class="houseChoose">
-				全部房号
+			<view class="houseChoose" @click="chooseHouse">
+				{{choosedHouse ? choosedHouse : '全部房号'}}
 				<image class="trinagle" src="../../static/triangle.png" mode="aspectFit"></image>
 			</view>
 		</view>
+		<view class="contentContainer">
+			<view class="totalProfit">总收入</view>
+			<view class="sectionThree">
+				<canvas v-show="!visible" canvas-id="canvasRing" id="canvasRing" class="charts" @touchstart="touchRing"></canvas>
+				<image class="divide" src="../../static/reportFormDivide.png" mode="aspectFit"></image>
+			</view>
+			<view class="sectionFour">
+				<view class="secForItem" v-for="(item,index) in itemProfitList" :key="index">
+					<view class="itemName">
+						{{item.name}}
+					</view>
+					<view class="itemPrice">
+						￥<span>{{item.price}}</span>
+					</view>
+				</view>
+			</view>
+		</view>
+		
 		<view class="pickerMask" v-if="visible" @click="pickerCancel"></view>
-		<view class="pickerBox" v-if="visible">
+		<view class="pickerBox" :class="{shorterPick : pickerTypeCurIndex == 3 || pickerTypeCurIndex == 4}" v-if="visible">
 			<view class="pickerTop">
 				<view class="pickerCancel" @click="pickerCancel">取消</view>
-				<view>选择时间</view>
+				<view v-if="pickerTypeCurIndex == 3">选择房产</view>
+				<view v-else-if="pickerTypeCurIndex == 4">选择房号</view>
+				<view v-else>选择时间</view>
 				<view class="pickerSure" @click="pickerSure">确定</view>
 			</view>
-			<view class="pickerTypeList">
+			<view class="pickerTypeList" v-if="!(pickerTypeCurIndex == 4 || pickerTypeCurIndex == 3)">
 				<view class="pickerLiOut">
 					<view class="pickerTypeLi" :class="{pickerTypeLiActive : pickerTypeCurIndex == index}" v-for="(item,index) in pickerTypeList" @click="choosePickerType(index)" :key="index">
 						{{item}}
@@ -51,12 +71,24 @@
 						<view class="item" v-for="(item,index) in years" :key="index">{{item}}</view>
 			    </picker-view-column>
 			</picker-view>
+			<picker-view v-if="pickerTypeCurIndex == 3" indicator-class="indicatorClass" :value="communityValue" @change="bindChange">
+			    <picker-view-column>
+						<view class="item" v-for="(item,index) in communityList" :key="index">{{item}}</view>
+			    </picker-view-column>
+			</picker-view>
+			<picker-view v-if="pickerTypeCurIndex == 4" indicator-class="indicatorClass" :value="houseValue" @change="bindChange">
+			    <picker-view-column>
+						<view class="item" v-for="(item,index) in houseList" :key="index">{{item}}</view>
+			    </picker-view-column>
+			</picker-view>
 		</view>
         
     </view>
 </template>
 
 <script>
+	import uCharts from '../../util/u-charts.js'
+	var canvaRing=null
 	export default {
 	    data: function () {
 	        const date = new Date()
@@ -80,6 +112,39 @@
 	            months.push(i)
 	        }
 	        return {
+				itemProfitList:[
+					{name:'租金',price:1000},
+					{name:'宽带',price:1000},
+					{name:'水费',price:1000},
+					{name:'电费',price:1000},
+					{name:'其他',price:1000},
+				],
+				cWidth:'',
+				cHeight:'',
+				chartData: {
+				  "series": [{
+					"name": "租金",
+					"data": 50
+				  }, {
+					"name": "宽带",
+					"data": 30
+				  }, {
+					"name": "水费",
+					"data": 20
+				  }, {
+					"name": "电费",
+					"data": 18
+				  }, {
+					"name": "其他",
+					"data": 8
+				  }]
+				},
+				pixelRatio:1,
+				choosedCommunity:'',
+				choosedHouse:'',
+				choosedDate:year+'年'+month+'月',
+				houseList:['房屋1','房屋2','房屋3'],
+				communityList:['新德公寓','青春里','新凯家园'],
 				pickerTypeCurIndex:0,
 				pickerTypeList:['月','季','年'],
 	            years,
@@ -89,28 +154,103 @@
 				seasons,
 				seasonIndex:0,
 	            monthValue: [year - 2015, month - 1],
+				seasonValue:[(year - 2015) * 4 + this.seasonIndex],
 				yearValue:[year - 2015],
+				communityValue:[0],
+				houseValue:[0],
 	            visible: false,
 	        }
 	    },
-		computed:{
-			seasonValue(){
-				let arr = [(this.year - 2015) * 4 + this.seasonIndex]
-				return arr
-			}
-		},
 		onLoad(){
-			this.getSeasonIndex()
+			let _this = this
+			_this.cWidth=uni.upx2px(686);
+			_this.cHeight=uni.upx2px(500);
+			_this.showRing("canvasRing",_this.chartData,_this);
+			_this.getSeasonIndex()
+			_this.seasonValue = [(_this.year - 2015) * 4 + _this.seasonIndex]
 		},
 	    methods: {
+			showRing(canvasId,chartData,that){
+				canvaRing=new uCharts({
+					$this:that,
+					canvasId: canvasId,
+					type: 'ring',
+					fontSize:11,
+					padding:[5,5,5,5],
+					legend:{
+						show:true,
+						position:'top',
+						float:'center',
+						itemGap:10,
+						padding:5,
+						lineHeight:26,
+						margin:5,
+						borderWidth :1
+					},
+					background:'#FFFFFF',
+					pixelRatio:that.pixelRatio,
+					series: chartData.series,
+					animation: false,
+					width: that.cWidth*that.pixelRatio,
+					height: that.cHeight*that.pixelRatio,
+					disablePieStroke: true,
+					dataLabel: true,
+					subtitle: {
+						name: '￥3430',
+						offsetX:-2,
+						color: '#7cb5ec',
+						fontSize: 18*that.pixelRatio,
+					},
+					title: {
+						offsetX:4,
+						name: '总收入',
+						color: '#666666',
+						fontSize: 15*that.pixelRatio,
+					},
+					extra: {
+						pie: {
+						  offsetAngle: 0,
+						  ringWidth: 40*that.pixelRatio,
+						  labelWidth:15
+						}
+					},
+				});
+			},
+			touchRing(e){
+				canvaRing.touchLegend(e, {
+					animation : false
+				});
+				canvaRing.showToolTip(e, {
+					format: function (item) {
+						return item.name + ':' + item.data 
+					}
+				});
+			},
+			chooseCommuinty(){
+				console.log('nihao')
+				this.pickerTypeCurIndex = 3
+				this.showPicker()
+			},
+			chooseHouse(){
+				this.pickerTypeCurIndex = 4
+				this.showPicker()
+			},
+			chooseDate(){
+				this.showPicker()
+				this.pickerTypeCurIndex = 0;
+			},
 			showPicker(){
 				this.visible = true;
 			},
-			pickerCancel(){
+			hidePicker(){
 				this.visible = false;
+				this.showRing("canvasRing",_this.chartData,this);
+			},
+			pickerCancel(){
+				this.hidePicker()
 			},
 			pickerSure(){
-				this.visible = false;
+				this.hidePicker()
 			},
 			getSeasonIndex(){
 				switch (this.month) {
@@ -142,10 +282,34 @@
 				this.pickerTypeCurIndex = index
 			},
 	        bindChange: function (e) {
+				console.log(e)
 	            const val = e.detail.value
-	            this.year = this.years[val[0]]
-	            this.month = this.months[val[1]]
-	            // this.day = this.days[val[2]]
+				switch (this.pickerTypeCurIndex) {
+					case 0:
+						this.monthValue = val
+						// this.year = this.years[val[0]]
+						// this.month = this.months[val[1]]
+						this.choosedDate = this.years[val[0]]+'年'+this.months[val[1]]+'月'
+					break;
+					case 1:
+						this.seasonValue = val
+						this.choosedDate =this.seasons[val[0]]
+					break;
+					case 2:
+						this.yearValue = val
+						this.choosedDate = this.years[val[0]]+'年'
+					break;
+					case 3:
+						this.communityValue = val;
+						this.choosedCommunity = this.communityList[val[0]]
+					break;
+					case 4:
+						this.houseValue = val;
+						this.choosedHouse = this.houseList[val[0]]
+					break;		
+					default:
+					break;
+				}
 	        }
 	    }
 	}
@@ -188,7 +352,13 @@
 		border-radius:28px;
 		background-color: #F5F5F5;
 	}
-	
+	.secProfit{
+		font-size: 32rpx;
+	}
+	.secProfit span{
+		font-size: 40rpx;
+		font-weight: bold;
+	}
 	.sectionTwo{
 		width: 100%;
 		height: 78rpx;
@@ -207,6 +377,55 @@
 	.sectionTwo view:first-of-type{
 		border-right: 1rpx solid #F5F5F8;
 	}
+	.contentContainer{
+		width: 686rpx;
+		background-color: #FFFFFF;
+		height: fit-content;
+		margin: 22rpx auto 0 auto;
+		padding-top: 28rpx;
+	}
+	.totalProfit{
+		width: 100%;
+		text-align: right;
+		margin-bottom: 20rpx;
+		padding-right: 30rpx;
+		font-size: 32rpx;
+		font-weight: bold;
+	}
+	.sectionThree{
+		width:100%;
+		height: 500rpx;
+		border-radius: 10rpx;
+		position: relative;
+	}
+	.sectionFour{
+		padding: 70rpx 35rpx 50rpx 35rpx;
+	}
+	.divide{
+		width: 100%;
+		height: 18rpx;
+		position: absolute;
+		bottom: -22rpx;
+	}
+	.secForItem{
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+		padding: 28rpx 0;
+		border-bottom: 2rpx solid #F7F7F7;
+		font-size: 32rpx;
+	}
+	.itemPrice{
+		font-size: 24rpx;
+	}
+	.itemPrice span{
+		font-size: 32rpx;
+		font-weight: bold;
+	}
+	.charts {
+		width: 100%;
+		height: 100%;
+	}
 	.pickerMask{
 		position: fixed;
 		top: 0;
@@ -223,6 +442,9 @@
 		background: #FFFFFF;
 		width: 100%;
 		height: 740rpx;
+	}
+	.shorterPick{
+		height: 560rpx !important;
 	}
 	.pickerTop{
 		width: calc(100% - 60rpx);

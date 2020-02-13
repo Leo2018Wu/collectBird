@@ -24,20 +24,7 @@
 						<!-- :style_Container="'height: 50px; font-size: 16px;'" -->
 						<!-- :initValue="''" -->
 						<template v-slot:main>
-							<!-- <my-select
-							ref="mainindex"
-							:propSelect="placeContent"
-							:list="list"
-							:clearable="false"
-							:showItemNum="5" 
-							:listShow="listShow"
-							:isCanInput="false"  
-							:placeholder = "'请选择'"
-							v-on:focus="focus"
-							v-on:blur="blur"
-							v-on:change="change"
-							:selectHideType="'hideAll'">
-							</my-select> -->
+							
 							<input  class="form-input" disabled="true" placeholder-class="form-input-placeholder" v-model="info.houseType" placeholder="请选择户型" @click="showList()"/>
 						</template>
 						<template v-slot:tip>
@@ -92,14 +79,12 @@
 	import evanForm from '../../components/evan-form/evan-form.vue'
 	import facilityBar from '../../components/facilityBar.vue'
 	import inputBar from '../../components/inputBar.vue'
-	import mySelect from '../../components/mySelect/mySelect.vue'
 	export default {
 		components:{
 			inputBar,
 			facilityBar,
 			evanFormItem,
 			evanForm,
-			mySelect,
 			chooseList
 		},
 		data() {

@@ -123,7 +123,8 @@ export default {
         //获取输入框值并设置keyword参数
         keyword: e.detail.value, //用户输入的关键词，可设置固定值,如keyword:'KFC'
         policy: 1,
-        region: _this.currentCity, //设置城市名，限制关键词所示的地域范围，非必填参数
+		region:'上海',
+        // region: _this.currentCity, //设置城市名，限制关键词所示的地域范围，非必填参数
 		"auto-extend":0,
         success: function(res) {
           //搜索成功后的回调
