@@ -32,7 +32,9 @@
 				</view>
 			</view>
 		</view> -->
-		
+		<view class="renterTitle">
+			租客信息
+		</view>
 		<!-- v-if="isShowAddBtn" -->
 		<view class="section3" v-for="(item,index) in roomInfo.tenants" :key="index" >
 			<renter-info-bar :userInfo = "item" v-on:emitUserId="getEmit"></renter-info-bar>
@@ -251,6 +253,13 @@
 		color: #FFFFFF;
 		border-radius: 18rpx;
 		font-size: 34rpx;
+	}
+	.renterTitle{
+		width: 100%;
+		padding: 30rpx 0 30rpx 40rpx;
+		border-bottom: 1rpx solid #FAFAFA;
+		font-weight: bold;
+		font-size: 30rpx;
 	}
 	.invite{
 		margin-right: 46rpx;

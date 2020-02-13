@@ -1,11 +1,22 @@
 <template>
     <view class="reportForm">
-		<view class="sectionOne">
+		<view class="sectionOne whiteBg">
 			<view class="secDate" @click="showPicker">
 				2020年2月
+				<image class="trinagle" src="../../static/triangle.png" mode="aspectFit"></image>
 			</view>
 			<view class="secProfit">
 				纯利润10000
+			</view>
+		</view>
+		<view class="sectionTwo whiteBg">
+			<view class="communityChoose">
+				全部房产
+				<image class="trinagle" src="../../static/triangle.png" mode="aspectFit"></image>
+			</view>
+			<view class="houseChoose">
+				全部房号
+				<image class="trinagle" src="../../static/triangle.png" mode="aspectFit"></image>
 			</view>
 		</view>
 		<view class="pickerMask" v-if="visible" @click="pickerCancel"></view>
@@ -145,15 +156,26 @@
 		width: 100%;
 		height: 100%;
 		min-height: 100vh;
+		background-color: #FAFAFA;
+	}
+	.whiteBg{
+		background-color: #FFFFFF;
 	}
 	.sectionOne{
-		width: calc(100% - 60rpx);
-		margin: 30rpx 0 38rpx 30rpx;
-		height: 60rpx;
+		padding: 30rpx 30rpx 38rpx 30rpx;
 		display: flex;
-		justify-content: space-between;
+		justify-content: flex-start;
 		align-items: center;
 		color: #333333;
+	}
+	.trinagle{
+		width: 20rpx;
+		height: 20rpx;
+		margin-left: 12rpx;
+		margin-top: 2rpx;
+	}
+	.sectionOne view:first-of-type{
+		margin-right: auto;
 	}
 	.secDate{
 		width: fit-content;
@@ -165,6 +187,25 @@
 		border:1px solid #DBDBDB;
 		border-radius:28px;
 		background-color: #F5F5F5;
+	}
+	
+	.sectionTwo{
+		width: 100%;
+		height: 78rpx;
+		font-size: 32rpx;
+		font-weight: 500;
+		/* display:flex; */
+		border-top: 1rpx solid #F5F5F8;
+	}
+	.sectionTwo view{
+		width: 50%;
+		height: 100%;
+		display: inline-flex;
+		justify-content: center;
+		align-items: center;
+	}
+	.sectionTwo view:first-of-type{
+		border-right: 1rpx solid #F5F5F8;
 	}
 	.pickerMask{
 		position: fixed;
