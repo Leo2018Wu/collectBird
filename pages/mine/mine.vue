@@ -177,10 +177,13 @@ export default {
 					self.$store.commit('openCode', loginRes.code);
 					let openCode = loginRes.code; //js_code可以给后台获取unionID或openID作为用户标识
 					// 获取用户信息
+					self.$request.post('/wx/login',{'code':openCode}).then( res=>{
+						console.log(res)
+					})
 					uni.getUserInfo({
 						provider: 'weixin',
 						success: function(infoRes) {
-							if (infoRes.userInfo) {	
+							if (infoRes.userInfo) {
 								self.show= true;
 								self.$store.commit('userName', infoRes.userInfo.nickName);
 								self.$store.commit('userImg', infoRes.userInfo.avatarUrl);
@@ -302,10 +305,10 @@ export default {
 				.then(res => {
 					console.log(res.data.data);
 					let myMsgs = res.data.data;
-					this.userName = myMsgs.userName;
+					// this.userName = myMsgs.userName;
 					this.usedInviCode = myMsgs.usedInviCode;
 					this.level = myMsgs.level;
-					this.userImg = myMsgs.userImg;
+					// this.userImg = myMsgs.userImg;
 					this.inviCode = myMsgs.inviCode;
 					this.trialDate = myMsgs.trialDate;
 					this.remainDay = myMsgs.remainDay;
@@ -314,22 +317,27 @@ export default {
 					console.log(err);
 				});
 		},
+		// 关闭填写邀请码弹窗
 		cancle() {
-			this.flag = false;
+			this.invitationCodeFlag = false;
 		},
+		// 打开填写邀请码弹窗
 		openNewsInvitationCode(e) {
-			this.flag = true;
+			this.invitationCodeFlag = true;
 		},
+		//跳转意见反馈
 		openFeedBack(e) {
 			uni.navigateTo({
 				url: '../feedback/feedback'
 			});
 		},
+		//跳转关于收租鸟
 		openAboutUs(e) {
 			uni.navigateTo({
 				url: '../aboutUs/aboutUs'
 			});
 		},
+		//跳转帮助
 		openHelp(e) {
 			uni.navigateTo({
 				url: '../help/help'
@@ -771,5 +779,6 @@ export default {
 	background-size: 100% 100%;
 	margin-left: 37rpx;
 	border: none !important;
+	outline: none !important;
 }
 </style>

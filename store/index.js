@@ -4,6 +4,8 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 const store = new Vuex.Store({  
     state: {
+		userOpenId: "1",//用户得openid
+		sessionKey: null,
 		loginSwitch:'',
 		isloginStatus: false,
 		userName: "",
@@ -24,9 +26,11 @@ const store = new Vuex.Store({
 			state.chooseLocationInfo = data
 		},
 		userName(state,data){
+			console.log(data)
 			state.userName = data
 		},
 		userImg(state,data){
+			console.log(data)
 			state.userImg = data
 		},
 		openCode(state,data){
