@@ -159,7 +159,7 @@
 		transform: translateY(-50%);
 	}
 	.addBarBox{
-		border-top: 2rpx solid #DBDBDB80;
+		border-top: 1rpx solid #DBDBDB;
 		padding: 34rpx 0;
 		background-color: #FFFFFF;
 	}
