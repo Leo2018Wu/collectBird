@@ -33,18 +33,6 @@
 					</evan-form-item>
 					<evan-form-item label="收租周期" prop="rentCycle">
 							<template v-slot:main>
-								<!-- <my-select
-								:list="list"
-								:clearable="false"
-								:showItemNum="5" 
-								:listShow="listShow"
-								:isCanInput="false"  
-								:placeholder = "'请选择'"
-								v-on:focus="focus"
-								v-on:blur="blur"
-								v-on:change="change"
-								:selectHideType="'hideAll'">
-								</my-select> -->
 								<input  class="form-input" disabled="true" @click="showList()" placeholder-class="form-input-placeholder" v-model="info.rentCycle"  placeholder="请选择收租周期"  />
 							</template>
 							<template v-slot:tip>
@@ -114,19 +102,6 @@
 					</evan-form-item>
 					<evan-form-item label="收租周期" prop="rentCycle">
 							<template v-slot:main>
-								<!-- <my-select
-								:list="list"
-								:clearable="false"
-								:showItemNum="5" 
-								:listShow="listShow"
-								:isCanInput="false"
-								:initValue= "initValue"
-								:placeholder = "'请选择'"
-								v-on:focus="focus"
-								v-on:blur="blur"
-								v-on:change="change"
-								:selectHideType="'hideAll'">
-								</my-select> -->
 								<input  class="form-input" disabled="true" placeholder-class="form-input-placeholder"  v-model="info.rentCycle" placeholder="请选择收租周期" @click="showList"/>
 							</template>
 							<template v-slot:tip>
@@ -170,7 +145,6 @@
 
 <script>
 	import chnToNumber from '../../util/index'
-	import mySelect from '../../components/mySelect/mySelect.vue'
 	import uImg from '@/components/uploadImg/uploadImg.vue';
 	import evanFormItem from '../../components/evan-form/evan-form-item.vue'
 	import evanForm from '../../components/evan-form/evan-form.vue'
@@ -181,7 +155,6 @@
 			inputBar,
 			evanFormItem,
 			evanForm,
-			mySelect,
 			chooseList
 		},
 		data() {
