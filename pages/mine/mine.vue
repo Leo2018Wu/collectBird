@@ -68,6 +68,16 @@
 				</view>
 				<view class="rightPart"><image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image></view>
 			</view>
+			<view class="jumpPortalitem">
+				<view class="leftPart">
+					<image class="jumpPortalImg" src="../../static/telphone.png" mode=""></image>
+					<view class="jumpPortalText">手机号</view>
+				</view>
+				<view class="rightPart">
+					<button class="getTelNumImg" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber"></button>
+					<view class="getTelNum" v-if="false">已绑定 {{ telPhoneNum }}</view>
+				</view>
+			</view>
 		</view>
 		<!-- 填写邀请码弹窗 -->
 		<view class="modal" v-show="invitationCodeFlag" @click="cancle"></view>
@@ -94,8 +104,8 @@
 				</view>
 			</view>
 		</view>
-
 		<!-- 授权弹窗 -->
+		<!-- <is-login v-show="loginFlag" v-on:onLoad="onLoad" :childLoginFlag="loginFlag" v-on:childByValue="childByValue"></is-login> -->
 		<view class="isloginModal" v-show="loginFlag" @click="cancleLogin"></view>
 		<view class="isloginBox" v-show="loginFlag">
 			<image class="bgcImg" src="../../static/authorization.png" mode=""></image>
@@ -103,9 +113,7 @@
 			<view class="loginTxt">授权登录体验完整功能</view>
 			<view class="loginImg">
 				<view class="notLogin" @click="cancleLogin"><image src="../../static/notLogin.png" mode=""></image></view>
-				<button class="loginButton" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true">
-					<!-- <view class="isLogin"><image src="../../static/login.png" mode=""></image></view> -->
-				</button>
+				<button class="loginButton" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true"></button>
 			</view>
 		</view>
 	</view>
@@ -115,26 +123,28 @@
 import evanFormItem from '../../components/evan-form/evan-form-item.vue';
 import evanForm from '../../components/evan-form/evan-form.vue';
 import { mapState, mapMutations } from 'vuex';
+// import { isLogin } from '../../components/isLogin.vue';
 export default {
 	components: {
 		evanFormItem,
-		evanForm
+		evanForm,
 		// isLogin
 	},
 	data() {
 		return {
 			invitationCodeFlag: false, // 是否显示填写邀请码弹窗
 			loginFlag: false, //登录弹窗
-			haveUser: false, //用户是否授权
+			// haveUser: false, //用户是否授权
 			userImg: this.$store.state.userImg, //用户头像
 			userName: this.$store.state.userName, //用户昵称
 			show: false, //是否显示点击登录
-			roomNum: '28',
+			roomNum: '0',
 			inviCode: '', // 我的邀请码
 			usedInviCode: '', //填写邀请码
 			level: '',
-			remainDay: '', //剩余天数
+			remainDay: '0', //剩余天数
 			trialDate: '',
+			telPhoneNum: '17521774352', // 绑定手机号
 			info: {
 				invitationCode: ''
 			},
@@ -148,24 +158,31 @@ export default {
 		};
 	},
 	onLoad(options) {
-		if (this.$store.state.openCode) {
-			// this.show = true;
+		this.$nextTick(() => {
+			this.$refs.form.setRules(this.rules);
+		});
+		// 查看是否已经授权
+		if (this.$store.state.openCode && this.$store.state.isloginStatus) {
+			// 获取数据
 			this.getMineMsg();
-			this.$nextTick(() => {
-				this.$refs.form.setRules(this.rules);
-			});
+			this.loginFlag = false;
+			this.show = true;
 		}
 	},
 	onShow() {
-		this.getMineMsg();
+		// 查看是否已经授权
+		if (this.$store.state.openCode && this.$store.state.isloginStatus) {
+			// 获取数据
+			this.getMineMsg();
+			this.loginFlag = false;
+			this.show = true;
+		}
 	},
-	// mounted() {
-	// 	this.setting();
-	// },
-	// computed: {
-	// 	...mapState('userName':userName,'userImg':userImg,'openCode':openCode)
-	// },
 	methods: {
+		childByValue(childValue) {
+			console.log(childValue);
+			this.loginFlag = childValue;
+		},
 		getUserInfo() {
 			this.loginFlag = false;
 			console.log(11111);
@@ -174,128 +191,83 @@ export default {
 				provider: 'weixin',
 				success: function(loginRes) {
 					console.log(loginRes, '1111');
-					self.$store.commit('openCode', loginRes.code);
-					let openCode = loginRes.code; //js_code可以给后台获取unionID或openID作为用户标识
-					// 获取用户信息
-					self.$request.post('/wx/login',{'code':openCode}).then( res=>{
-						console.log(res)
-					})
-					uni.getUserInfo({
-						provider: 'weixin',
-						success: function(infoRes) {
-							if (infoRes.userInfo) {
-								self.show= true;
-								self.$store.commit('userName', infoRes.userInfo.nickName);
-								self.$store.commit('userImg', infoRes.userInfo.avatarUrl);
-								self.userName = infoRes.userInfo.nickName;
-								self.userImg = infoRes.userInfo.avatarUrl;
-								console.log(infoRes);
-								//infoRes里面有用户信息需要的话可以取一下
-								// let username = infoRes.userInfo.nickName; //用户名
-								// let userImg = infoRes.userInfo.userImg; //用户头像
-							}
-							// let formdata = { code: openCode, username: username, userImg: userImg };
-							// //login是接口地址，看下面PHP代码
-							// this.post("/login",formdata).then(res=>{//这是我封装的请求方法
-							// 	if(res.code==200){
-							// 		//登录成功
-							// 	}
-							// })
-						},
-						fail: function(res) {
-							uni.showToast({
-								title: '微信授权不成功！',
-								duration: 2000
+					uni.checkSession({
+						success() {
+							// session_key 未过期，并且在本生命周期一直有效
+							self.$store.commit('openCode', loginRes.code);
+							self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
+								console.log(res);
+								if (res) {
+									self.$store.commit('isloginStatus', true);
+									self.$store.commit('openCode', res.data.openId);
+									self.$store.commit('sessionKey', res.data.sessionKey);
+									uni.getUserInfo({
+										provider: 'weixin',
+										success: function(infoRes) {
+											if (infoRes.userInfo) {
+												self.show = true;
+												self.$store.commit('userName', infoRes.userInfo.nickName);
+												self.$store.commit('userImg', infoRes.userInfo.avatarUrl);
+												self.userName = infoRes.userInfo.nickName;
+												self.userImg = infoRes.userInfo.avatarUrl;
+												console.log(infoRes);
+												//infoRes里面有用户信息需要的话可以取一下
+												// let username = infoRes.userInfo.nickName; //用户名
+												// let userImg = infoRes.userInfo.userImg; //用户头像
+											}
+										},
+										fail: function(res) {
+											uni.showToast({
+												title: '微信授权不成功！',
+												duration: 2000
+											});
+										}
+									});
+								}
 							});
+						},
+						fail() {
+							// session_key 已经失效，需要重新执行登录流程
+							uni.login({
+								provider: 'weixin',
+								success: function(loginRes) {
+									self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
+										console.log(res);
+									});
+								}
+							}); // 重新登录
 						}
 					});
+
+					// let openCode = loginRes.code; //js_code可以给后台获取unionID或openID作为用户标识
+					// 获取用户信息
+					// self.$request.post('/wx/login', { code: openCode }).then(res => {
+					// 	console.log(res);
+					// });
 				},
 				fail: function(res) {}
 			});
 		},
-		// bindGetUserInfo(e) {
-		//           const that = this;
-		//           if (e.mp.detail.rawData){
-		//               //用户按了允许授权按钮
-		//               // that.setting();
-		// 			  uni.getStorage({
-		// 			  	key: 'loginSwitch',
-		// 				success(e) {
-		// 					if (e.data == 1) {
-		// 						uni.showToast({
-		// 							title: '您已经授权过了！',
-		// 							duration: 2000
-		// 						})
-		// 					} else {
-		// 						that.setting()
-		// 					}
-		// 				},
-		// 				fail() {
-		// 					that.setting()
-		// 				}
-		// 			  })
-		//           } else {
-		//               //用户按了拒绝按钮
-		//               wx.showModal({
-		//                 title: '提示',
-		//                 content: '您拒绝授权，无法进行操作哦！',
-		//                 showCancel: false,
-		//                 confirmText: '返回授权',
-		//                 success: function (res) {
-		//                   // 用户没有授权成功，不需要改变 isHide 的值
-		//                   if (res.confirm) {
-		// 						console.log('用户点击了“返回授权”');
-		//                   }
-		//                 }
-		//               })
-		// 			  uni.setStorage({
-		// 			  	key: 'loginSwitch',
-		// 			  	data: '0'
-		// 			  })
-		//           }
-		//       },
-		// wxLogin(e) {
-		//        const that = this;
-		//        that.logining = true;
-		//        let userInfo = e.detail.userInfo;
-		//        uni.login({
-		//            provider:"weixin",
-		//            success:(login_res => {
-		//                let code = login_res.code;
-		//                uni.getUserInfo({
-		//                    success(info_res) {
-		//                        console.log(info_res)
-		//                        uni.request({
-		//                            url:'http://localhost:8080/wxlogin',
-		//                            method:"POST",
-		//                            header: {
-		//                                              'content-type': 'application/x-www-form-urlencoded'
-		//                                            },
-		//                            data:{
-		//                                code : code,
-		//                                rawData : info_res.rawData
-		//                            },
-		//                            success(res) {
-		//                                if(res.data.status == 200){
-		//                                    that.$store.commit('login',userInfo);
-		//                                }else{
-		//                                    console.log('服务器异常')
-		//                                }
-		//                            },
-		//                            fail(error) {
-		//                                console.log(error)
-		//                            }
-		//                        })
-		//                        uni.hideLoading()
-		//                        uni.navigateBack()
-		//                    }
-		//                })
 
-		//            })
-		//            })
-		//        }
-		//    },
-
+		// getPhoneNumber(e) {
+		// 	var that = this;
+		// 	console.log(e.detail.errMsg == 'getPhoneNumber:ok');
+		// 	if (e.detail.errMsg == 'getPhoneNumber:ok') {
+		// 		// uni.request({
+		// 		//   url: 'http://localhost/index/users/decodePhone',
+		// 		//   data: {
+		// 		//     encryptedData: e.detail.encryptedData,
+		// 		//     iv: e.detail.iv,
+		// 		//     sessionKey: that.data.session_key,
+		// 		//     uid: "",
+		// 		//   },
+		// 		//   method: "post",
+		// 		//   success: function (res) {
+		// 		//     console.log(res);
+		// 		//   }
+		// 		// })
+		// 	}
+		// },
 		getMineMsg() {
 			let _this = this;
 			_this.$request
@@ -588,6 +560,20 @@ export default {
 	top: 34%;
 	right: 40rpx;
 }
+.getTelNumImg {
+	background-image: url(../../static/getTelNum.png);
+	width: 213rpx !important;
+	height: 53rpx !important;
+	background-size: 100% 100%;
+	border: none !important;
+	outline: none !important;
+}
+.getTelNum {
+	font-size: 28rpx;
+	font-family: PingFang SC;
+	font-weight: 500;
+	color: rgba(153, 153, 153, 1);
+}
 
 /* 弹窗 */
 .modal {
@@ -712,7 +698,7 @@ export default {
 	height: 537rpx;
 	overflow: hidden;
 	position: fixed;
-	top: 28%;
+	top: 19%;
 	left: 15%;
 	z-index: 1001;
 }
@@ -780,5 +766,8 @@ export default {
 	margin-left: 37rpx;
 	border: none !important;
 	outline: none !important;
+}
+button::after {
+	border: none;
 }
 </style>

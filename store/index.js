@@ -2,41 +2,48 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 Vue.use(Vuex)
-const store = new Vuex.Store({  
-    state: {
-		userOpenId: "1",//用户得openid
+const store = new Vuex.Store({
+	state: {
+		// userOpenId: "1",//用户得openid
 		sessionKey: null,
-		loginSwitch:'',
-		isloginStatus: false,
+		loginSwitch: '',
+		isloginStatus: false, //是否授权登录状态
 		userName: "",
 		userImg: "",
-		openCode:"",
-        landladyInfo: {},
-		tempRoomInfo:{},
-		chooseLocationInfo:{}
-    },  
-    mutations: {  
-        landladyInfo(state,data){
+		openCode: null,
+		landladyInfo: {},
+		tempRoomInfo: {},
+		chooseLocationInfo: {}
+	},
+	mutations: {
+		landladyInfo(state, data) {
 			state.landladyInfo = data
 		},
-		tempRoomInfo(state,data){
+		tempRoomInfo(state, data) {
 			state.tempRoomInfo = data
 		},
-		chooseLocationInfo(state,data){
+		chooseLocationInfo(state, data) {
 			state.chooseLocationInfo = data
 		},
-		userName(state,data){
+		userName(state, data) {
 			console.log(data)
 			state.userName = data
 		},
-		userImg(state,data){
+		userImg(state, data) {
 			console.log(data)
 			state.userImg = data
 		},
-		openCode(state,data){
+		openCode(state, data) {
 			console.log(data)
 			state.openCode = data
+		},
+		isloginStatus(state, data) {
+			console.log(data)
+			state.isloginStatus = data
+		},
+		sessionKey(state, data) {
+			state.sessionKey = data
 		}
-    }  
+	}
 })
 export default store

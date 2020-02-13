@@ -40,13 +40,24 @@
 				</view>
 			</view>
 		</view>
+		<!-- 授权弹窗 -->
+		<view class="isloginModal" v-show="loginFlag" @click="cancleLogin"></view>
+		<view class="isloginBox" v-show="loginFlag">
+			<image class="bgcImg" src="../../static/authorization.png" mode=""></image>
+			<view class="deleteImg" @click="cancleLogin"><image src="../../static/delete.png" mode=""></image></view>
+			<view class="loginTxt">授权登录体验完整功能</view>
+			<view class="loginImg">
+				<view class="notLogin" @click="cancleLogin"><image src="../../static/notLogin.png" mode=""></image></view>
+				<button class="loginButton" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true"></button>
+			</view>
+		</view>
 	</view>
 </template>
 
 <script>
-// import renterInfoBar from '../../components/isLogin/isLgin.vue'
+// import renterInfoBar from '../../components/isLogin/isLgin.vue';
 export default {
-	// components:{
+	// components: {
 	// 	isLogin
 	// },
 	data() {
@@ -55,12 +66,26 @@ export default {
 			mouthIncome: '0',
 			billDuein: '0',
 			billReceived: '0',
-			todayReceived: '0'
+			todayReceived: '0',
+			loginFlag: false,
+			userName: '',
+			userImg: ''
 		};
 	},
+	onShow(option) {
+		setTimeout(() => {
+			if (this.$store.state.openCode && this.$store.state.isloginStatus) {
+				console.log(this.$store.state.openCode);
+				this.getLandLadyInfo();
+				this.getMoneyInfo();
+			} else {
+				this.loginFlag = true;
+			}
+		}, 1000);
+	},
 	onLoad() {
-		this.getLandLadyInfo();
-		this.getMoneyInfo();
+		// this.getLandLadyInfo();
+		// this.getMoneyInfo();
 	},
 	methods: {
 		getMoneyInfo() {
@@ -103,10 +128,49 @@ export default {
 				url: '../billManage/billManage'
 			});
 		},
-		goReportForm(){
+		goReportForm() {
 			uni.navigateTo({
 				url: '../reportForm/reportForm'
 			});
+		},
+		getUserInfo() {
+			this.loginFlag = false;
+			console.log(11111);
+			let self = this;
+			uni.login({
+				provider: 'weixin',
+				success: function(loginRes) {
+					console.log(loginRes, '1111');
+					self.$store.commit('openCode', loginRes.code);
+					// 获取用户信息
+					self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
+						self.getLandLadyInfo();
+						self.getMoneyInfo();
+						self.$store.commit('isloginStatus', true);
+						console.log(res);
+						uni.getUserInfo({
+							provider: 'weixin',
+							success: function(infoRes) {
+								if (infoRes.userInfo) {
+									console.log(infoRes);
+									self.$store.commit('userName', infoRes.userInfo.nickName);
+									self.$store.commit('userImg', infoRes.userInfo.avatarUrl);
+								}
+							},
+							fail: function(res) {
+								uni.showToast({
+									title: '微信授权不成功！',
+									duration: 2000
+								});
+							}
+						});
+					});
+				},
+				fail: function(res) {}
+			});
+		},
+		cancleLogin(e) {
+			this.loginFlag = false;
 		}
 	}
 };
@@ -188,5 +252,91 @@ export default {
 	font-size: 26rpx;
 	font-family: PingFang-SC-Medium;
 	font-weight: 500;
+}
+
+/* 登录弹窗 */
+.isloginModal {
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 1000;
+	background: #000;
+	opacity: 0.5;
+	overflow: hidden;
+	z-index: 500;
+}
+.isloginBox {
+	width: 513rpx;
+	height: 537rpx;
+	overflow: hidden;
+	position: fixed;
+	top: 19%;
+	left: 15%;
+	z-index: 1001;
+}
+.bgcImg {
+	width: 100%;
+	height: 100%;
+	z-index: 9000;
+}
+.loginTxt {
+	font-size: 30rpx;
+	font-family: PingFang SC;
+	font-weight: 400;
+	color: rgba(102, 102, 102, 1);
+	line-height: 36px;
+	text-align: center;
+	z-index: 9000;
+	position: absolute;
+	bottom: 79px;
+	left: 106rpx;
+}
+.deleteImg {
+	width: 38rpx;
+	height: 38rpx;
+	position: absolute;
+	top: 15rpx;
+	right: 15rpx;
+	z-index: 9000;
+}
+.deleteImg image {
+	width: 100%;
+	height: 100%;
+}
+.loginImg {
+	position: absolute;
+	z-index: 9000;
+	bottom: 60rpx;
+	left: 0rpx;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0rpx 52rpx;
+}
+.notLogin {
+	width: 185rpx;
+	height: 70rpx;
+}
+.notLogin image {
+	width: 100%;
+	height: 100%;
+}
+.isLogin image {
+	width: 100%;
+	height: 100%;
+}
+.loginButton {
+	width: 185rpx !important;
+	height: 70rpx !important;
+	background-image: url(../../static/login.png);
+	background-size: 100% 100%;
+	margin-left: 37rpx;
+	border: none !important;
+	outline: none !important;
+}
+button::after {
+	border: none;
 }
 </style>

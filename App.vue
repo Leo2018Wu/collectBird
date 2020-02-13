@@ -1,35 +1,26 @@
 <script>
 export default {
 	onLaunch: function() {
-		console.log('App Launch');
-		// 获取用户openId 
+		// // 获取用户openId;
 		// uni.login({
 		// 	//获取code
 		// 	success: function(res) {
-		// 		console.log('得到conde：');
-		// 		console.log(res);
+		// 		console.log('得到conde:', res.code, res);
 		// 		let data = {
 		// 			code: res.code
 		// 		};
-		// 		console.log('请求openID提交的数据：');
-		// 		console.log(data);
-		// 		// 获取服务器端的openid
-		// 		// this.$request.post('/wx/login',data).then( res=>{
-		// 		// 		console.log(res)
-		// 		// 		this.sessionKey = res.data.sessionKey;
-		// 		// 		this.userOpenId = res.data.openId;
-		// 		// 	})
+		// 		console.log('请求openID提交的数据：', data);
 		// 		uni.request({
 		// 			url: 'https://funnyduck.raysler.com/rentbird/wx/login',
 		// 			data: data,
 		// 			header: { 'content-type': 'application/json' },
 		// 			method: 'POST',
 		// 			success: function(res) {
-		// 				console.log('获取服务器端openId成功：');
+		// 				console.log('获取服务器端openId成功：', res.data.openId);
+		// 				console.log('获取服务器端sessionKey成功：', res.data.sessionKey);
 		// 				console.log(res);
 		// 				if (res.data.openId) {
-		// 					this.userOpenId = res.data.openId;
-		// 					// this.getusernews();
+		// 					_this.userOpenId = res.data.openId;
 		// 				} else {
 		// 					wx.showToast({
 		// 						title: '登录异常，请关闭小程序重新登录',
@@ -38,16 +29,15 @@ export default {
 		// 					});
 		// 					return;
 		// 				}
-		// 				// _this.userOpenId = "123460admin";
-		// 				this.sessionKey = res.data.sessionKey;
+		// 				_this.sessionKey = res.data.sessionKey;
 		// 				// 或许openId为异步。用callback保证得到OpenId后能再执行首页的获取数据操作
 		// 				// if (_this.userOpenIdCallback) {
 		// 				// 	_this.userOpenIdCallback();
 		// 				// }
 
-		// 				// if (_this.globalData.userInfo != null) {
-		// 				// 	_this.updataUserInfo();
-		// 				// }
+		// 				if (_this.globalData.userName != null) {
+		// 					_this.updataUserInfo();
+		// 				}
 		// 				// if (_this.getUserInfoFun) {
 		// 				// 	_this.getUnionId();
 		// 				// }
@@ -66,7 +56,54 @@ export default {
 	},
 	onHide: function() {
 		console.log('App Hide');
+	},
+	// 用户的头像昵称
+	globalData: {
+		userName: '',
+		userImg: '',
+		networkType: 'net' //当前网络状态
+		// topicNum:'',
+		// likeNum:'',
+		// commentNum:''
+	},
+	userOpenId: '1', //用户得openid
+	// 当用户执行授权时更新后台用户信息
+	updataUserInfo: function() {
+		let _this = this;
+		let data = {
+			openId: _this.userOpenId,
+			userName: _this.globalData.userInfo.nickName,
+			userImg: _this.globalData.userInfo.avatarUrl
+		};
+		console.log(data);
+		wx.request({
+			url: _this.local + '/user/update.do',
+			header: { 'content-type': 'application/json' },
+			data: data,
+			method: 'POST',
+			success(res) {
+				console.log(res);
+			},
+			fail(error) {
+				console.log(error);
+			}
+		});
 	}
+	// // 获取网络状态
+	// getNet() {
+	//   let _this = this
+	//   wx.getNetworkType({
+	//     success: function (res) {
+	//       if (_this.globalData.networkType != res.networkType) {
+	//         wx.showLoading({
+	//           title: '正在重新登录',
+	//           mask: true
+	//         }),
+	//         _this.reLoad(res.networkType);
+	//       }
+	//     },
+	//   });
+	//  }
 };
 </script>
 
@@ -102,5 +139,8 @@ button {
 	margin: 0;
 	padding: 0;
 	border: none !important;
+}
+button::after {
+	border: none;
 }
 </style>
