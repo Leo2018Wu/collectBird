@@ -42,6 +42,16 @@
 			</view>
 			<view class="jumpPortalitem">
 				<view class="leftPart">
+					<image class="jumpPortalImg" src="../../static/telphone.png" mode=""></image>
+					<view class="jumpPortalText">手机号</view>
+				</view>
+				<view class="rightPart">
+					<button class="getTelNumImg" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber"></button>
+					<view class="getTelNum" v-if="false">已绑定 {{ telPhoneNum }}</view>
+				</view>
+			</view>
+			<view class="jumpPortalitem">
+				<view class="leftPart">
 					<image class="jumpPortalImg" src="../../static/myIcon5.png" mode=""></image>
 					<view class="jumpPortalText">邀请好友</view>
 				</view>
@@ -67,16 +77,6 @@
 					<view class="jumpPortalText">关于收租鸟</view>
 				</view>
 				<view class="rightPart"><image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image></view>
-			</view>
-			<view class="jumpPortalitem">
-				<view class="leftPart">
-					<image class="jumpPortalImg" src="../../static/telphone.png" mode=""></image>
-					<view class="jumpPortalText">手机号</view>
-				</view>
-				<view class="rightPart">
-					<button class="getTelNumImg" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber"></button>
-					<view class="getTelNum" v-if="false">已绑定 {{ telPhoneNum }}</view>
-				</view>
 			</view>
 		</view>
 		<!-- 填写邀请码弹窗 -->
@@ -135,15 +135,15 @@ export default {
 			invitationCodeFlag: false, // 是否显示填写邀请码弹窗
 			loginFlag: false, //登录弹窗
 			// haveUser: false, //用户是否授权
-			userImg: this.$store.state.userImg, //用户头像
-			userName: this.$store.state.userName, //用户昵称
+			userImg: "", //用户头像
+			userName: '', //用户昵称
 			show: false, //是否显示点击登录
 			roomNum: '0',
 			inviCode: '', // 我的邀请码
 			usedInviCode: '', //填写邀请码
 			level: '',
 			remainDay: '0', //剩余天数
-			trialDate: '',
+			trialDate: '2030-01-01',
 			telPhoneNum: '17521774352', // 绑定手机号
 			info: {
 				invitationCode: ''
@@ -161,21 +161,28 @@ export default {
 		this.$nextTick(() => {
 			this.$refs.form.setRules(this.rules);
 		});
-		// 查看是否已经授权
-		if (this.$store.state.openCode && this.$store.state.isloginStatus) {
+		if (this.$store.state.isloginStatus) {
 			// 获取数据
-			this.getMineMsg();
-			this.loginFlag = false;
 			this.show = true;
+			this.userName = this.$store.state.userName;
+			this.userImg = this.$store.state.userImg;
+			this.getMineMsg();
+		}else{
+			this.show = false;
+			this.userImg = 'https://funnyduck.raysler.com/uploadFile/huyue/moments/images/20190807/232437400374245352789212064.jpg';
 		}
 	},
 	onShow() {
 		// 查看是否已经授权
-		if (this.$store.state.openCode && this.$store.state.isloginStatus) {
+		if (this.$store.state.isloginStatus) {
 			// 获取数据
-			this.getMineMsg();
-			this.loginFlag = false;
 			this.show = true;
+			this.userName = this.$store.state.userName;
+			this.userImg = this.$store.state.userImg;
+			this.getMineMsg();
+		}else{
+			this.show = false;
+			this.userImg = 'https://funnyduck.raysler.com/uploadFile/huyue/moments/images/20190807/232437400374245352789212064.jpg';
 		}
 	},
 	methods: {
@@ -210,6 +217,7 @@ export default {
 												self.$store.commit('userImg', infoRes.userInfo.avatarUrl);
 												self.userName = infoRes.userInfo.nickName;
 												self.userImg = infoRes.userInfo.avatarUrl;
+												self.getMineMsg()
 												console.log(infoRes);
 												//infoRes里面有用户信息需要的话可以取一下
 												// let username = infoRes.userInfo.nickName; //用户名
@@ -339,7 +347,7 @@ export default {
 									title: '提交成功'
 								});
 								this.info.invitationCode = '';
-								this.flag = false;
+								this.invitationCodeFlag = false;
 								this.getMineMsg();
 							}
 						})
@@ -351,6 +359,7 @@ export default {
 		},
 		cancleLogin(e) {
 			this.loginFlag = false;
+			this.getMineMsg();
 		},
 		openLogin(e) {
 			this.loginFlag = true;
@@ -464,7 +473,7 @@ export default {
 .leftMsg {
 	width: 48%;
 	text-align: center;
-	padding-top: 35rpx;
+	padding-top: 30rpx;
 }
 
 .leftMsgTitle {
@@ -490,7 +499,7 @@ export default {
 .rightMsg {
 	width: 48%;
 	text-align: center;
-	padding-top: 35rpx;
+	padding-top: 30rpx;
 }
 
 .rightMsgTitle {
