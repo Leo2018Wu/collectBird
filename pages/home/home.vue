@@ -62,60 +62,58 @@ export default {
 	// },
 	data() {
 		return {
-			//本月净收入
-			mouthIncome: '0',
-			billDuein: '0',
-			billReceived: '0',
-			todayReceived: '0',
-			loginFlag: false,
-			userName: '',
-			userImg: ''
+			mouthIncome: '0', //本月净收入
+			billDuein: '0', //本月账单待收
+			billReceived: '0', //本月账单已收
+			todayReceived: '0', //今日已收金额
+			loginFlag: false
 		};
 	},
 	onShow(option) {
 		console.log(this.$store.state.isloginStatus);
-		if(this.$store.state.isloginStatus){
-			this.loginFlag = false
-			this.getMoneyInfo()
-		}else{
-			this.loginFlag = true
+		if (this.$store.state.isloginStatus) {
+			this.loginFlag = false;
+			this.getMoneyInfo();
+		} else {
+			this.loginFlag = true;
+			// this.getMoneyInfo();
 		}
 	},
 	onLoad(option) {
-		// this.$store.state.isloginStatus? this.getMoneyInfo() : this.loginFlag = true
-		if(this.$store.state.isloginStatus){
+		if (this.$store.state.isloginStatus) {
 			this.loginFlag = false;
-			this.getMoneyInfo()
-		}else{
+			this.getMoneyInfo();
+		} else {
 			this.loginFlag = true;
 		}
 	},
 	methods: {
+		getLandLadyInfo(userInfo) {
+			let _this = this;
+			console.log(_this.$store.state.userOpenId);
+			_this.$request
+				.post('user/findByOpenId',userInfo)
+				.then(res => {
+					_this.$store.commit('landladyInfo', res.data.data);
+					_this.getMoneyInfo() 
+				})
+				.catch(err => {});
+		},
 		getMoneyInfo() {
-			this.$request
+			let _this = this;
+			_this.$request
 				.post('user/money', {
-					id: 'ab8afaed-31f7-11ea-91b8-525400bc2088'
+					id: _this.$store.state.landladyInfo.id
 				})
 				.then(res => {
 					console.log(res);
 					let data = res.data.data;
-					this.mouthIncome = data.monthIncome;
-					this.billReceived = data.monthAllIncome;
-					this.billDuein = data.monthUnIncome;
-					this.todayReceived = data.todaySumTotal;
+					_this.mouthIncome = data.monthIncome;
+					_this.billReceived = data.monthAllIncome;
+					_this.billDuein = data.monthUnIncome;
+					_this.todayReceived = data.todaySumTotal;
 				});
 		},
-		// getLandLadyInfo() {
-		// 	let _this = this;
-		// 	this.$request
-		// 		.post('/user/findOne', {
-		// 			id: 'ab8afaed-31f7-11ea-91b8-525400bc2088'
-		// 		})
-		// 		.then(res => {
-		// 			_this.$store.commit('landladyInfo', res.data.data);
-		// 		})
-		// 		.catch(err => {});
-		// },
 		toHouseList(e) {
 			uni.navigateTo({
 				url: '../houseList/houseList'
@@ -147,17 +145,31 @@ export default {
 					self.$store.commit('openCode', loginRes.code);
 					// 获取用户信息
 					self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
-						// self.getLandLadyInfo();
-						self.getMoneyInfo();
 						self.$store.commit('isloginStatus', true);
+						self.$store.commit('userOpenId', res.data.data.openid);
+						self.$store.commit('sessionKey', res.data.data.session_key);
 						console.log(res);
 						uni.getUserInfo({
 							provider: 'weixin',
 							success: function(infoRes) {
 								if (infoRes.userInfo) {
 									console.log(infoRes);
-									self.$store.commit('userName', infoRes.userInfo.nickName);
-									self.$store.commit('userImg', infoRes.userInfo.avatarUrl);
+									// 微信的gender 1 男 2 女 0 未知
+									// 收租鸟userSex 0 男 1 女
+									if (infoRes.userInfo.gender == '1') {
+										self.gender = '0';
+									} else if (infoRes.userInfo.gender == '2') {
+										self.gender = '1';
+									} else {
+										self.gender = '未知';
+									}
+									let userInfo = {
+										openId: res.data.data.openid,
+										userName: infoRes.userInfo.nickName,
+										userImg: infoRes.userInfo.avatarUrl,
+										userSex: self.gender
+									};
+									self.getLandLadyInfo(userInfo) 
 								}
 							},
 							fail: function(res) {

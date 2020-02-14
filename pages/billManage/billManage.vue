@@ -19,49 +19,81 @@
 				<view class="billBaritem" @click="changeIndex(index)" v-for="(item, index) in arr" :key="index" :class="{ active: currentIndex == index }">{{ item }}</view>
 			</view>
 			<view class="billList">
-				<view class="billListItem" v-for="(item, idx) in billListInfo" :key="idx" @click="showBill(item)">
-					<view class="billListLeft">
-						<view class="billDateText">账单日期</view>
-						<view class="billDate">{{ item.endDate.substr(0, 10) }}</view>
-						<view class="billAdress">{{ item.roomNo }}</view>
-					</view>
-					<view class="billListright">
-						<view class="billSum" v-show="currentIndex != 3" :class="{ bule: currentIndex == 2 }">{{ item.total }}</view>
-						<view class="overdueNum" v-show="currentIndex == 1">{{ item.overdueDays }}天后交租</view>
-						<view class="overdueNum" v-show="currentIndex == 0 && item.overdueDays > 0">逾期{{ item.overdueDays }}天</view>
-						<view class="" v-show="currentIndex == 3">
-							<view class="billSum" :class="{ bule: item.billStatus == 4 }">{{ item.total }}</view>
-							<view class="overdueNum" v-show="item.billStatus == 0">{{ item.overdueDays }}天后交租</view>
-							<view class="overdueNum" v-show="item.billStatus == 3 && item.overdueDays > 0">逾期{{ item.overdueDays }}天</view>
+				<mescroll-uni :down="downOption" @down="downCallback" :up="upOption" @up="upCallback" :fixed="false" @init="init">
+					<view class="billListItem" v-for="(item, idx) in billListInfo" :key="idx" @click="showBill(item)">
+						<view class="billListLeft">
+							<view class="billDateText">账单日期</view>
+							<view class="billDate">{{ item.endDate.substr(0, 10) }}</view>
+							<view class="billAdress">{{ item.roomNo }}</view>
+						</view>
+						<view class="billListright">
+							<view class="billSum" v-show="currentIndex != 3" :class="{ bule: currentIndex == 2 }">{{ item.total }}</view>
+							<view class="overdueNum" v-show="currentIndex == 1">{{ item.overdueDays }}天后交租</view>
+							<view class="overdueNum" v-show="currentIndex == 0 && item.overdueDays > 0">逾期{{ item.overdueDays }}天</view>
+							<view class="" v-show="currentIndex == 3">
+								<view class="billSum" :class="{ bule: item.billStatus == 4 }">{{ item.total }}</view>
+								<view class="overdueNum" v-show="item.billStatus == 0">{{ item.overdueDays }}天后交租</view>
+								<view class="overdueNum" v-show="item.billStatus == 3 && item.overdueDays > 0">逾期{{ item.overdueDays }}天</view>
+							</view>
 						</view>
 					</view>
-				</view>
+				</mescroll-uni>
 			</view>
 		</view>
-		
 	</view>
 </template>
 
 <script>
+	import MescrollUni from "../../components/mescroll-uni/mescroll-uni.vue";
 export default {
+	components: {
+		// 'scroll-tab': scrollTab,
+		// 'house-sku': houseSku,
+		// 'add-Bar': addBar,
+		MescrollUni
+	},
 	data() {
 		return {
 			billListInfo: [],
 			billStatus: '3', // 默认展示已逾期
-			landlordId: '',
+			userId: '',
 			arr: ['已逾期', '未收款', '已收款', '全部'],
 			currentIndex: 0,
 			// isActive: true, //判断是否选中
-			unIncome: '',
-			income: ''
+			unIncome: 0,
+			income: 0,
+			mescroll: {},
+			para: {
+				userId: this.$store.state.landladyInfo.id,
+				pageNum: 1
+			},
+			// 下拉刷新的常用配置
+			downOption: {
+				use: true, // 是否启用下拉刷新; 默认true
+				auto: true // 是否在初始化完毕之后自动执行下拉刷新的回调; 默认true
+			},
+			// 上拉加载的常用配置
+			upOption: {
+				use: true, // 是否启用上拉加载; 默认true
+				auto: true, // 是否在初始化完毕之后自动执行上拉加载的回调; 默认true
+				page: {
+					num: 0, // 当前页码,默认0,回调之前会加1,即callback(page)会从1开始
+					size: 10 // 每页数据的数量,默认10
+				},
+				noMoreSize: 5, // 配置列表的总数量要大于等于5条才显示'-- END --'的提示
+				empty: {
+					use: true,
+					tip: '暂无相关数据'
+				}
+			}
 		};
 	},
 	onLoad() {
 		this.getMoney();
-		this.getBillList(this.billStatus, this.landlordId);
+		// this.getBillList(this.billStatus, this.userId);
 	},
 	onShow() {
-		this.getBillList(this.billStatus, this.landlordId);
+		// this.getBillList(this.billStatus, this.userId);
 	},
 	methods: {
 		showBill(item) {
@@ -69,48 +101,52 @@ export default {
 				url: '../billDetail/billDetail?billId=' + item.id
 			});
 		},
-		// overDue() {
-		// 	this.isActive = true;
-		// 	// this.billStatus = '3'
-		// 	this.getBillList('3', this.landlordId);
-		// },
-		// unpaid() {
-		// 	this.isActive = true;
-		// 	this.billStatus = '0';
-		// 	this.getBillList('0', this.landlordId);
-		// },
-		// receipt() {
-		// 	this.isActive = true;
-		// 	this.billStatus = '4';
-		// 	this.getBillList('4', this.landlordId);
-		// },
-		// all() {
-		// 	this.isActive = true;
-		// 	this.billStatus = '';
-		// 	this.getBillList('', this.landlordId);
-		// },
-		getBillList(billStatus, landlordId) {
-			console.log(billStatus, landlordId);
+		async getBillList(pageNum,billStatus) {
+			console.log('进来了进来了');
 			let _this = this;
-			_this.$request
-				.post('/bill/billList', {
-					billStatus: this.billStatus,
-					// landlordId: _this.$store.state.landladyInfo.id,
-					landlordId: 'ab8afaed-31f7-11ea-91b8-525400bc2088'
-				})
-				.then(res => {
-					console.log(res);
-					_this.billListInfo = res.data.data;
-				})
-				.catch(err => {
-					console.log(err);
+			_this.para.pageNum = pageNum
+			console.log(_this.para.pageNum);
+			let para ={
+				pageNum: pageNum ,
+				billStatus: billStatus,
+				userId: _this.$store.state.landladyInfo.id
+			}
+			console.log(para);
+			try {
+				const response = await _this.$request.post('/bill/billList', para);
+				let arr = [];
+				console.log(response.data.data);
+				response.res.data.data.forEach((item, index) => {
+					arr.push(item);
 				});
+				response.data.data = arr;
+				return response.data.data;
+			} catch (e) {
+				console.log(e);
+			}
 		},
+		// getBillList(billStatus, userId) {
+		// 	console.log(billStatus, userId);
+		// 	let _this = this;
+		// 	_this.$request
+		// 		.post('/bill/billList', {
+		// 			billStatus: this.billStatus,
+		// 			// userId: _this.$store.state.landladyInfo.id,
+		// 			userId: 'ab8afaed-31f7-11ea-91b8-525400bc2088'
+		// 		})
+		// 		.then(res => {
+		// 			console.log(res);
+		// 			_this.billListInfo = res.data.data;
+		// 		})
+		// 		.catch(err => {
+		// 			console.log(err);
+		// 		});
+		// },
 		getMoney() {
 			let _this = this;
 			_this.$request
 				.post('/bill/money', {
-					id: 'ab8afaed-31f7-11ea-91b8-525400bc2088'
+					id: this.$store.state.landladyInfo.id
 				})
 				.then(res => {
 					console.log(res);
@@ -140,7 +176,28 @@ export default {
 				default:
 					break;
 			}
-			this.getBillList(this.billStatus, this.landlordId);
+		},
+		init(e) {
+			this.mescroll = e;
+		},
+		/*下拉刷新的回调, 有三种处理方式: */
+		downCallback(mescroll) {
+			let _this = this;
+			mescroll.resetUpScroll(); // 重置列表为第一页 (自动执行 page.num=1, 再触发upCallback方法 )
+		},
+		/*上拉加载的回调*/
+		async upCallback(mescroll) {
+			let _this = this;
+			// 此时mescroll会携带page的参数:
+			let pageNum = mescroll.num; // 页码, 默认从1开始
+			let pageSize = mescroll.size; // 页长, 默认每页10条
+			if (mescroll.num == 1) _this.billListInfo = []; //如果是第一页需手动置空列表
+			let res = await _this.getBillList(pageNum,this.billStatus);
+			let curPageData = res;
+			_this.billListInfo = _this.billListInfo.concat(curPageData); //追加新数据
+			_this.$nextTick(() => {
+				mescroll.endSuccess(curPageData.length, res.hasNextPage);
+			});
 		}
 	}
 };
@@ -149,7 +206,7 @@ export default {
 <style>
 .billManage {
 	height: 100%;
-	min-height:100vh;
+	min-height: 100vh;
 	width: 100%;
 	background-color: #fafafa;
 }
@@ -258,7 +315,7 @@ export default {
 
 .billList {
 	height: 67%;
-	background-color: #FAFAFA;
+	background-color: #fafafa;
 }
 
 .billListLeft {

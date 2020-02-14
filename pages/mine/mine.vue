@@ -4,7 +4,7 @@
 			<view class="myMsg">
 				<view class="myContainer">
 					<view class=""><image class="myPhoto" :src="userImg"></image></view>
-					<view class="login" v-if="!show" @click="openLogin">点击登录</view>
+					<view class="login" v-if="!show" @click="openLogin"><view class="logintext">登录</view></view>
 					<view class="detail" v-if="show">
 						<view class="detailTop">
 							<view class="myName">{{ userName }}</view>
@@ -47,7 +47,7 @@
 				</view>
 				<view class="rightPart">
 					<button class="getTelNumImg" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber"></button>
-					<view class="getTelNum" v-if="false">已绑定 {{ telPhoneNum }}</view>
+					<view class="getTelNum" v-if="false">已绑定 {{ phoneNumber }}</view>
 				</view>
 			</view>
 			<view class="jumpPortalitem">
@@ -127,24 +127,26 @@ import { mapState, mapMutations } from 'vuex';
 export default {
 	components: {
 		evanFormItem,
-		evanForm,
+		evanForm
 		// isLogin
 	},
 	data() {
 		return {
 			invitationCodeFlag: false, // 是否显示填写邀请码弹窗
 			loginFlag: false, //登录弹窗
-			// haveUser: false, //用户是否授权
-			userImg: "", //用户头像
-			userName: '', //用户昵称
+			userImg: '../../static/tourist.png', //用户头像
+			userName: '游客', //用户昵称
+			gender: '', //用户性别
+			openId: '',
 			show: false, //是否显示点击登录
 			roomNum: '0',
 			inviCode: '', // 我的邀请码
 			usedInviCode: '', //填写邀请码
 			level: '',
+			// landladyInfo: {},
 			remainDay: '0', //剩余天数
 			trialDate: '2030-01-01',
-			telPhoneNum: '17521774352', // 绑定手机号
+			phoneNumber: '17521774352', // 绑定手机号
 			info: {
 				invitationCode: ''
 			},
@@ -157,6 +159,9 @@ export default {
 			loginingStatus: false //登录状态
 		};
 	},
+	computed: {
+		...mapState(['landladyInfo'])
+	},
 	onLoad(options) {
 		this.$nextTick(() => {
 			this.$refs.form.setRules(this.rules);
@@ -164,12 +169,16 @@ export default {
 		if (this.$store.state.isloginStatus) {
 			// 获取数据
 			this.show = true;
-			this.userName = this.$store.state.userName;
-			this.userImg = this.$store.state.userImg;
-			this.getMineMsg();
-		}else{
+			let userInfo = {
+				openId: this.$store.state.userOpenId,
+				userName: this.$store.state.landladyInfo.userName,
+				userImg: this.$store.state.landladyInfo.userImg,
+				userSex: this.$store.state.landladyInfo.userSex
+			};
+			console.log(userInfo);
+			this.getMineMsg(userInfo);
+		} else {
 			this.show = false;
-			this.userImg = 'https://funnyduck.raysler.com/uploadFile/huyue/moments/images/20190807/232437400374245352789212064.jpg';
 		}
 	},
 	onShow() {
@@ -177,12 +186,15 @@ export default {
 		if (this.$store.state.isloginStatus) {
 			// 获取数据
 			this.show = true;
-			this.userName = this.$store.state.userName;
-			this.userImg = this.$store.state.userImg;
-			this.getMineMsg();
-		}else{
+			let userInfo = {
+				openId: this.$store.state.userOpenId,
+				userName: this.$store.state.landladyInfo.userName,
+				userImg: this.$store.state.landladyInfo.userImg,
+				userSex: this.$store.state.landladyInfo.userSex
+			};
+			this.getMineMsg(userInfo);
+		} else {
 			this.show = false;
-			this.userImg = 'https://funnyduck.raysler.com/uploadFile/huyue/moments/images/20190807/232437400374245352789212064.jpg';
 		}
 	},
 	methods: {
@@ -205,23 +217,33 @@ export default {
 							self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
 								console.log(res);
 								if (res) {
+									self.openId = res.data.data.openid;
 									self.$store.commit('isloginStatus', true);
-									self.$store.commit('openCode', res.data.openId);
-									self.$store.commit('sessionKey', res.data.sessionKey);
+									self.$store.commit('userOpenId', res.data.data.openid);
+									self.$store.commit('sessionKey', res.data.data.session_key);
 									uni.getUserInfo({
 										provider: 'weixin',
 										success: function(infoRes) {
 											if (infoRes.userInfo) {
 												self.show = true;
-												self.$store.commit('userName', infoRes.userInfo.nickName);
-												self.$store.commit('userImg', infoRes.userInfo.avatarUrl);
-												self.userName = infoRes.userInfo.nickName;
-												self.userImg = infoRes.userInfo.avatarUrl;
-												self.getMineMsg()
+												// 微信的gender 1 男 2 女 0 未知
+												// 收租鸟userSex 0 男 1 女
+												if (infoRes.userInfo.gender == '1') {
+													self.gender = '0';
+												} else if (infoRes.userInfo.gender == '2') {
+													self.gender = '1';
+												} else {
+													self.gender = '未知';
+												}
+												let userInfo = {
+													openId: res.data.data.openid,
+													userName: infoRes.userInfo.nickName,
+													userImg: infoRes.userInfo.avatarUrl,
+													userSex: self.gender
+												};
+												self.getMineMsg(userInfo);
+
 												console.log(infoRes);
-												//infoRes里面有用户信息需要的话可以取一下
-												// let username = infoRes.userInfo.nickName; //用户名
-												// let userImg = infoRes.userInfo.userImg; //用户头像
 											}
 										},
 										fail: function(res) {
@@ -246,50 +268,26 @@ export default {
 							}); // 重新登录
 						}
 					});
-
-					// let openCode = loginRes.code; //js_code可以给后台获取unionID或openID作为用户标识
-					// 获取用户信息
-					// self.$request.post('/wx/login', { code: openCode }).then(res => {
-					// 	console.log(res);
-					// });
 				},
 				fail: function(res) {}
 			});
 		},
 
-		// getPhoneNumber(e) {
-		// 	var that = this;
-		// 	console.log(e.detail.errMsg == 'getPhoneNumber:ok');
-		// 	if (e.detail.errMsg == 'getPhoneNumber:ok') {
-		// 		// uni.request({
-		// 		//   url: 'http://localhost/index/users/decodePhone',
-		// 		//   data: {
-		// 		//     encryptedData: e.detail.encryptedData,
-		// 		//     iv: e.detail.iv,
-		// 		//     sessionKey: that.data.session_key,
-		// 		//     uid: "",
-		// 		//   },
-		// 		//   method: "post",
-		// 		//   success: function (res) {
-		// 		//     console.log(res);
-		// 		//   }
-		// 		// })
-		// 	}
-		// },
-		getMineMsg() {
+		getMineMsg(userInfo) {
 			let _this = this;
 			_this.$request
-				.post('/user/findOne', {
-					id: 'ab8afaed-31f7-11ea-91b8-525400bc2088'
-				})
+				.post('user/findByOpenId', userInfo)
 				.then(res => {
+					_this.$store.commit('landladyInfo', res.data.data);
 					console.log(res.data.data);
 					let myMsgs = res.data.data;
-					this.usedInviCode = myMsgs.usedInviCode;
-					this.level = myMsgs.level;
-					this.inviCode = myMsgs.inviCode;
-					this.trialDate = myMsgs.trialDate;
-					this.remainDay = myMsgs.remainDay;
+					_this.userName = myMsgs.userName
+					_this.userImg = myMsgs.userImg
+					_this.usedInviCode = myMsgs.usedInviCode;
+					_this.level = myMsgs.level;
+					_this.inviCode = myMsgs.inviCode;
+					_this.trialDate = myMsgs.trialDate;
+					_this.remainDay = myMsgs.remainDay;
 				})
 				.catch(err => {
 					console.log(err);
@@ -301,7 +299,9 @@ export default {
 		},
 		// 打开填写邀请码弹窗
 		openNewsInvitationCode(e) {
-			this.invitationCodeFlag = true;
+			if (!this.usedInviCode) {
+				this.invitationCodeFlag = true;
+			}
 		},
 		//跳转意见反馈
 		openFeedBack(e) {
@@ -333,7 +333,7 @@ export default {
 						title: '正在提交'
 					});
 					let v = {
-						id: 'ab8afaed-31f7-11ea-91b8-525400bc2088',
+						id: this.$store.state.landladyInfo.id,
 						usedInviCode: this.info.invitationCode
 					};
 					this.$request
@@ -346,7 +346,8 @@ export default {
 								});
 								this.info.invitationCode = '';
 								this.invitationCodeFlag = false;
-								this.getMineMsg();
+								// this.invitationCode = this.info.invitationCode;
+								this.getMineMsg({openId: this.$store.state.userOpenId});
 							}
 						})
 						.catch(() => {
@@ -357,7 +358,6 @@ export default {
 		},
 		cancleLogin(e) {
 			this.loginFlag = false;
-			this.getMineMsg();
 		},
 		openLogin(e) {
 			this.loginFlag = true;
@@ -386,7 +386,23 @@ export default {
 	overflow: hidden;
 }
 .login {
-	margin-left: 50rpx;
+	width: 150rpx;
+	height: 60rpx;
+	background: -webkit-linear-gradient(146deg, rgba(244, 183, 74, 1) 0%, rgba(240, 153, 66, 1) 100%);
+	background: linear-gradient(-56deg, rgba(244, 183, 74, 1) 0%, rgba(240, 153, 66, 1) 100%);
+	opacity: 0.8;
+	border-radius: 30rpx;
+	margin-left: 30rpx;
+	text-align: center;
+	line-height: 60rpx;
+	margin-top: 34rpx;
+
+}
+.logintext {
+	font-size: 32rpx;
+	font-family: PingFang SC;
+	font-weight: 400;
+	color: rgba(255, 255, 255, 1);
 }
 .myMsg {
 	height: 72%;

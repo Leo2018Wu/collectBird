@@ -75,7 +75,7 @@
 				this.$refs.form.validate((res) => {
 					console.log();
 					let v={
-						createUser:"ab8afaed-31f7-11ea-91b8-525400bc2088",
+						createUser:this.$store.state.landladyInfo.id,
 						type:this.feedbackType,
 						reason:this.info.questionCommit
 					}

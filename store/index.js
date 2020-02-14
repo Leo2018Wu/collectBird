@@ -4,14 +4,11 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 const store = new Vuex.Store({
 	state: {
-		// userOpenId: "1",//用户得openid
-		sessionKey: null,
-		loginSwitch: '',
+		openCode:"",	//用户登录openCode
+		userOpenId: "",	//用户登录openId
+		sessionKey: null, //用户登录sessionKey 
 		isloginStatus: false, //是否授权登录状态
-		userName: "",
-		userImg: "",
-		openCode: null,
-		landladyInfo: {},
+		landladyInfo: {},	// 登录信息
 		tempRoomInfo: {},
 		chooseLocationInfo: {}
 	},
@@ -25,17 +22,13 @@ const store = new Vuex.Store({
 		chooseLocationInfo(state, data) {
 			state.chooseLocationInfo = data
 		},
-		userName(state, data) {
-			console.log(data)
-			state.userName = data
-		},
-		userImg(state, data) {
-			console.log(data)
-			state.userImg = data
-		},
 		openCode(state, data) {
 			console.log(data)
 			state.openCode = data
+		},
+		userOpenId(state, data) {
+			console.log(data)
+			state.userOpenId = data
 		},
 		isloginStatus(state, data) {
 			console.log(data)
