@@ -63,7 +63,7 @@ export default {
 			para: {
 				landlordId: "",
 				pageNum: 1,
-				billstatus:'3'
+				billStatus:'3'
 			},
 			// 下拉刷新的常用配置
 			downOption: {
@@ -115,19 +115,19 @@ export default {
 			switch (index) {
 				case 0:
 					this.billStatus = '3';
-					this.getBillList(1,this.billStatus)
+					this.downCallback(this.mescroll)
 					break;
 				case 1:
 					this.billStatus = '0';
-					this.getBillList(1,this.billStatus)
+					this.downCallback(this.mescroll)
 					break;
 				case 2:
 					this.billStatus = '4';
-					this.getBillList(1,this.billStatus)
+					this.downCallback(this.mescroll)
 					break;
 				case 3:
 					this.billStatus = '';
-					this.getBillList(1,this.billStatus)
+					this.downCallback(this.mescroll)
 					break;
 				default:
 					break;
@@ -146,7 +146,7 @@ export default {
 			let _this = this;
 			_this.para.pageNum = pageNum;
 			_this.para.landlordId = _this.$store.state.landladyInfo.id;
-			_this.para.billstatus = this.billStatus
+			_this.para.billStatus = this.billStatus
 			console.log( _this.para);
 			try {
 				const response = await _this.$request.post('/bill/billList', _this.para);
@@ -163,6 +163,7 @@ export default {
 						arr.push(item);
 					});
 				}
+				
 				response.data.data.list = arr;
 				return response.data.data;
 			} catch (e) {
