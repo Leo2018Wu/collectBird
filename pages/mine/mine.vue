@@ -4,7 +4,12 @@
 			<view class="myMsg">
 				<view class="myContainer">
 					<view class=""><image class="myPhoto" :src="userImg"></image></view>
-					<view class="login" v-if="!show" @click="openLogin"><view class="logintext">登录</view></view>
+					<!-- class="login" -->
+					<view v-if="!show">
+						<button class="login" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true">登录</button>
+					</view>
+					<!-- <view class="login" v-if="!show" @click="openLogin"><view class="logintext">登录</view></view> -->
+					<!-- <view class="login" v-if="!show" @click="openLogin"><view class="logintext">登录</view></view> -->
 					<view class="detail" v-if="show">
 						<view class="detailTop">
 							<view class="myName">{{ userName }}</view>
@@ -36,7 +41,7 @@
 				<view class="leftPart">
 					<image class="jumpPortalImg" src="../../static/myIcon1.png" mode=""></image>
 					<view class="jumpPortalText">填写邀请码</view>
-					<view class="modalNum">{{ usedInviCode ? usedInviCode : 0}}</view>
+					<view class="modalNum">{{ usedInviCode ? usedInviCode : 0 }}</view>
 				</view>
 				<view class="rightPart"><image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image></view>
 			</view>
@@ -123,12 +128,12 @@
 import evanFormItem from '../../components/evan-form/evan-form-item.vue';
 import evanForm from '../../components/evan-form/evan-form.vue';
 import { mapState, mapMutations } from 'vuex';
-import { isLogin } from '../../components/isLogin.vue';
+// import { isLogin } from '../../components/isLogin.vue';
 export default {
 	components: {
 		evanFormItem,
-		evanForm,
-		'is-login': isLogin
+		evanForm
+		// 'is-login': isLogin
 	},
 	data() {
 		return {
@@ -166,120 +171,116 @@ export default {
 		this.$nextTick(() => {
 			this.$refs.form.setRules(this.rules);
 		});
-		if (this.$store.state.isloginStatus) {
-			// 获取数据
-			this.show = true;
-			let userInfo = {
-				openId: this.$store.state.userOpenId,
-				userName: this.$store.state.landladyInfo.userName,
-				userImg: this.$store.state.landladyInfo.userImg,
-				userSex: this.$store.state.landladyInfo.userSex
-			};
-			console.log(userInfo);
-			this.getMineMsg(userInfo);
-		} else {
-			this.show = false;
-		}
 	},
 	onShow() {
-		// 查看是否已经授权
-		if (this.$store.state.isloginStatus) {
-			// 获取数据
-			this.show = true;
-			let userInfo = {
-				openId: this.$store.state.userOpenId,
-				userName: this.$store.state.landladyInfo.userName,
-				userImg: this.$store.state.landladyInfo.userImg,
-				userSex: this.$store.state.landladyInfo.userSex
-			};
-			this.getMineMsg(userInfo);
-		} else {
-			this.show = false;
-		}
+		this.checkLoginStatus().then(res => {
+			console.log(res);
+			if (res) {
+				this.show = false;
+			} else {
+				this.show = true;
+			}
+		});
 	},
 	methods: {
-		ffffff(value){
-			console.log(value);
-			this.loginFlag = value;
-			this.show = true;
-			this.getMineMsg({openId:this.$store.state.userOpenId});
-			
+		checkLoginStatus() {
+			let _this = this;
+			return new Promise((reslove, rej) => {
+				//判断用户是否授权过
+				uni.getSetting({
+					success(res) {
+						console.log(res);
+						if (res.authSetting['scope.userInfo']) {
+							_this.$store.commit('isloginStatus', true);
+							_this.show = true;
+							let userInfo = {
+								openId: _this.$store.state.userOpenId,
+								userName: _this.$store.state.landladyInfo.userName,
+								userImg: _this.$store.state.landladyInfo.userImg,
+								userSex: _this.$store.state.landladyInfo.userSex
+							};
+							_this.getMineMsg(userInfo);
+						}
+					},
+					complete() {
+						reslove(!_this.$store.state.isloginStatus);
+					}
+				});
+			});
 		},
-		childByValue(childValue) {
-			console.log(childValue);
-			this.loginFlag = childValue;
-			this.getMineMsg({openId:this.$store.state.userOpenId});
-		},
-		// getUserInfo() {
-		// 	this.loginFlag = false;
-		// 	console.log(11111);
-		// 	let self = this;
-		// 	uni.login({
-		// 		provider: 'weixin',
-		// 		success: function(loginRes) {
-		// 			console.log(loginRes, '1111');
-		// 			uni.checkSession({
-		// 				success() {
-		// 					// session_key 未过期，并且在本生命周期一直有效
-		// 					self.$store.commit('openCode', loginRes.code);
-		// 					self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
-		// 						console.log(res);
-		// 						if (res) {
-		// 							self.openId = res.data.data.openid;
-		// 							self.$store.commit('isloginStatus', true);
-		// 							self.$store.commit('userOpenId', res.data.data.openid);
-		// 							self.$store.commit('sessionKey', res.data.data.session_key);
-		// 							uni.getUserInfo({
-		// 								provider: 'weixin',
-		// 								success: function(infoRes) {
-		// 									if (infoRes.userInfo) {
-		// 										self.show = true;
-		// 										// 微信的gender 1 男 2 女 0 未知
-		// 										// 收租鸟userSex 0 男 1 女
-		// 										if (infoRes.userInfo.gender == '1') {
-		// 											self.gender = '0';
-		// 										} else if (infoRes.userInfo.gender == '2') {
-		// 											self.gender = '1';
-		// 										} else {
-		// 											self.gender = '未知';
-		// 										}
-		// 										let userInfo = {
-		// 											openId: res.data.data.openid,
-		// 											userName: infoRes.userInfo.nickName,
-		// 											userImg: infoRes.userInfo.avatarUrl,
-		// 											userSex: self.gender
-		// 										};
-		// 										self.getMineMsg(userInfo);
+		getUserInfo() {
+			this.loginFlag = false;
+			console.log(11111);
+			let self = this;
+			uni.login({
+				provider: 'weixin',
+				success: function(loginRes) {
+					console.log(loginRes, '1111');
+					uni.checkSession({
+						success() {
+							// session_key 未过期，并且在本生命周期一直有效
+							self.$store.commit('openCode', loginRes.code);
+							self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
+								console.log(res);
+								if (res) {
+									self.openId = res.data.data.openid;
+									self.$store.commit('isloginStatus', true);
+									self.$store.commit('userOpenId', res.data.data.openid);
+									self.$store.commit('sessionKey', res.data.data.session_key);
+									uni.getUserInfo({
+										provider: 'weixin',
+										success: function(infoRes) {
+											if (infoRes.userInfo) {
+												self.show = true;
+												// 微信的gender 1 男 2 女 0 未知
+												// 收租鸟userSex 0 男 1 女
+												if (infoRes.userInfo.gender == '1') {
+													self.gender = '0';
+												} else if (infoRes.userInfo.gender == '2') {
+													self.gender = '1';
+												} else {
+													self.gender = '未知';
+												}
+												let userInfo = {
+													openId: res.data.data.openid,
+													userName: infoRes.userInfo.nickName,
+													userImg: infoRes.userInfo.avatarUrl,
+													userSex: self.gender
+												};
+												self.getMineMsg(userInfo);
 
-		// 										console.log(infoRes);
-		// 									}
-		// 								},
-		// 								fail: function(res) {
-		// 									uni.showToast({
-		// 										title: '微信授权不成功！',
-		// 										duration: 2000
-		// 									});
-		// 								}
-		// 							});
-		// 						}
-		// 					});
-		// 				},
-		// 				fail() {
-		// 					// session_key 已经失效，需要重新执行登录流程
-		// 					uni.login({
-		// 						provider: 'weixin',
-		// 						success: function(loginRes) {
-		// 							self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
-		// 								console.log(res);
-		// 							});
-		// 						}
-		// 					}); // 重新登录
-		// 				}
-		// 			});
-		// 		},
-		// 		fail: function(res) {}
-		// 	});
-		// },
+												console.log(infoRes);
+											}
+										},
+										fail: function(res) {
+											uni.showToast({
+												title: '微信授权不成功！',
+												duration: 2000
+											});
+										}
+									});
+								}
+							});
+						},
+						fail() {
+							self.show = false;
+							// session_key 已经失效，需要重新执行登录流程
+							uni.login({
+								provider: 'weixin',
+								success: function(loginRes) {
+									self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
+										console.log(res);
+									});
+								}
+							}); // 重新登录
+						}
+					});
+				},
+				fail: function(res) {
+					self.show = false;
+				}
+			});
+		},
 
 		getMineMsg(userInfo) {
 			let _this = this;
@@ -289,8 +290,8 @@ export default {
 					_this.$store.commit('landladyInfo', res.data.data);
 					console.log(res.data.data);
 					let myMsgs = res.data.data;
-					_this.userName = myMsgs.userName
-					_this.userImg = myMsgs.userImg
+					_this.userName = myMsgs.userName;
+					_this.userImg = myMsgs.userImg;
 					_this.usedInviCode = myMsgs.usedInviCode;
 					_this.level = myMsgs.level;
 					_this.inviCode = myMsgs.inviCode;
@@ -355,7 +356,7 @@ export default {
 								this.info.invitationCode = '';
 								this.invitationCodeFlag = false;
 								// this.invitationCode = this.info.invitationCode;
-								this.getMineMsg({openId: this.$store.state.userOpenId});
+								this.getMineMsg({ openId: this.$store.state.userOpenId });
 							}
 						})
 						.catch(() => {
@@ -368,7 +369,7 @@ export default {
 			this.loginFlag = false;
 		},
 		openLogin(e) {
-			this.loginFlag = true;
+			this.getUserInfo();
 		}
 	}
 };
@@ -396,7 +397,7 @@ export default {
 .login {
 	width: 150rpx;
 	height: 60rpx;
-	background: -webkit-linear-gradient(146deg, rgba(244, 183, 74, 1) 0%, rgba(240, 153, 66, 1) 100%);
+	/* background: -webkit-linear-gradient(146deg, rgba(244, 183, 74, 1) 0%, rgba(240, 153, 66, 1) 100%); */
 	background: linear-gradient(-56deg, rgba(244, 183, 74, 1) 0%, rgba(240, 153, 66, 1) 100%);
 	opacity: 0.8;
 	border-radius: 30rpx;
@@ -404,14 +405,12 @@ export default {
 	text-align: center;
 	line-height: 60rpx;
 	margin-top: 34rpx;
-
-}
-.logintext {
 	font-size: 32rpx;
 	font-family: PingFang SC;
 	font-weight: 400;
 	color: rgba(255, 255, 255, 1);
 }
+
 .myMsg {
 	height: 72%;
 	/* background:linear-gradient(-56deg,rgba(244,183,74,1) 0%,rgba(240,153,66,1) 100%); */
