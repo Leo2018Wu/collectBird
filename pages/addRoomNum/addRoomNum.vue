@@ -294,10 +294,13 @@
 	.communityName{
 		padding: 32rpx 0 32rpx 40rpx;
 		color: #444444;
-		font-size: 30rpx;
+		font-size: 34rpx;
 		font-weight: bold;
 		background-color: #FFFFFF;
 		margin-bottom: 17rpx;
+	}
+	.form-input{
+		font-size: 32rpx;
 	}
 	.section1{
 		padding: 0rpx 40rpx;
