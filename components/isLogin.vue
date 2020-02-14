@@ -15,76 +15,103 @@
 </template>
 
 <script>
+import { mapState, mapMutations } from 'vuex';
 export default {
 	data() {
-		return {
-			// isloginFlag: false,
-			// userName: '',
-			// userImg: ''
-		};
+		return {};
 	},
 	props: {
 		childLoginFlag: {
 			type: Boolean
-		},
-		childUserName: {
-			type: String
-		},
-		childUserImg: {
-			type: String
 		}
 	},
 	methods: {
 		cancleLogin() {
-			// this.isloginFlag = false;
 			this.$emit('childByValue', false); //关键点
-			this.$emit('onLoad');
 		},
 		getUserInfo() {
-			let self = this;
-			self.$emit('childByValue', false);
+			this.loginFlag = false;
 			console.log(11111);
+			let self = this;
 			uni.login({
 				provider: 'weixin',
 				success: function(loginRes) {
 					console.log(loginRes, '1111');
-					self.$store.commit('openCode', loginRes.code);
-					let openCode = loginRes.code; //js_code可以给后台获取unionID或openID作为用户标识
-					// 获取用户信息
-					self.$request.post('/wx/login', { code: openCode }).then(res => {
-						if (res) {
-							self.$emit('onLoad');
-							self.$store.commit('isloginStatus', true);
-							self.$store.commit('openCode', res.data.openId);
-							self.$store.commit('sessionKey', res.data.sessionKey);
-							uni.getUserInfo({
-								provider: 'weixin',
-								success: function(infoRes) {
-									if (infoRes.userInfo) {
-										self.show = true;
-										self.$store.commit('userName', infoRes.userInfo.nickName);
-										self.$store.commit('userImg', infoRes.userInfo.avatarUrl);
-										self.$emit('onLoad');
-										// self.userName = infoRes.userInfo.nickName;
-										// self.userImg = infoRes.userInfo.avatarUrl;
-										console.log(infoRes);
-										//infoRes里面有用户信息需要的话可以取一下
-										// let username = infoRes.userInfo.nickName; //用户名
-										// let userImg = infoRes.userInfo.userImg; //用户头像
-									}
-								},
-								fail: function(res) {
-									uni.showToast({
-										title: '微信授权不成功！',
-										duration: 2000
+					uni.checkSession({
+						success() {
+							// session_key 未过期，并且在本生命周期一直有效
+							self.$store.commit('openCode', loginRes.code);
+							self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
+								console.log(res);
+								if (res) {
+									self.openId = res.data.data.openid;
+									self.$store.commit('isloginStatus', true);
+									self.$store.commit('userOpenId', res.data.data.openid);
+									self.$store.commit('sessionKey', res.data.data.session_key);
+									uni.getUserInfo({
+										provider: 'weixin',
+										success: function(infoRes) {
+											console.log(infoRes);
+											if (infoRes.userInfo) {
+												self.show = true;
+												// 微信的gender 1 男 2 女 0 未知
+												// 收租鸟userSex 0 男 1 女
+												if (infoRes.userInfo.gender == '1') {
+													self.gender = '0';
+												} else if (infoRes.userInfo.gender == '2') {
+													self.gender = '1';
+												} else {
+													self.gender = '未知';
+												}
+												let userInfo = {
+													openId: res.data.data.openid,
+													userName: infoRes.userInfo.nickName,
+													userImg: infoRes.userInfo.avatarUrl,
+													userSex: self.gender
+												};
+												self.getMineMsg(userInfo);
+											}
+										},
+										fail: function(res) {
+											uni.showToast({
+												title: '微信授权不成功！',
+												duration: 2000
+											});
+										}
 									});
 								}
 							});
+						},
+						fail() {
+							// session_key 已经失效，需要重新执行登录流程
+							uni.login({
+								provider: 'weixin',
+								success: function(loginRes) {
+									self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
+										console.log(res);
+									});
+								}
+							}); // 重新登录
 						}
 					});
 				},
 				fail: function(res) {}
 			});
+		},
+		getMineMsg(userInfo) {
+			let _this = this;
+			_this.$request
+				.post('user/findByOpenId', userInfo)
+				.then(res => {
+					_this.$store.commit('landladyInfo', res.data.data);
+					console.log(res.data.data);
+					let myMsgs = res.data.data;
+					this.$emit('childByValue', res.data.data);
+					this.$emit('ffffff', false);
+				})
+				.catch(err => {
+					console.log(err);
+				});
 		}
 	}
 };

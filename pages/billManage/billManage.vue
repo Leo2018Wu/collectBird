@@ -44,12 +44,9 @@
 </template>
 
 <script>
-	import MescrollUni from "../../components/mescroll-uni/mescroll-uni.vue";
+import MescrollUni from '../../components/mescroll-uni/mescroll-uni.vue';
 export default {
 	components: {
-		// 'scroll-tab': scrollTab,
-		// 'house-sku': houseSku,
-		// 'add-Bar': addBar,
 		MescrollUni
 	},
 	data() {
@@ -64,8 +61,8 @@ export default {
 			income: 0,
 			mescroll: {},
 			para: {
-				userId: this.$store.state.landladyInfo.id,
-				pageNum: 1
+				landlordId: "",
+				pageNum: 1,
 			},
 			// 下拉刷新的常用配置
 			downOption: {
@@ -90,58 +87,15 @@ export default {
 	},
 	onLoad() {
 		this.getMoney();
-		// this.getBillList(this.billStatus, this.userId);
 	},
 	onShow() {
-		// this.getBillList(this.billStatus, this.userId);
+		this.getMoney();
 	},
 	methods: {
-		showBill(item) {
-			uni.navigateTo({
-				url: '../billDetail/billDetail?billId=' + item.id
-			});
+		updateData() {
+			console.log('wwww');
+			this.downCallback(this.mescroll);
 		},
-		async getBillList(pageNum,billStatus) {
-			console.log('进来了进来了');
-			let _this = this;
-			_this.para.pageNum = pageNum
-			console.log(_this.para.pageNum);
-			let para ={
-				pageNum: pageNum ,
-				billStatus: billStatus,
-				userId: _this.$store.state.landladyInfo.id
-			}
-			console.log(para);
-			try {
-				const response = await _this.$request.post('/bill/billList', para);
-				let arr = [];
-				console.log(response.data.data);
-				response.res.data.data.forEach((item, index) => {
-					arr.push(item);
-				});
-				response.data.data = arr;
-				return response.data.data;
-			} catch (e) {
-				console.log(e);
-			}
-		},
-		// getBillList(billStatus, userId) {
-		// 	console.log(billStatus, userId);
-		// 	let _this = this;
-		// 	_this.$request
-		// 		.post('/bill/billList', {
-		// 			billStatus: this.billStatus,
-		// 			// userId: _this.$store.state.landladyInfo.id,
-		// 			userId: 'ab8afaed-31f7-11ea-91b8-525400bc2088'
-		// 		})
-		// 		.then(res => {
-		// 			console.log(res);
-		// 			_this.billListInfo = res.data.data;
-		// 		})
-		// 		.catch(err => {
-		// 			console.log(err);
-		// 		});
-		// },
 		getMoney() {
 			let _this = this;
 			_this.$request
@@ -177,9 +131,42 @@ export default {
 					break;
 			}
 		},
+		showBill(item) {
+			uni.navigateTo({
+				url: '../billDetail/billDetail?billId=' + item.id
+			});
+		},
 		init(e) {
 			this.mescroll = e;
 		},
+		async getBillList(pageNum, billStatus) {
+			console.log('进来了进来了');
+			let _this = this;
+			_this.para.pageNum = pageNum;
+			_this.para.landlordId = _this.$store.state.landladyInfo.id;
+			console.log( _this.para);
+			try {
+				const response = await _this.$request.post('/bill/billList', _this.para);
+				let arr = [];
+				console.log(response.data.data);
+				if(response.data.data.length>0){
+					response.data.data.list.forEach((item, index) => {
+						if (item.communityImgs == null) {
+							item.communityImgs = [];
+							item.communityImgs.push('https://funnyduck.raysler.com/uploadFile/huyue/article/images/20190704/1562239924231ZGZQuw.jpeg');
+						} else {
+							item.communityImgs = item.communityImgs.split(',');
+						}
+						arr.push(item);
+					});
+				}
+				response.data.data.list = arr;
+				return response.data.data;
+			} catch (e) {
+				console.log(e);
+			}
+		},
+
 		/*下拉刷新的回调, 有三种处理方式: */
 		downCallback(mescroll) {
 			let _this = this;
@@ -192,7 +179,7 @@ export default {
 			let pageNum = mescroll.num; // 页码, 默认从1开始
 			let pageSize = mescroll.size; // 页长, 默认每页10条
 			if (mescroll.num == 1) _this.billListInfo = []; //如果是第一页需手动置空列表
-			let res = await _this.getBillList(pageNum,this.billStatus);
+			let res = await _this.getBillList(pageNum, _this.billStatus);
 			let curPageData = res;
 			_this.billListInfo = _this.billListInfo.concat(curPageData); //追加新数据
 			_this.$nextTick(() => {
