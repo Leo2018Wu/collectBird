@@ -143,6 +143,7 @@ export default {
 		},
 		getUserInfo() {
 			let self = this;
+			self.loginFlag = false;
 			uni.login({
 				provider: 'weixin',
 				success: function(loginRes) {
@@ -150,7 +151,6 @@ export default {
 					self.$store.commit('openCode', loginRes.code);
 					// 获取用户信息
 					self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
-						self.loginFlag = false;
 						self.$store.commit('isloginStatus', true);
 						self.$store.commit('userOpenId', res.data.data.openid);
 						self.$store.commit('sessionKey', res.data.data.session_key);
