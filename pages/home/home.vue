@@ -70,24 +70,30 @@ export default {
 		};
 	},
 	onShow(option) {
+		this.checkLoginStatus().then((res) => {
+			this.loginFlag = res;
+		})
 		console.log(this.$store.state.isloginStatus);
-		if (this.$store.state.isloginStatus) {
-			this.loginFlag = false;
-			this.getMoneyInfo();
-		} else {
-			this.loginFlag = true;
-			// this.getMoneyInfo();
-		}
-	},
-	onLoad(option) {
-		if (this.$store.state.isloginStatus) {
-			this.loginFlag = false;
-			this.getMoneyInfo();
-		} else {
-			this.loginFlag = true;
-		}
 	},
 	methods: {
+		checkLoginStatus(){
+			let _this = this;
+			return new Promise((reslove,rej)=>{
+				//判断用户是否授权过
+				uni.getSetting({
+					success(res) {
+						console.log(res)
+						if (res.authSetting['scope.userInfo']) {
+							_this.$store.commit('isloginStatus',true)
+							_this.getUserInfo()
+						}
+					},
+					complete() {
+						reslove(!_this.$store.state.isloginStatus)
+					}
+				})
+			})
+		},
 		getLandLadyInfo(userInfo) {
 			let _this = this;
 			console.log(_this.$store.state.userOpenId);
@@ -135,8 +141,6 @@ export default {
 			});
 		},
 		getUserInfo() {
-			this.loginFlag = false;
-			console.log(11111);
 			let self = this;
 			uni.login({
 				provider: 'weixin',
@@ -145,6 +149,7 @@ export default {
 					self.$store.commit('openCode', loginRes.code);
 					// 获取用户信息
 					self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
+						self.loginFlag = false;
 						self.$store.commit('isloginStatus', true);
 						self.$store.commit('userOpenId', res.data.data.openid);
 						self.$store.commit('sessionKey', res.data.data.session_key);
@@ -350,6 +355,7 @@ export default {
 	margin-left: 37rpx;
 	border: none !important;
 	outline: none !important;
+	border-radius: 30rpx;
 }
 button::after {
 	border: none;

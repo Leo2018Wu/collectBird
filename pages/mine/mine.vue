@@ -789,6 +789,7 @@ export default {
 	margin-left: 37rpx;
 	border: none !important;
 	outline: none !important;
+	border-radius: 30rpx;
 }
 button::after {
 	border: none;
