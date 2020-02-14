@@ -78,15 +78,15 @@ export default {
 		...mapState(['login', 'landladyInfo'])
 	},
 	onShow() {
-		let _this = this;
-		this.$request
-			.post('user/findByOpenId', {
-				id: this.$store.state.userOpenId
-			})
-			.then(res => {
-				_this.$store.commit('landladyInfo', res.data.data);
-			})
-			.catch(err => {});
+		// let _this = this;
+		// this.$request
+		// 	.post('user/findByOpenId', {
+		// 		id: this.$store.state.userOpenId
+		// 	})
+		// 	.then(res => {
+		// 		_this.$store.commit('landladyInfo', res.data.data);
+		// 	})
+		// 	.catch(err => {});
 	},
 	created() {
 		console.log(uni);

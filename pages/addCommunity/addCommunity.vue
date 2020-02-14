@@ -94,6 +94,7 @@
 			
 		},
 		onLoad(options){
+			console.log(this.$store.state)
 			if(JSON.stringify(options) !="{}"){
 				this.isEdit = true;
 				this.communityInfo = JSON.parse(options.communityInfo);

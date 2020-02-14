@@ -94,12 +94,15 @@ export default {
 				})
 			})
 		},
-		getLandLadyInfo(userInfo) {
+		getLandLadyInfo(id) {
 			let _this = this;
 			console.log(_this.$store.state.userOpenId);
 			_this.$request
-				.post('user/findByOpenId',userInfo)
+				.post('user/findByOpenId',{
+					openId:id
+				})
 				.then(res => {
+					console.log(res)
 					_this.$store.commit('landladyInfo', res.data.data);
 					_this.getMoneyInfo() 
 				})
@@ -174,7 +177,7 @@ export default {
 										userImg: infoRes.userInfo.avatarUrl,
 										userSex: self.gender
 									};
-									self.getLandLadyInfo(userInfo) 
+									self.getLandLadyInfo(res.data.data.openid) 
 								}
 							},
 							fail: function(res) {

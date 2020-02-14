@@ -399,7 +399,7 @@
 					roomId:_this.roomId,
 					tenantName:_this.info1.name,
 					landlordId:_this.$store.state.landladyInfo.id,
-					landlordName:_this.$store.state.landladyInfo.nickName,
+					landlordName:_this.$store.state.landladyInfo.userName,
 					tenantPhone:_this.info1.tel,
 					tenantIdNumber:_this.info1.IDNum,
 					idCardImg1:_this.imgSideUrl,
