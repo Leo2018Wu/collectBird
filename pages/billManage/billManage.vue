@@ -115,15 +115,19 @@ export default {
 			switch (index) {
 				case 0:
 					this.billStatus = '3';
+					this.getBillList(1,this.billStatus)
 					break;
 				case 1:
 					this.billStatus = '0';
+					this.getBillList(1,this.billStatus)
 					break;
 				case 2:
 					this.billStatus = '4';
+					this.getBillList(1,this.billStatus)
 					break;
 				case 3:
 					this.billStatus = '';
+					this.getBillList(1,this.billStatus)
 					break;
 				default:
 					break;
