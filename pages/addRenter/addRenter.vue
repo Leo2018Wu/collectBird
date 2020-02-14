@@ -119,7 +119,7 @@
 					<template v-slot:main>
 					<!-- 	<view style="display: flex;">
 							<input class="form-input0" placeholder-class="form-input-placeholder" v-model="info3.ele" placeholder="1元/度" /> -->
-							<input class="form-input inputColor" placeholder-class="form-input-placeholder" v-model="info3.eleCost" placeholder="请输入" />
+							<input class="form-input inputColor" placeholder-class="form-input-placeholder" v-model="info3.eleCost" placeholder="初始刻度" />
 						<!-- </view> -->
 					</template>
 					
@@ -393,7 +393,9 @@
 			},
 			save(){
 				let _this = this;
-				
+				uni.showLoading({
+					title:'正在保存...'
+				})
 				let postUrl = this.isEdit ? '/roomUser/update' : '/roomUser/signTenant'
 				let par = {
 					roomId:_this.roomId,
@@ -436,6 +438,7 @@
 								_this.$refs.form3.validate((res3) =>{
 									if(res3){
 										_this.$request.post(postUrl,par).then((responce)=>{
+											uni.hideLoading()
 											let tipContent = this.isEdit ? '编辑成功' : '添加成功'
 											uni.showToast({
 												title:tipContent

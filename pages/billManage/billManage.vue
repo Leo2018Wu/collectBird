@@ -88,9 +88,6 @@ export default {
 	onLoad() {
 		this.getMoney();
 	},
-	onShow() {
-		this.getMoney();
-	},
 	methods: {
 		updateData() {
 			console.log('wwww');
