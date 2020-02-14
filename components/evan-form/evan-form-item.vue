@@ -165,7 +165,8 @@ export default {
   flex-direction: row;
  
   align-items: center;
-  height: 93rpx;
+  // height: 93rpx;
+  height: 112rpx;
   // padding: 30rpx 0;
   border-bottom: 1rpx solid #ebebeb;
   position: relative;
@@ -173,9 +174,10 @@ export default {
     border-bottom: 0;
   }
   &__label {
-    font-size: 30rpx;
+    // font-size: 30rpx;
+	font-size: 34rpx;
     color: #333;
-
+	font-weight: bold;
     // &.showAsteriskRect::before {
     // 	content: '';
     // 	color: #F56C6C;
@@ -190,6 +192,7 @@ export default {
 
   &__main {
     flex: 1;
+	font-size: 32rpx;
   }
 }
 

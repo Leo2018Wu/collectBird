@@ -4,7 +4,7 @@
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form" :model="info">
 					<evan-form-item label="小区名" prop="name">
 						<template v-slot:main>
-							<view @click="chooseLocation(false)" class="form-input" :class="{'form-input-placeholder': myName == '请输入小区名'}">{{myName}}</view>
+							<view @click="chooseLocation(false)" class="form-input form-input-placeholder">{{myName}}</view>
 							<!-- <input @click="chooseLocation(false)" class="form-input" placeholder-class="form-input-placeholder" v-model="info.name" placeholder="请输入小区名" /> -->
 						</template>
 						<template v-slot:tip>
@@ -13,7 +13,7 @@
 					</evan-form-item>
 					<evan-form-item label="详细地址" prop="addr">
 						<template v-slot:main>
-							<view @click="chooseLocation(true)" class="form-input textOverFlow" :class="{'form-input-placeholder': myAddr == '请输入地址'}">{{myAddr}}</view>
+							<view @click="chooseLocation(true)" class="form-input form-input-placeholder">{{myAddr}}</view>
 							<!-- <input @click="chooseLocation(true)" class="form-input" placeholder-class="form-input-placeholder" :value="info.addr"  placeholder="请填写" /> -->
 						</template>
 						<template v-slot:tip>
@@ -283,10 +283,12 @@
 		text-align: right;
 		overflow: hidden;
 		max-width: 500rpx;
-		font-size: 30rpx;
+		font-size: 32rpx;
 	}
 	.uploadBlock{
 		width: 100%;
+		font-size: 34rpx;
+		font-weight: bold;
 		height: fit-content;
 		display: flex;
 		justify-content: flex-end;

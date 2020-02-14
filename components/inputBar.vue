@@ -55,11 +55,12 @@ export default {
 
 <style>
 .inputBar {
-	font-size: 30rpx;
+	font-size: 34rpx;
   display: flex;
   align-items: center;
   justify-content: space-between;
   white-space: nowrap;
+  font-weight: bold;
 }
 input {
   width: calc(100% - 180rpx);
