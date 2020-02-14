@@ -63,6 +63,7 @@ export default {
 			para: {
 				landlordId: "",
 				pageNum: 1,
+				billstatus:'3'
 			},
 			// 下拉刷新的常用配置
 			downOption: {
@@ -86,9 +87,6 @@ export default {
 		};
 	},
 	onLoad() {
-		this.getMoney();
-	},
-	onShow() {
 		this.getMoney();
 	},
 	methods: {
@@ -117,15 +115,19 @@ export default {
 			switch (index) {
 				case 0:
 					this.billStatus = '3';
+					this.getBillList(1,this.billStatus)
 					break;
 				case 1:
 					this.billStatus = '0';
+					this.getBillList(1,this.billStatus)
 					break;
 				case 2:
 					this.billStatus = '4';
+					this.getBillList(1,this.billStatus)
 					break;
 				case 3:
 					this.billStatus = '';
+					this.getBillList(1,this.billStatus)
 					break;
 				default:
 					break;
@@ -144,13 +146,14 @@ export default {
 			let _this = this;
 			_this.para.pageNum = pageNum;
 			_this.para.landlordId = _this.$store.state.landladyInfo.id;
+			_this.para.billstatus = _this.billStatus
 			console.log( _this.para);
 			try {
 				const response = await _this.$request.post('/bill/billList', _this.para);
 				let arr = [];
 				console.log(response.data.data);
 				if(response.data.data.length>0){
-					response.data.data.list.forEach((item, index) => {
+					response.data.data.forEach((item, index) => {
 						if (item.communityImgs == null) {
 							item.communityImgs = [];
 							item.communityImgs.push('https://funnyduck.raysler.com/uploadFile/huyue/article/images/20190704/1562239924231ZGZQuw.jpeg');
