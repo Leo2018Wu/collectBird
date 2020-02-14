@@ -134,6 +134,8 @@ radio {
 	width: 100%;
 	height: 100%;
 	text-align: right;
+	font-size: 32rpx;
+	color: #999999;
 }
 button {
 	margin: 0;
