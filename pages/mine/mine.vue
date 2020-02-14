@@ -105,9 +105,9 @@
 			</view>
 		</view>
 		<!-- 授权弹窗 -->
-		<!-- <is-login v-show="loginFlag" v-on:onLoad="onLoad" :childLoginFlag="loginFlag" v-on:childByValue="childByValue"></is-login> -->
+		<is-login v-show="loginFlag" v-on:ffffff="ffffff" :childLoginFlag="loginFlag" v-on:childByValue="childByValue"></is-login>
 		<view class="isloginModal" v-show="loginFlag" @click="cancleLogin"></view>
-		<view class="isloginBox" v-show="loginFlag">
+		<!-- <view class="isloginBox" v-show="loginFlag">
 			<image class="bgcImg" src="../../static/authorization.png" mode=""></image>
 			<view class="deleteImg" @click="cancleLogin"><image src="../../static/delete.png" mode=""></image></view>
 			<view class="loginTxt">授权登录体验完整功能</view>
@@ -115,7 +115,7 @@
 				<view class="notLogin" @click="cancleLogin"><image src="../../static/notLogin.png" mode=""></image></view>
 				<button class="loginButton" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true"></button>
 			</view>
-		</view>
+		</view> -->
 	</view>
 </template>
 
@@ -123,12 +123,12 @@
 import evanFormItem from '../../components/evan-form/evan-form-item.vue';
 import evanForm from '../../components/evan-form/evan-form.vue';
 import { mapState, mapMutations } from 'vuex';
-// import { isLogin } from '../../components/isLogin.vue';
+import { isLogin } from '../../components/isLogin.vue';
 export default {
 	components: {
 		evanFormItem,
-		evanForm
-		// isLogin
+		evanForm,
+		'is-login': isLogin
 	},
 	data() {
 		return {
@@ -198,80 +198,88 @@ export default {
 		}
 	},
 	methods: {
+		ffffff(value){
+			console.log(value);
+			this.loginFlag = value;
+			this.show = true;
+			this.getMineMsg({openId:this.$store.state.userOpenId});
+			
+		},
 		childByValue(childValue) {
 			console.log(childValue);
 			this.loginFlag = childValue;
+			this.getMineMsg({openId:this.$store.state.userOpenId});
 		},
-		getUserInfo() {
-			this.loginFlag = false;
-			console.log(11111);
-			let self = this;
-			uni.login({
-				provider: 'weixin',
-				success: function(loginRes) {
-					console.log(loginRes, '1111');
-					uni.checkSession({
-						success() {
-							// session_key 未过期，并且在本生命周期一直有效
-							self.$store.commit('openCode', loginRes.code);
-							self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
-								console.log(res);
-								if (res) {
-									self.openId = res.data.data.openid;
-									self.$store.commit('isloginStatus', true);
-									self.$store.commit('userOpenId', res.data.data.openid);
-									self.$store.commit('sessionKey', res.data.data.session_key);
-									uni.getUserInfo({
-										provider: 'weixin',
-										success: function(infoRes) {
-											if (infoRes.userInfo) {
-												self.show = true;
-												// 微信的gender 1 男 2 女 0 未知
-												// 收租鸟userSex 0 男 1 女
-												if (infoRes.userInfo.gender == '1') {
-													self.gender = '0';
-												} else if (infoRes.userInfo.gender == '2') {
-													self.gender = '1';
-												} else {
-													self.gender = '未知';
-												}
-												let userInfo = {
-													openId: res.data.data.openid,
-													userName: infoRes.userInfo.nickName,
-													userImg: infoRes.userInfo.avatarUrl,
-													userSex: self.gender
-												};
-												self.getMineMsg(userInfo);
+		// getUserInfo() {
+		// 	this.loginFlag = false;
+		// 	console.log(11111);
+		// 	let self = this;
+		// 	uni.login({
+		// 		provider: 'weixin',
+		// 		success: function(loginRes) {
+		// 			console.log(loginRes, '1111');
+		// 			uni.checkSession({
+		// 				success() {
+		// 					// session_key 未过期，并且在本生命周期一直有效
+		// 					self.$store.commit('openCode', loginRes.code);
+		// 					self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
+		// 						console.log(res);
+		// 						if (res) {
+		// 							self.openId = res.data.data.openid;
+		// 							self.$store.commit('isloginStatus', true);
+		// 							self.$store.commit('userOpenId', res.data.data.openid);
+		// 							self.$store.commit('sessionKey', res.data.data.session_key);
+		// 							uni.getUserInfo({
+		// 								provider: 'weixin',
+		// 								success: function(infoRes) {
+		// 									if (infoRes.userInfo) {
+		// 										self.show = true;
+		// 										// 微信的gender 1 男 2 女 0 未知
+		// 										// 收租鸟userSex 0 男 1 女
+		// 										if (infoRes.userInfo.gender == '1') {
+		// 											self.gender = '0';
+		// 										} else if (infoRes.userInfo.gender == '2') {
+		// 											self.gender = '1';
+		// 										} else {
+		// 											self.gender = '未知';
+		// 										}
+		// 										let userInfo = {
+		// 											openId: res.data.data.openid,
+		// 											userName: infoRes.userInfo.nickName,
+		// 											userImg: infoRes.userInfo.avatarUrl,
+		// 											userSex: self.gender
+		// 										};
+		// 										self.getMineMsg(userInfo);
 
-												console.log(infoRes);
-											}
-										},
-										fail: function(res) {
-											uni.showToast({
-												title: '微信授权不成功！',
-												duration: 2000
-											});
-										}
-									});
-								}
-							});
-						},
-						fail() {
-							// session_key 已经失效，需要重新执行登录流程
-							uni.login({
-								provider: 'weixin',
-								success: function(loginRes) {
-									self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
-										console.log(res);
-									});
-								}
-							}); // 重新登录
-						}
-					});
-				},
-				fail: function(res) {}
-			});
-		},
+		// 										console.log(infoRes);
+		// 									}
+		// 								},
+		// 								fail: function(res) {
+		// 									uni.showToast({
+		// 										title: '微信授权不成功！',
+		// 										duration: 2000
+		// 									});
+		// 								}
+		// 							});
+		// 						}
+		// 					});
+		// 				},
+		// 				fail() {
+		// 					// session_key 已经失效，需要重新执行登录流程
+		// 					uni.login({
+		// 						provider: 'weixin',
+		// 						success: function(loginRes) {
+		// 							self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
+		// 								console.log(res);
+		// 							});
+		// 						}
+		// 					}); // 重新登录
+		// 				}
+		// 			});
+		// 		},
+		// 		fail: function(res) {}
+		// 	});
+		// },
 
 		getMineMsg(userInfo) {
 			let _this = this;
