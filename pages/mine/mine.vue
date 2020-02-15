@@ -41,11 +41,7 @@
 				<view class="leftPart">
 					<image class="jumpPortalImg" src="../../static/myIcon1.png" mode=""></image>
 					<view class="jumpPortalText">填写邀请码</view>
-<<<<<<< HEAD
-					<view class="modalNum">{{ usedInviCode ? usedInviCode : 0 }}</view>
-=======
 					<view class="modalNum">{{ usedInviCode ? usedInviCode : ''}}</view>
->>>>>>> 6f0572ad199b3d3dde7a41378d7cc58131271ce4
 				</view>
 				<view class="rightPart"><image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image></view>
 			</view>
