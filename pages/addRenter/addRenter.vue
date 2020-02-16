@@ -23,9 +23,6 @@
 						</radio-group>
 						<!-- <input class="form-input" placeholder-class="form-input-placeholder" v-model="info1.name" placeholder="租客姓名" /> -->
 					</template>
-					<!-- <template v-slot:tip>
-								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
-					</template> -->
 				</evan-form-item>
 				<evan-form-item label="电话" prop="tel">
 					<template v-slot:main>
@@ -120,7 +117,7 @@
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 					</template>
 				</evan-form-item>
-				<evan-form-item label="每期交租" prop="rentUnitPrice">
+				<evan-form-item label="月租金" prop="rentUnitPrice">
 					<template v-slot:main>
 						<input class="form-input" type="number" placeholder-class="form-input-placeholder" v-model="info2.rentUnitPrice" placeholder="请输入" @input="espInput" />
 					</template>
@@ -143,26 +140,17 @@
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form3" :model="info3">
 				<evan-form-item label="电费(1元/度)" prop="eleCost">
 					<template v-slot:main>
-						<!-- 	<view style="display: flex;">
-							<input class="form-input0" placeholder-class="form-input-placeholder" v-model="info3.ele" placeholder="1元/度" /> -->
-						<input class="form-input inputColor" placeholder-class="form-input-placeholder" v-model="info3.eleCost" placeholder="初始刻度" />
-						<!-- </view> -->
+							<input class="form-input inputColor" placeholder-class="form-input-placeholder" v-model="info3.eleCost" placeholder="初始刻度" />
 					</template>
 				</evan-form-item>
 				<evan-form-item label="水费(元/月)" prop="waterCost">
 					<template v-slot:main>
-						<!-- <view style="display: flex;">
-									<input class="form-input0"  disabled placeholder-class="form-input-placeholder" v-model="info3.water" placeholder="30元/月" /> -->
-						<input class="form-input inputColor" placeholder-class="form-input-placeholder" v-model="info3.waterCost" placeholder="30元/月" />
-						<!-- </view> -->
+									<input class="form-input inputColor"  placeholder-class="form-input-placeholder" v-model="info3.waterCost" placeholder="30元/月" />
 					</template>
 				</evan-form-item>
 				<evan-form-item label="宽带(元/月)" prop="netCost" :border="false">
 					<template v-slot:main>
-						<!-- <view style="display: flex;">
-							<input class="form-input0" disabled placeholder-class="form-input-placeholder"  v-model="info3.net" placeholder="30元/月" /> -->
-						<input class="form-input inputColor" placeholder-class="form-input-placeholder" v-model="info3.netCost" placeholder="30元/月" />
-						<!-- </view> -->
+							<input class="form-input inputColor"  placeholder-class="form-input-placeholder" v-model="info3.netCost" placeholder="30元/月" />
 					</template>
 				</evan-form-item>
 				<view class="section4 whiteBg">
@@ -333,49 +321,41 @@ export default {
 					message: '请输入宽带费'
 				}
 			}
-		};
-	},
-	watch: {
-		rentCycleList(newVal, oldVal) {
-			console.log(newVal, oldVal);
-			this.espInput();
-			// this.info2.deposit = this.info2.rentUnitPrice / this.newVal[0]
-			// console.log(this.info2.rentUnitPrice)
-			// console.log(this.info2.deposit)
-		}
-	},
-	onLoad(options) {
-		console.log(options);
-		if (options.userId) {
-			console.log('我处于编辑状态', options.userId);
-			this.isEdit = true;
-			this.userId = options.userId;
-			uni.setNavigationBarTitle({
-				title: '编辑租客'
-			});
-			this.getUserInfo(options.userId);
-		}
-		this.commInfo = JSON.parse(options.commInfo);
-		this.roomId = options.roomId;
-		this.$nextTick(() => {
-			this.$refs.form1.setRules(this.rules1);
-			this.$refs.form2.setRules(this.rules2);
-			this.$refs.form3.setRules(this.rules3);
-		});
-		this.getRentCycleList();
-	},
-	methods: {
-		getUserInfo(id) {
-			this.$request
-				.post('roomUser/findById', {
-					tenantId: id
-				})
-				.then(res => {
-					console.log('用户信息', res);
-					let data = res.data.data;
-					console.log(data.tenantIdNumber);
-					let rentIndex = parseInt(data.payRentCycle) - 1;
-					console.log(rentIndex);
+		},
+		onLoad(options) {
+			console.log(options)
+			if(options.userId){
+				console.log('我处于编辑状态',options.userId)
+				this.isEdit = true;
+				this.userId = options.userId
+				uni.setNavigationBarTitle({
+				    title: '编辑租客'
+				});
+				this.getUserInfo(options.userId);
+			}
+			this.commInfo = JSON.parse(options.commInfo) 
+			this.roomId = options.roomId;
+			this.$nextTick(() => {
+				this.$refs.form1.setRules(this.rules1)
+				this.$refs.form2.setRules(this.rules2)
+				this.$refs.form3.setRules(this.rules3)
+			})
+			this.getRentCycleList()
+			if(!this.isEdit){
+				//默认选择一年
+				this.chooseLi(1)
+			}
+		},
+		methods: {
+			getUserInfo(id){
+				this.$request.post('roomUser/findById',{
+					tenantId:id
+				}).then((res)=>{
+					console.log('用户信息',res)
+					let data = res.data.data
+					console.log(data.tenantIdNumber)
+					let rentIndex = parseInt(data.payRentCycle) - 1; 
+					console.log(rentIndex)
 					this.chooseIndex = rentIndex;
 					this.renterId = data.id;
 					this.info1.name = data.tenantName;
@@ -506,28 +486,109 @@ export default {
 						icon: 'none'
 					});
 				}
-			}
-		},
-		getID(e) {
-			let _this = this;
-			let value = e.detail.value;
-			if (value.length == 18) {
-				if (!_this.$validate.isIdNumber(value)) {
-					uni.showToast({
-						title: '身份证号码格式有误',
-						icon: 'none'
-					});
-				}
-			}
-		},
-		chooseImg(type) {
-			this.isChooseReverseImg = type;
-			let returnUrl = myUploadImg.upload().then(res => {
-				console.log(res);
-				if (this.isChooseReverseImg) {
-					this.imgOtherSideUrl = res;
-				} else {
-					this.imgSideUrl = res;
+				_this.$refs.form1.validate((res1) => {
+					if (res1) {
+						console.log(res1)
+						_this.$refs.form2.validate((res2) =>{
+							if(res2){
+								_this.$refs.form3.validate((res3) =>{
+									if(res3){
+										_this.$request.post(postUrl,par).then((responce)=>{
+											uni.hideLoading()
+											let tipContent = this.isEdit ? '编辑成功' : '添加成功'
+											uni.showToast({
+												title:tipContent
+											})
+												setTimeout(() => {
+																				// let pages = getCurrentPages();
+																			 //    if (pages.length > 1) {
+																			 //        let beforePage = pages[pages.length - 2];
+																				// 		console.log(beforePage)
+																			 //            beforePage.$vm.updateData()
+																			            uni.navigateBack({
+																			                delta: 1,
+																			            })
+																			        // }
+																			}, 1500);
+											
+										})
+									}
+								})
+							}
+						})
+					}
+				})
+			},
+			getPhone(e){
+					let _this = this
+					let value = e.detail.value;
+					if(value.length == 11){
+						if(!_this.$validate.isMobilePhone(value)){
+							uni.showToast({
+								title:'手机号码格式有误',
+								icon:'none',
+							})
+						}
+					}
+			},
+			getID(e){
+					let _this = this
+					let value = e.detail.value;
+					if(value.length == 18){
+						if(!_this.$validate.isIdNumber(value)){
+							uni.showToast({
+								title:'身份证号码格式有误',
+								icon:'none',
+							})
+						}
+					}
+			},
+			chooseImg(type){
+				this.isChooseReverseImg = type
+				let returnUrl = myUploadImg.upload().then((res)=>{
+					console.log(res)
+					if(this.isChooseReverseImg){
+						this.imgOtherSideUrl = res;
+					}else{
+						this.imgSideUrl = res;
+					}
+				})
+				
+			},
+			espInput(e){
+				console.log(this.rentCycleList)
+				this.info2.deposit = this.info2.rentUnitPrice
+				// if(this.rentCycleList.length != 0 && this.info2.rentUnitPrice / this.rentCycleList[0] !=0){
+				// 	this.info2.deposit = Math.ceil((this.info2.rentUnitPrice / this.rentCycleList[0]))
+				// }
+			},
+			blur(){
+				this.listShow = false
+			},
+			focus(e){
+				this.listShow = true
+			},
+			change(e){
+				this.rentCycleList = chnToNumber.chnToNumber(e.newVal)
+				
+				this.info2.rentCycle = e.newVal
+			},
+			getRentCycleList(){
+				this.$request.post('/dict/findByParentName',{
+					name:'RENT_CYCLE'
+				}).then(res =>{
+					this.list = []
+					res.data.data.forEach(item =>{
+						this.list.push(item.name)
+					})
+				})
+			},
+			chooseLi(index,temp){
+				if(temp){
+					this.currentLiIndex = index == 6 ? 0 : (index == 12 ? 1 : 2)
+				}else{
+					this.currentLiIndex = index
+					this.info2.keepDate = this.getKeepDate(index)
 				}
 			});
 		},
@@ -626,128 +687,126 @@ export default {
 </script>
 
 <style scoped>
-.addRenter {
-	min-height: 100vh;
-	height: 100%;
-	width: 100%;
-	background-color: #fafafa;
-}
-.whiteBg {
-	background-color: #ffffff;
-}
-.housTitle {
-	padding: 32rpx 0 32rpx 40rpx;
-	font-size: 34rpx;
-	font-weight: bold;
-	color: #444444;
-	margin-bottom: 17rpx;
-}
-.inputColor {
-	color: #999999;
-}
-.idName {
-	font-size: 34rpx;
-	font-weight: bold;
-}
-.section1,
-.section2,
-.section3,
-.section4 {
-	padding: 0 40rpx;
-	font-size: 30rpx;
-	color: #333333;
-	margin-bottom: 17rpx;
-}
-.inpArrow {
-	width: 30rpx;
-	height: 24rpx;
-	margin-left: 8rpx;
-}
-.idImgBox {
-	padding: 32rpx 0 35rpx 0;
-	display: flex;
-	justify-content: flex-end;
-	align-items: flex-start;
-}
-.chooseIdImg0,
-.chooseIdImg1 {
-	width: 221rpx;
-	height: 128rpx;
-}
-.chooseIdImg0 image,
-.chooseIdImg1 image {
-	width: 100%;
-	height: 100%;
-	border-radius: 14rpx;
-}
-.chooseIdImg1 {
-	margin-left: 28rpx;
-}
-.chooseIdImg0 {
-	margin-left: auto;
-}
-.section2Name {
-	padding-top: 32rpx;
-	font-weight: bold;
-	font-size: 34rpx;
-}
-.keepDateList {
-	/* height: 93rpx; */
-	display: flex;
-	flex-wrap: wrap;
-	align-items: center;
-	border-bottom: 3rpx solid #ebebeb80;
-	padding-bottom: 32rpx;
-}
-.keepDateLi {
-	width: calc((100% - 69rpx) / 4);
-	height: 60rpx;
-	text-align: center;
-	line-height: 60rpx;
-	border-radius: 10rpx;
-	margin-right: 23rpx;
-	color: #666666;
-	border: 1rpx solid #d2d2d2;
-}
-.keepDateLiActive {
-	border: 1rpx solid #ffa344;
-	color: #ffa344;
-}
-.keepDateLi:last-of-type {
-	margin-right: unset;
-}
-.form-input0 {
-	width: 50%;
-	height: 100%;
-	text-align: right;
-}
-.secTip {
-	width: 100%;
-	height: 180rpx;
-	padding: 32rpx 0 30rpx 0;
-	font-size: 30rpx;
-	color: #333333;
-	/* border-bottom: 2rpx solid #EBEBEB; */
-}
-.textPlaceholder {
-	padding: 32rpx 0 30rpx 0;
-	color: #999999;
-	font-size: 30rpx;
-}
-.sureBtn {
-	width: 257rpx;
-	height: 74rpx;
-	line-height: 74rpx;
-	text-align: center;
-	border-radius: 37rpx;
-	color: #ffffff;
-	background: linear-gradient(-90deg, rgba(243, 183, 73, 1) 0%, rgba(240, 154, 66, 1) 100%);
-	font-size: 32rpx;
-	margin: 124rpx auto 72rpx auto;
-}
-.sexRadio {
-	text-align: right;
-	/* color: #444444;
+	
+	.addRenter{
+		min-height: 100vh;
+		height: 100%;
+		width: 100%;
+		background-color: #FAFAFA;
+	}
+	.whiteBg{
+		background-color: #FFFFFF;
+	}
+	.housTitle{
+		padding: 32rpx 0 32rpx 40rpx;
+		font-size: 34rpx;
+		font-weight: bold;
+		color: #444444;
+		margin-bottom: 17rpx;
+		
+	}
+	.inputColor{
+		color: #999999;
+	}
+	.idName{
+		font-size: 34rpx;
+		font-weight: bold;
+	}
+	.section1,.section2,.section3,.section4{
+		padding: 0 40rpx;
+		font-size: 30rpx;
+		color: #333333;
+		margin-bottom: 17rpx;
+	}
+	.inpArrow{
+		width: 30rpx;
+		height: 24rpx;
+		margin-left: 8rpx;
+	}
+	.idImgBox{
+		padding: 32rpx 0 35rpx 0;
+		display: flex;
+		justify-content: flex-end;
+		align-items: flex-start;
+	}
+	.chooseIdImg0,.chooseIdImg1{
+		width: 221rpx;
+		height: 128rpx;
+		
+	}
+	.chooseIdImg0 image ,.chooseIdImg1 image{
+		width: 100%;
+		height: 100%;
+		border-radius: 14rpx;
+	}
+	.chooseIdImg1{
+		margin-left: 28rpx;
+	}
+	.chooseIdImg0{
+		margin-left: auto;
+	}
+	.section2Name{
+		padding-top: 32rpx;
+		font-weight: bold;
+		font-size: 34rpx;
+	}
+	.keepDateList{
+		/* height: 93rpx; */
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		border-bottom: 3rpx solid #EBEBEB80;
+		padding-bottom: 32rpx;
+	}
+	.keepDateLi{
+		width: calc((100% - 69rpx) / 4);
+		height: 60rpx;
+		text-align: center;
+		line-height: 60rpx;
+		border-radius: 10rpx;
+		margin-right: 23rpx;
+		color: #666666;
+		border: 1rpx solid #D2D2D2;
+	}
+	.keepDateLiActive{
+		border: 1rpx solid #FFA344;
+		color: #FFA344;
+	}
+	.keepDateLi:last-of-type{
+		margin-right: unset;
+	}
+	.form-input0{
+		width: 50%;
+		height: 100%;
+		text-align: right;
+	}
+	.secTip{
+		width: 100%;
+		height: 180rpx;
+		padding: 32rpx 0 30rpx 0;
+		font-size: 34rpx;
+		color: #333333;
+		/* border-bottom: 2rpx solid #EBEBEB; */
+	}
+	.textPlaceholder{
+		padding: 32rpx 0 30rpx 0;
+		color: #999999;
+		font-size: 34rpx;
+	}
+	.sureBtn{
+		width: 257rpx;
+		height: 74rpx;
+		line-height: 74rpx;
+		text-align: center;
+		border-radius: 37rpx;
+		color: #FFFFFF;
+		background:linear-gradient(-90deg,rgba(243,183,73,1) 0%,rgba(240,154,66,1) 100%);
+		font-size: 32rpx;
+		margin: 124rpx auto 72rpx auto;
+	}
+	.sexRadio{
+		text-align: right;
+		/* color: #444444;
 		font-size: 28rpx; */
 }
 .sexRadio text {

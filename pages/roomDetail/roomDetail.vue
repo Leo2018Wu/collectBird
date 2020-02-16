@@ -145,7 +145,6 @@
 
 <script>
 	import chnToNumber from '../../util/index'
-	import uImg from '@/components/uploadImg/uploadImg.vue';
 	import evanFormItem from '../../components/evan-form/evan-form-item.vue'
 	import evanForm from '../../components/evan-form/evan-form.vue'
 	import inputBar from '../../components/inputBar.vue'

@@ -21,11 +21,11 @@
 			</view>
 			<view class="renterListBox" :class="{active:isShow && currentIndex == index}">
 				<view class="renterLi" v-for="(p,idx) in item.tenantList" :key="idx" @click="goRenter(p,item.communityName)">
-					<image class="renterImg" v-if="p.userSex == 0" src="../../static/defaultMale.png" mode="aspectFill"></image>
+					<image class="renterImg" v-if="p.tenantSex == 0" src="../../static/defaultMale.png" mode="aspectFill"></image>
 					<image class="renterImg" v-else src="../../static/defaultFemale.png" mode="aspectFill"></image>
 					<view class="renterInfoBox">
-						<view class="textOverFlow">{{p.userName}}</view>
-						<view class="renterTel textOverFlow">{{p.phoneNumber}}</view>
+						<view class="textOverFlow">{{p.tenantName}}</view>
+						<view class="renterTel textOverFlow">{{p.tenantPhone}}</view>
 						<view class="roomNo textOverFlow">{{p.map.buildingNo}}号{{p.map.houseNo}}-卧{{p.map.roomNo}}</view>
 					</view>
 					<view class="overDue" v-if="p.overdue != 0">账单逾期</view>

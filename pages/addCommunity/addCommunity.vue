@@ -1,5 +1,6 @@
 <template>
 	<view class="addCommunity">
+		<tip-modal v-if="isShowTipModal" v-on:emitCancel="returnCancel" v-on:emitSure="returnSure"></tip-modal>
 		<view class="content">
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form" :model="info">
 					<evan-form-item label="小区名" prop="name">
@@ -24,13 +25,8 @@
 			<view class="uploadBlock">
 				<view>房源照片</view>
 				<view class="uploadImg">
-					<uImg  ref="upimg"
-					    :canUploadFile="true" 
-					    :limit="limitNum"
-					    :uploadFileUrl="uploadFileUrl" 
-					    :uImgList.sync="uImgList" 
-					    @uploadSuccess="uploadSuccess"
-						:parentPath="'community'"/>
+					<image v-if="!communityImg" src="../../static/upload.png" mode="aspectFill" @click="chooseImg"></image>
+					<image v-else :src="communityImg" mode="aspectFit" @click="chooseImg"></image>
 				</view>
 			</view>
 		</view>
@@ -42,31 +38,28 @@
 			<view class="addNext" @click="save()">保存</view>
 			<view class="btnSave" @click="deleteComm">删除小区</view>
 		</view>
+		
 	</view>
 </template>
 
 <script>
+	import myUploadImg from '../../util/myUpload.js'
 	import evanFormItem from '../../components/evan-form/evan-form-item.vue'
 	import evanForm from '../../components/evan-form/evan-form.vue'
-	import uImg from '@/components/uploadImg/uploadImg.vue';
+	import tipModal from '../../components/tipModal.vue';
 	export default {
 		components:{
-			uImg,
 			evanForm,
-			evanFormItem
+			evanFormItem,
+			tipModal
 		},
 		
 		data() {
 			return {
+				isShowTipModal:false,
 				isEdit:false,
 				communityInfo:{},
-				msg:'',
-				length:140,
-				limitNum:1,
-				uploadFileUrl: '/util/uploadByPath', //替换成你的后端接收文件地址
-				name:'file', //上传的名字
-				uImgList: [],
-				imgArr:[],
+				communityImg:'',
 				info:{
 				        name: '',
 				        addr: '',
@@ -84,25 +77,18 @@
 			}
 		},
 		onShow(){
-			console.log('测试使用',this.isEdit)
-			// if(!this.isEdit){
 				let chooseLocationInfo = this.$store.state.chooseLocationInfo;
 				console.log(chooseLocationInfo)
 				this.info.name = chooseLocationInfo.name;
 				this.info.addr = chooseLocationInfo.addr;
-			// }
-			
 		},
 		onLoad(options){
-			console.log(this.$store.state)
 			if(JSON.stringify(options) !="{}"){
 				this.isEdit = true;
 				this.communityInfo = JSON.parse(options.communityInfo);
-				console.log(this.communityInfo)
 				this.info.name = this.communityInfo.communityName,
 				this.info.addr = this.communityInfo.communityAddress;
-				this.uImgList.push(this.communityInfo.communityImgs[0]);
-				this.imgArr.push(this.communityInfo.communityImgs[0])
+				this.communityImg = this.communityInfo.communityImgs[0];
 				let storeInfo = {
 					name:this.communityInfo.communityName,
 					addr:this.communityInfo.communityAddress
@@ -116,29 +102,16 @@
 					title:'编辑房源'
 				})
 			}
-			console.log(options)
 			this.$nextTick(() => {
 				this.$refs.form.setRules(this.rules)
 			})
 		},
 		computed:{
 			myName(){
-				// if(this.isEdit){
-				// 	return this.communityInfo.communityName
-				// }else{
-					// info.name = this.$store.state.chooseLocationInfo.name
-					return this.$store.state.chooseLocationInfo.name ? this.$store.state.chooseLocationInfo.name : '请输入小区名';
-				// }
-				
+				return this.$store.state.chooseLocationInfo.name ? this.$store.state.chooseLocationInfo.name : '请输入小区名';
 			},
 			myAddr(){
-				// if(this.isEdit){
-				// 	return this.communityInfo.communityAddress
-				// }else{
-					// info.addr = this.$store.state.chooseLocationInfo.addr
-					return this.$store.state.chooseLocationInfo.addr ? this.$store.state.chooseLocationInfo.addr : '请输入地址';
-				// }
-				
+				return this.$store.state.chooseLocationInfo.addr ? this.$store.state.chooseLocationInfo.addr : '请输入地址';
 			}
 		},
 		
@@ -146,14 +119,29 @@
 			this.$store.commit('chooseLocationInfo',{})
 		},
 		methods: {
-			
+			chooseImg(){
+				myUploadImg.upload().then((res)=>{
+					console.log(res)
+					this.communityImg = res;
+				})
+			},
 			chooseLocation(e){
 					let url = e ? '../chooseLocation/chooseLocation?type='+'addr' : '../chooseLocation/chooseLocation'
 					uni.navigateTo({
 						url
 					})
 			},
+			hideModal(){
+				this.isShowTipModal = false
+			},
 			deleteComm(){
+				this.isShowTipModal = true
+			},
+			returnCancel(){
+				this.hideModal()
+			},
+			returnSure(){
+				this.hideModal()
 				this.$request.post('/community/delete',{
 					id:this.communityInfo.id
 				}).then(res =>{
@@ -173,8 +161,6 @@
 								let pages = getCurrentPages();
 							    if (pages.length > 1) {
 							        let beforePage = pages[pages.length - 2];
-										console.log(beforePage)
-									
 							            beforePage.$vm.updateData()
 							            uni.navigateBack({
 							                delta: 1,
@@ -183,25 +169,12 @@
 							}, 1500);
 			},
 			save() {
-				// this.imgArr = [];
 				let _this = this;
 				this.$refs.form.validate((res) => {
-					console.log('1111')
 					if (res) {
-						console.log('2222')
-						// if(_this.imgArr == []){
-							_this.upFile()
-						// }else{
-						// console.log('3333')
-						// _this.submitData()
-					// }
-						
+						_this.submitData()
 					}
 				})
-				// uni.showLoading({
-				// 	title:'图片正在上传'
-				// })
-				
 			},
 			submitData(){
 				console.log()
@@ -211,16 +184,15 @@
 							landlordId:_this.$store.state.landladyInfo.id,
 							communityAddress:_this.myAddr,
 							communityName:_this.myName,
-							communityImgs:_this.imgArr.join(','),
 							id:this.communityInfo.id
 						} : {
 							landlordId:_this.$store.state.landladyInfo.id,
 							communityAddress:_this.myAddr,
 							communityName:_this.myName,
-							communityImgs:_this.imgArr.join(','),
 						}
+						postPar.communityImgs = _this.communityImg 
+						? _this.communityImg : "https://funnyduck.raysler.com/uploadFile/huyue/article/images/20190704/1562239924231ZGZQuw.jpeg"
 						_this.$request.post(postUrl,postPar).then((data)=>{
-							// console.log(data)
 							if(this.isEdit){
 								uni.showToast({
 									title: '编辑成功',
@@ -239,19 +211,6 @@
 					
 			
 			},
-			uploadSuccess(result) {
-				// let data = JSON.parse(result.data)
-				console.log('只愿一生',result)
-				uni.hideLoading()
-				this.imgArr = result
-				this.submitData()
-				},
-				//上传方法的调用
-				upFile(){
-					this.$refs.upimg.upload()
-				},
-				
-				
 		}
 	}
 </script>
@@ -300,7 +259,12 @@
 	.uploadImg{
 		width: 100%;
 		height: 106rpx;
-		margin-left: auto;
+		display: flex;
+		justify-content: flex-end;
+	}
+	.uploadImg image{
+		width: 106rpx;
+		height: 100%;
 	}
 	.btnBox{
 		width: 100%;

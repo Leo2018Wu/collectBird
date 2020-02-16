@@ -2,16 +2,16 @@
 	<view>
 		<view class="section" @click="emit()">
 			<!-- <image v-if="userInfo.userImg" class="renterAvatar" :src="userInfo.userImg" mode="aspectFill"></image> -->
-			<image v-if="userInfo.userSex == 0" class="renterAvatar" src="../static/defaultMale.png" mode="aspectFill"></image>
+			<image v-if="userInfo.tenantSex == 0" class="renterAvatar" src="../static/defaultMale.png" mode="aspectFill"></image>
 			<image v-else class="renterAvatar" src="../static/defaultFemale.png" mode="aspectFill"></image>
 			<view class="renterInfo">
 				<view class="infoTop">
-					<span>{{userInfo.userName}}</span>
-					<image class="renterSex" v-if="userInfo.userSex == 0" src="../static/male.png" mode="aspectFit"></image>
+					<span>{{userInfo.tenantName}}</span>
+					<image class="renterSex" v-if="userInfo.tenantSex == 0" src="../static/male.png" mode="aspectFit"></image>
 					<image class="renterSex" v-else src="../static/female.png" mode="aspectFit"></image>
 				</view>
 				<view class="infoBottom textOverFlow">
-					{{userInfo.phoneNumber}}
+					{{userInfo.tenantPhone}}
 				</view>
 			</view>
 			<image class="renterArrow" src="../static/right_arrow.png" mode="aspectFit"></image>
