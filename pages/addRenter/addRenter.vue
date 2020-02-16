@@ -153,16 +153,16 @@
 							<input class="form-input inputColor"  placeholder-class="form-input-placeholder" v-model="info3.netCost" placeholder="30元/月" />
 					</template>
 				</evan-form-item>
-				<view class="section4 whiteBg">
+				<!-- <view class="section4 whiteBg">
 					<evan-form-item prop="remarks" :border="false">
 						<template v-slot:main>
 							<textarea class="secTip textOverFlow" placeholder="备注" value v-model="info3.remarks" placeholder-class="textPlaceholder"></textarea>
 						</template>
 					</evan-form-item>
-				</view>
+				</view> -->
 			</evan-form>
 		</view>
-		<!-- <view class="section4 whiteBg"><textarea class="secTip textOverFlow" placeholder="备注" value placeholder-class="textPlaceholder"></textarea></view> -->
+		<view class="section4 whiteBg"><textarea class="secTip textOverFlow" placeholder="备注" :value="remarks" v-model="remarks" placeholder-class="textPlaceholder"></textarea></view>
 		<view class="sureBtn" @click="save">保存</view>
 	</view>
 </template>
@@ -180,11 +180,10 @@ export default {
 		evanForm,
 		chooseList
 	},
-	watch: {},
-	computed: {},
 	data() {
 		const currentDate = this.getDate();
 		return {
+			remarks:'',
 			userId: null,
 			renterId: null,
 			chooseIndex: null,
@@ -247,7 +246,7 @@ export default {
 				],
 				IDNum: [
 					{
-						// required: true,
+						required: false,
 						message: '请输入租户身份证号码'
 					},
 					{
@@ -301,7 +300,7 @@ export default {
 				netCost: '30',
 				net: '30元/月',
 				water: '30元/月',
-				remarks: ''
+				// remarks: ''
 			},
 			rules3: {
 				// ele:{
@@ -321,8 +320,9 @@ export default {
 					message: '请输入宽带费'
 				}
 			}
+			}
 		},
-		onLoad(options) {
+		onLoad(options){
 			console.log(options)
 			if(options.userId){
 				console.log('我处于编辑状态',options.userId)
@@ -348,176 +348,134 @@ export default {
 		},
 		methods: {
 			getUserInfo(id){
-				this.$request.post('roomUser/findById',{
-					tenantId:id
-				}).then((res)=>{
-					console.log('用户信息',res)
-					let data = res.data.data
-					console.log(data.tenantIdNumber)
-					let rentIndex = parseInt(data.payRentCycle) - 1; 
-					console.log(rentIndex)
-					this.chooseIndex = rentIndex;
-					this.renterId = data.id;
-					this.info1.name = data.tenantName;
-					this.info1.tel = data.tenantPhone;
-					this.info1.IDNum = data.tenantIdNumber;
-					this.imgSideUrl = data.idCardImg1;
-					this.imgOtherSideUrl = data.idCardImg2;
-					this.info3.eleCost = data.eleUnitPrice; //
-					this.info3.waterCost = data.waterPrice; //
-					this.info3.netCost = data.netPrice; //
-					this.info3.remarks = data.remarks;
-					this.info2.startDate = data.startDate.substr(0, 10);
-					this.info2.keepDate = data.endDate.substr(0, 10);
-					this.info2.rentUnitPrice = data.rentPrice;
-					this.info2.deposit = data.depositAmount;
-					this.info2.rentCycle = this.list[rentIndex];
-					this.rentCycleList[0] = data.payRentCycle;
-					this.rentCycleList[1] = data.depositNum;
-					// this.currentSex = data.tenantSex;
-					this.radioChange({ target: { value: data.tenantSex } });
-					this.chooseLi(data.rentMonthNum, true);
-					this.rentMonthNum = data.rentMonthNum;
-				});
-		},
-		showList() {
-			this.listShow = true;
-		},
-		hideList() {
-			this.listShow = false;
-		},
-		returnEmit(e) {
-			console.log(e);
-			this.rentCycleList = chnToNumber.chnToNumber(e.newVal);
-			console.log('大家好啊', this.rentCycleList);
-			this.info2.rentCycle = e.newVal;
-			this.chooseIndex = e.index;
-			this.listShow = false;
-		},
-		radioChange(evt) {
-			console.log(evt);
-			for (let i = 0; i < this.sexList.length; i++) {
-				if (this.sexList[i].value == evt.target.value) {
-					this.currentSex = this.sexList[i].value;
-					break;
-				}
-			}
-			// this.currentSex = evt.target.value;
-		},
-		save() {
-			let _this = this;
-			uni.showLoading({
-				title: '正在保存...'
-			});
-			let postUrl = this.isEdit ? '/roomUser/update' : '/roomUser/signTenant';
-			let par = {
-				roomId: _this.roomId,
-				tenantName: _this.info1.name,
-				landlordId: _this.$store.state.landladyInfo.id,
-				landlordName: _this.$store.state.landladyInfo.userName,
-				tenantPhone: _this.info1.tel,
-				tenantIdNumber: _this.info1.IDNum,
-				idCardImg1: _this.imgSideUrl,
-				idCardImg2: _this.imgOtherSideUrl,
-				eleUnitPrice: '1',
-				elePrevNum: _this.info3.eleCost,
-				waterPrice: _this.info3.waterCost,
-				netPrice: _this.info3.netCost,
-				startDate: _this.info2.startDate ? _this.info2.startDate + ' 00:00:00' : this.date + ' 00:00:00',
-				rentMonthNum: _this.rentMonthNum,
-				endDate: _this.info2.keepDate + ' 00:00:00',
-				payRentCycle: _this.rentCycleList[0],
-				rentPrice: _this.info2.rentUnitPrice,
-				depositAmount: _this.info2.deposit,
-				depositNum: _this.rentCycleList[1],
-				tenantSex: _this.currentSex, //性别字段
-				remarks: _this.info3.remarks
-			};
-			if (this.isEdit) {
-				par.id = this.renterId;
-				par.tenantId = this.userId;
-			}
-			if (!(_this.imgSideUrl && _this.imgOtherSideUrl)) {
-				uni.showToast({
-					title: '请先添加身份证照片',
-					icon: 'none'
-				});
-				return;
-			}
-			_this.$refs.form1.validate(res1 => {
-				if (res1) {
-					console.log(res1);
-					_this.$refs.form2.validate(res2 => {
-						if (res2) {
-							_this.$refs.form3.validate(res3 => {
-								if (res3) {
-									_this.$request.post(postUrl, par).then(responce => {
-										uni.hideLoading();
-										let tipContent = this.isEdit ? '编辑成功' : '添加成功';
-										uni.showToast({
-											title: tipContent
-										});
-										setTimeout(() => {
-											// let pages = getCurrentPages();
-											//    if (pages.length > 1) {
-											//        let beforePage = pages[pages.length - 2];
-											// 		console.log(beforePage)
-											//            beforePage.$vm.updateData()
-											uni.navigateBack({
-												delta: 1
-											});
-											// }
-										}, 1500);
-									});
-								}
-							});
-						}
+					this.$request.post('roomUser/findById',{
+						tenantId:id
+					}).then((res)=>{
+						console.log('用户信息',res)
+						let data = res.data.data
+						console.log(data.tenantIdNumber)
+						let rentIndex = parseInt(data.payRentCycle) - 1; 
+						console.log(rentIndex)
+						this.chooseIndex = rentIndex;
+						this.renterId = data.id;
+						this.info1.name = data.tenantName;
+						this.info1.tel = data.tenantPhone;
+						this.info1.IDNum = data.tenantIdNumber;
+						this.imgSideUrl = data.idCardImg1;
+						this.imgOtherSideUrl = data.idCardImg2;
+						this.info3.eleCost = data.eleUnitPrice; //
+						this.info3.waterCost = data.waterPrice; //
+						this.info3.netCost = data.netPrice; //
+						this.info3.remarks = data.remarks;
+						this.info2.startDate = data.startDate.substr(0, 10);
+						this.info2.keepDate = data.endDate.substr(0, 10);
+						this.info2.rentUnitPrice = data.rentPrice;
+						this.info2.deposit = data.depositAmount;
+						this.info2.rentCycle = this.list[rentIndex];
+						this.rentCycleList[0] = data.payRentCycle;
+						this.rentCycleList[1] = data.depositNum;
+						// this.currentSex = data.tenantSex;
+						this.radioChange({ target: { value: data.tenantSex } });
+						this.chooseLi(data.rentMonthNum, true);
+						this.rentMonthNum = data.rentMonthNum;
+						this.remarks = data.remarks;
 					});
-				}
-			});
-		},
-		getPhone(e) {
-			let _this = this;
-			let value = e.detail.value;
-			if (value.length == 11) {
-				if (!_this.$validate.isMobilePhone(value)) {
-					uni.showToast({
-						title: '手机号码格式有误',
-						icon: 'none'
-					});
-				}
-				_this.$refs.form1.validate((res1) => {
-					if (res1) {
-						console.log(res1)
-						_this.$refs.form2.validate((res2) =>{
-							if(res2){
-								_this.$refs.form3.validate((res3) =>{
-									if(res3){
-										_this.$request.post(postUrl,par).then((responce)=>{
-											uni.hideLoading()
-											let tipContent = this.isEdit ? '编辑成功' : '添加成功'
-											uni.showToast({
-												title:tipContent
-											})
-												setTimeout(() => {
-																				// let pages = getCurrentPages();
-																			 //    if (pages.length > 1) {
-																			 //        let beforePage = pages[pages.length - 2];
-																				// 		console.log(beforePage)
-																			 //            beforePage.$vm.updateData()
-																			            uni.navigateBack({
-																			                delta: 1,
-																			            })
-																			        // }
-																			}, 1500);
-											
-										})
-									}
-								})
-							}
-						})
+			},
+			showList() {
+				this.listShow = true;
+			},
+			hideList() {
+				this.listShow = false;
+			},
+			returnEmit(e) {
+				console.log(e);
+				this.rentCycleList = chnToNumber.chnToNumber(e.newVal);
+				console.log('大家好啊', this.rentCycleList);
+				this.info2.rentCycle = e.newVal;
+				this.chooseIndex = e.index;
+				this.listShow = false;
+			},
+			radioChange(evt) {
+				console.log(evt);
+				for (let i = 0; i < this.sexList.length; i++) {
+					if (this.sexList[i].value == evt.target.value) {
+						this.currentSex = this.sexList[i].value;
+						break;
 					}
-				})
+				}
+				// this.currentSex = evt.target.value;
+			},
+			save() {
+				let _this = this;
+				uni.showLoading({
+					title: '正在保存...'
+				});
+				let postUrl = this.isEdit ? '/roomUser/update' : '/roomUser/signTenant';
+				let par = {
+					roomId: _this.roomId,
+					tenantName: _this.info1.name,
+					landlordId: _this.$store.state.landladyInfo.id,
+					landlordName: _this.$store.state.landladyInfo.userName,
+					tenantPhone: _this.info1.tel,
+					tenantIdNumber: _this.info1.IDNum,
+					idCardImg1: _this.imgSideUrl,
+					idCardImg2: _this.imgOtherSideUrl,
+					eleUnitPrice: '1',
+					elePrevNum: _this.info3.eleCost,
+					waterPrice: _this.info3.waterCost,
+					netPrice: _this.info3.netCost,
+					startDate: _this.info2.startDate ? _this.info2.startDate + ' 00:00:00' : this.date + ' 00:00:00',
+					rentMonthNum: _this.rentMonthNum,
+					endDate: _this.info2.keepDate + ' 00:00:00',
+					payRentCycle: _this.rentCycleList[0],
+					rentPrice: _this.info2.rentUnitPrice,
+					depositAmount: _this.info2.deposit,
+					depositNum: _this.rentCycleList[1],
+					tenantSex: _this.currentSex, //性别字段
+					remarks: _this.remarks
+				};
+				if (this.isEdit) {
+					par.id = this.renterId;
+					par.tenantId = this.userId;
+				}
+				// if (!(_this.imgSideUrl && _this.imgOtherSideUrl)) {
+				// 	uni.showToast({
+				// 		title: '请先添加身份证照片',
+				// 		icon: 'none'
+				// 	});
+				// 	return;
+				// }
+				_this.$refs.form1.validate(res1 => {
+					if (res1) {
+						console.log(res1);
+						_this.$refs.form2.validate(res2 => {
+							if (res2) {
+								_this.$refs.form3.validate(res3 => {
+									if (res3) {
+										_this.$request.post(postUrl, par).then(responce => {
+											uni.hideLoading();
+											let tipContent = this.isEdit ? '编辑成功' : '添加成功';
+											uni.showToast({
+												title: tipContent
+											});
+											setTimeout(() => {
+												// let pages = getCurrentPages();
+												//    if (pages.length > 1) {
+												//        let beforePage = pages[pages.length - 2];
+												// 		console.log(beforePage)
+												//            beforePage.$vm.updateData()
+												uni.navigateBack({
+													delta: 1
+												});
+												// }
+											}, 1500);
+										});
+									}
+								});
+							}
+						});
+					}
+				});
 			},
 			getPhone(e){
 					let _this = this
@@ -584,100 +542,61 @@ export default {
 				})
 			},
 			chooseLi(index,temp){
-				if(temp){
-					this.currentLiIndex = index == 6 ? 0 : (index == 12 ? 1 : 2)
-				}else{
-					this.currentLiIndex = index
-					this.info2.keepDate = this.getKeepDate(index)
+					if(temp){
+						this.currentLiIndex = index == 6 ? 0 : (index == 12 ? 1 : 2)
+					}else{
+						this.currentLiIndex = index
+						this.info2.keepDate = this.getKeepDate(index)
+					}
+			},
+			getKeepDate(index) {
+				let keepDate;
+				let _this = this;
+				switch (index) {
+					case 0:
+						keepDate = moment(this.date)
+							.add(6, 'month')
+							.subtract(1, 'days');
+						_this.rentMonthNum = 6;
+						break;
+					case 1:
+						keepDate = moment(this.date)
+							.add(12, 'month')
+							.subtract(1, 'days');
+						_this.rentMonthNum = 12;
+						break;
+					case 2:
+						keepDate = moment(this.date)
+							.add(24, 'month')
+							.subtract(1, 'days');
+						_this.rentMonthNum = 24;
+						break;
+					case 3:
+						uni.showToast({
+							title: '请自己填写',
+							icon: 'none'
+						});
+						break;
+					default:
+						break;
 				}
-			});
-		},
-		espInput(e) {
-			console.log(this.rentCycleList);
-
-			if (this.rentCycleList.length != 0 && this.info2.rentUnitPrice / this.rentCycleList[0] != 0) {
-				this.info2.deposit = Math.ceil(this.info2.rentUnitPrice / this.rentCycleList[0]);
-			}
-		},
-		blur() {
-			this.listShow = false;
-		},
-		focus(e) {
-			this.listShow = true;
-		},
-		change(e) {
-			this.rentCycleList = chnToNumber.chnToNumber(e.newVal);
-
-			this.info2.rentCycle = e.newVal;
-		},
-		getRentCycleList() {
-			this.$request
-				.post('/dict/findByParentName', {
-					name: 'RENT_CYCLE'
-				})
-				.then(res => {
-					this.list = [];
-					res.data.data.forEach(item => {
-						this.list.push(item.name);
-					});
-				});
-		},
-		chooseLi(index, temp) {
-			if (temp) {
-				this.currentLiIndex = index == 6 ? 0 : index == 12 ? 1 : 2;
-			} else {
-				this.currentLiIndex = index;
-				this.info2.keepDate = this.getKeepDate(index);
-			}
-		},
-		getKeepDate(index) {
-			let keepDate;
-			let _this = this;
-			switch (index) {
-				case 0:
-					keepDate = moment(this.date)
-						.add(6, 'month')
-						.subtract(1, 'days');
-					_this.rentMonthNum = 6;
-					break;
-				case 1:
-					keepDate = moment(this.date)
-						.add(12, 'month')
-						.subtract(1, 'days');
-					_this.rentMonthNum = 12;
-					break;
-				case 2:
-					keepDate = moment(this.date)
-						.add(24, 'month')
-						.subtract(1, 'days');
-					_this.rentMonthNum = 24;
-					break;
-				case 3:
-					uni.showToast({
-						title: '请自己填写',
-						icon: 'none'
-					});
-					break;
-				default:
-					break;
-			}
-			return this.getDate(keepDate);
-		},
-		getDate(value) {
-			let date;
-			if (value) {
-				date = new Date(value);
-			} else {
-				date = new Date();
-			}
-			let year = date.getFullYear();
-			let month = date.getMonth() + 1;
-			let day = date.getDate();
-			month = month > 9 ? month : '0' + month;
-			day = day > 9 ? day : '0' + day;
-			return `${year}-${month}-${day}`;
-		},
-		bindDateChange(e) {
+				return this.getDate(keepDate);
+			},
+			getDate(value) {
+				let date;
+				if (value) {
+					date = new Date(value);
+				} else {
+					date = new Date();
+				}
+				let year = date.getFullYear();
+				let month = date.getMonth() + 1;
+				let day = date.getDate();
+				month = month > 9 ? month : '0' + month;
+				day = day > 9 ? day : '0' + day;
+				return `${year}-${month}-${day}`;
+			},
+			bindDateChange(e) {
 			console.log('nihaoa', e);
 			this.date = e.detail.value;
 			this.info2.startDate = e.detail.value;

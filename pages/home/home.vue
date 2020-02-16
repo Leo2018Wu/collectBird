@@ -79,6 +79,7 @@ export default {
 			});
 			console.log(this.$store.state.isloginStatus);
 		}
+		this.getMoneyInfo()
 	},
 	methods: {
 		checkLoginStatus() {
