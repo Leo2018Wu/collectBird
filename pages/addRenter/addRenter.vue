@@ -162,7 +162,7 @@
 				</view> -->
 			</evan-form>
 		</view>
-		<view class="section4 whiteBg"><textarea class="secTip textOverFlow" placeholder="备注" :value="remarks" v-model="remarks" placeholder-class="textPlaceholder"></textarea></view>
+		<view class="section4 whiteBg"><textarea class="secTip textOverFlow" placeholder="备注"  v-model="remarks" placeholder-class="textPlaceholder"></textarea></view>
 		<view class="sureBtn" @click="save">保存</view>
 	</view>
 </template>
@@ -695,7 +695,7 @@ export default {
 		margin-right: unset;
 	}
 	.form-input{
-		font-size: 32rpx;
+		font-size: 34rpx;
 	}
 	.secTip{
 		width: 100%;
