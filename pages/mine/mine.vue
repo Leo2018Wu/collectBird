@@ -4,11 +4,7 @@
 			<view class="myMsg">
 				<view class="myContainer">
 					<view class=""><image class="myPhoto" :src="userImg"></image></view>
-					<!-- class="login" -->
-					<view v-if="!show">
-						<button class="login" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true">登录</button>
-					</view>
-					<!-- <view class="login" v-if="!show" @click="openLogin"><view class="logintext">登录</view></view> -->
+					<view v-if="!show"><button class="login" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true">登录</button></view>
 					<!-- <view class="login" v-if="!show" @click="openLogin"><view class="logintext">登录</view></view> -->
 					<view class="detail" v-if="show">
 						<view class="detailTop">
@@ -41,11 +37,7 @@
 				<view class="leftPart">
 					<image class="jumpPortalImg" src="../../static/myIcon1.png" mode=""></image>
 					<view class="jumpPortalText">填写邀请码</view>
-<<<<<<< HEAD
-					<view class="modalNum">{{ usedInviCode ? usedInviCode : 0 }}</view>
-=======
-					<view class="modalNum">{{ usedInviCode ? usedInviCode : ''}}</view>
->>>>>>> 6f0572ad199b3d3dde7a41378d7cc58131271ce4
+					<view class="modalNum">{{ usedInviCode ? usedInviCode : '' }}</view>
 				</view>
 				<view class="rightPart"><image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image></view>
 			</view>
@@ -97,7 +89,7 @@
 					<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form" :model="info">
 						<evan-form-item prop="invitationCode">
 							<template v-slot:main>
-								<input type="text" value="" maxlength="4" v-model="info.invitationCode" placeholder="请输入邀请码" style="font-size: 30rpx;" />
+								<input type="text" value="" maxlength="6" v-model="info.invitationCode" placeholder="请输入邀请码" style="font-size: 30rpx;" />
 							</template>
 						</evan-form-item>
 					</evan-form>
@@ -148,11 +140,10 @@ export default {
 			gender: '', //用户性别
 			openId: '',
 			show: false, //是否显示点击登录
-			roomNum: '0',
+			roomNum: '50',
 			inviCode: '', // 我的邀请码
 			usedInviCode: '', //填写邀请码
 			level: '',
-			// landladyInfo: {},
 			remainDay: '0', //剩余天数
 			trialDate: '2030-01-01',
 			phoneNumber: '17521774352', // 绑定手机号
@@ -651,9 +642,9 @@ export default {
 }
 
 .modalInput {
-	padding: 25rpx 0rpx 10rpx 0rpx;
+	padding: 15rpx 0rpx 10rpx 0rpx;
 	/* border-bottom: 1rpx solid #eeeeee; */
-	width: 80%;
+	width: 75%;
 	text-align: center;
 	margin: 0 auto;
 	font-size: 30rpx;
@@ -673,7 +664,7 @@ export default {
 	color: rgba(255, 160, 68, 1);
 	display: flex;
 	justify-content: center;
-	padding: 10rpx 20rpx 25rpx;
+	padding: 10rpx 20rpx 15rpx;
 }
 
 .reminderSymbol {
@@ -688,7 +679,7 @@ export default {
 
 .button {
 	width: 100%;
-	height: 90rpx;
+	height: 25%;
 	border-top: 1rpx solid rgba(238, 238, 238, 1);
 	display: flex;
 	justify-content: space-around;
@@ -703,7 +694,6 @@ export default {
 .modalLine {
 	width: 1rpx;
 	height: 89rpx;
-	/* border: 1rpx solid rgba(238, 238, 238, 1); */
 	background-color: rgba(238, 238, 238, 1);
 	position: absolute;
 	top: 0%;
@@ -779,11 +769,6 @@ export default {
 	width: 185rpx;
 	height: 70rpx;
 }
-/* .isLogin {
-	margin-left: 37rpx;
-	width: 185rpx;
-	height: 70rpx;
-} */
 .notLogin image {
 	width: 100%;
 	height: 100%;
