@@ -57,15 +57,16 @@
 		},
 
 		onLoad(options) {
-			console.log(options)
+			
 			this.roomId = options.roomId;
 			this.userInfo = JSON.parse(options.userInfo) 
+			console.log(this.userInfo)
 			this.communityInfo = JSON.parse(options.commInfo)
 			this.getBillRecord(this.userInfo.id)
 		},
 		onShow(){
-			this.$request.post('user/findOne',{
-				id:this.userInfo.id
+			this.$request.post('/roomUser/findById',{
+				tenantId:this.userInfo.id
 			}).then((res)=>{
 				this.userInfo = res.data.data
 			})
@@ -97,7 +98,9 @@
 				let _this = this;
 				let arr1 = [];
 				let arr2 = [];
-				_this.$request.post("/bill/findByUser",{id}).then((res)=>{
+				_this.$request.post("/bill/findByTenantId",{
+					tenantId:id
+				}).then((res)=>{
 					res.data.data.forEach((item,index) => {
 						if(item.billStatus != 4){
 							arr1.push(item)

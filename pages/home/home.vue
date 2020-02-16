@@ -55,11 +55,7 @@
 </template>
 
 <script>
-// import renterInfoBar from '../../components/isLogin/isLgin.vue';
 export default {
-	// components: {
-	// 	isLogin
-	// },
 	data() {
 		return {
 			mouthIncome: '0', //本月净收入

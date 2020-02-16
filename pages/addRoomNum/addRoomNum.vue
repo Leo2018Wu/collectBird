@@ -42,9 +42,9 @@
 				<span class="inputSpan"></span>
 			</view> -->
 			
-			<view class="switchBox">
+			<view class="switchBox" @click="showTip()">
 				<span>是否整租</span>
-				<switch :checked="isWholeRent" @change="changeType" color="#F09A42" />
+				<switch :disabled="tempRoomList[0].tenantNum > 0" :checked="isWholeRent" @change="changeType" color="#F09A42" />
 			</view>
 		</view>
 		<!-- <view class="section2">
@@ -99,6 +99,7 @@
 				returnHouseId:null,
 				housePar:[],
 				roomList:[],
+				tempRoomList:[],
 				listShow:false,
 				communityId:'',//从楼号页面传过来的houseId
 				houseId:'',
@@ -177,6 +178,7 @@
 				let _this = this;
 				this.$request.post('/house/findById',{id}).then(res=>{
 					console.log(res)
+					this.tempRoomList = res.data.data.roomList
 					this.info.houseNo = res.data.data.buildingNo;
 					this.info.roomNo = res.data.data.houseNo;
 					this.rentType = res.data.data.rentType;
@@ -189,13 +191,7 @@
 					let index = parseInt(res.data.data.bedroomNum) - 1;
 					
 					_this.returnEmit(temp)
-					
-					let par = {
-						detail:{
-							value:this.rentType == '0' ? true : false,
-						}
-					}
-					_this.changeType(par);
+					_this.isWholeRent = this.rentType == '0' ? 1 : 0;
 				})
 			},
 			getHouseTypeList(){
@@ -274,9 +270,19 @@
 					}
 				})
 			},
+			showTip(){
+				if(this.tempRoomList[0].tenantNum > 0){
+					uni.showToast({
+						title:'当前房号下已经有房间有租客入驻，不可调整出租方式。',
+						icon:'none',
+						duration:1500
+					})
+				}
+			},
 			changeType(e){
 				console.log(e)
-				this.isWholeRent = e.detail.value ?  1 : 0 //1是整租0不是
+					this.isWholeRent = e.detail.value ?  1 : 0 //1是整租0不是
+				
 			}
 		}
 	}

@@ -23,15 +23,15 @@
 			<view class="billDateBox">
 				<view class="billDateLi">
 					<span class="billDateTitle">收租日期</span>
-					<span>{{billInfo.endDate.substr(0,10)}}</span>
+					<span>{{billInfo.startDate}}</span>
 				</view>
 				<view class="billDateLi">
 					<span class="billDateTitle">缴费周期</span>
-					<span class="billDate">{{billInfo.startDate.substr(0,10)}} ~ {{billInfo.endDate.substr(0,10)}}</span>
+					<span class="billDate">{{billInfo.startDate}} ~ {{billInfo.endDate}}</span>
 				</view>
 					<view class="billDateLi" v-if="billInfo.billStatus == 4">
 						<span class="billDateTitle">到账日期</span>
-						<span>{{billInfo.payRentDate.substr(0,10)}}</span>
+						<span>{{billInfo.payRentDate}}</span>
 					</view>
 					<view class="billDateLi" v-if="billInfo.billStatus == 4">
 						<span class="billDateTitle">收款方式</span>
@@ -56,7 +56,7 @@
 						{{item.itemName}}<span>1.00元/度</span>
 					</view>
 					<view v-if="item.type == 1" class="eleCostTotal">{{item.quantity}}{{"度" | addSpace}} ({{item.currentNum}}-{{item.prevNum}}）</view>
-					<view v-if="item.type == 1">抄表日期: {{item.noteDate.substr(0,10)}}</view>
+					<view v-if="item.type == 1">抄表日期: {{item.noteDate}}</view>
 				</view>
 				<view class="priceTotal">{{item.amout}}</view>
 			</view>
@@ -89,6 +89,7 @@
 </template>
 
 <script>
+	import dateForm from '../../util/index.js'
 	export default {
 		data() {
 			return {
@@ -109,8 +110,9 @@
 					id
 				}).then((res) =>{
 					_this.billInfo = res.data.data
-					console.log(_this.billInfo)
-					console.log(_this.billInfo.items)
+					_this.billInfo.startDate = dateForm.dateForm(_this.billInfo.startDate)
+					_this.billInfo.endDate = dateForm.dateForm(_this.billInfo.endDate)
+					_this.billInfo.payRentDate = dateForm.dateForm(_this.billInfo.payRentDate)
 					_this.init = true;
 				})
 			},

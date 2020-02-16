@@ -35,6 +35,11 @@ const chnToNumber = function chnToNumber(chnStr) {
 	}
 	return resArr;
 }
+const dateForm = function dateForm(value) {
+		let data = value.split(' ')[0];
+		return data;
+}
 module.exports = {
-	chnToNumber
+	chnToNumber,
+	dateForm
 }

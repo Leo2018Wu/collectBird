@@ -14,7 +14,7 @@
 				</view>
 				<view class="detailBottom">
 					<span class="housePrice">{{communityInfo.roomPrice}}元/月</span>
-					<span class="showRecord" v-if="roomInfo.unPayBill == 1">查看账单</span>
+					<span class="showRecord" v-if="roomInfo.unPayBill == 1" @click.stop="showBill()">查看账单</span>
 				</view>
 			</view>
 		</view>
@@ -123,9 +123,11 @@
 					console.log(_this.roomInfo)
 				})
 			},
-			
 			showBill(){
-				
+				console.log('我点击了')
+				uni.navigateTo({
+					url:'../billDetail/billDetail?billId='+this.roomInfo.billId
+				})
 			},
 			getEmit(e){
 				console.log(e)
@@ -212,6 +214,8 @@
 		background-color: #FFECEC;
 		border-radius: 23rpx;
 		margin-left: 35rpx;
+		position: relative;
+		z-index: 9;
 	}
 	.section2{
 		padding: 40rpx 40rpx 6rpx 40rpx;

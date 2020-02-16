@@ -21,11 +21,7 @@
 								</view>
 							</label>
 						</radio-group>
-								<!-- <input class="form-input" placeholder-class="form-input-placeholder" v-model="info1.name" placeholder="租客姓名" /> -->
 					</template>
-					<!-- <template v-slot:tip>
-								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
-					</template> -->
 				</evan-form-item>
 				<evan-form-item label="电话" prop="tel">
 					<template v-slot:main>
@@ -94,7 +90,7 @@
 								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 							</template>
 				</evan-form-item>
-				<evan-form-item label="每期交租" prop="rentUnitPrice">
+				<evan-form-item label="月租金" prop="rentUnitPrice">
 					<template v-slot:main>
 								<input class="form-input" type="number" placeholder-class="form-input-placeholder" v-model="info2.rentUnitPrice" placeholder="请输入" @input="espInput" />
 							</template>
@@ -117,28 +113,19 @@
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form3" :model="info3">
 				<evan-form-item label="电费(1元/度)" prop="eleCost">
 					<template v-slot:main>
-					<!-- 	<view style="display: flex;">
-							<input class="form-input0" placeholder-class="form-input-placeholder" v-model="info3.ele" placeholder="1元/度" /> -->
 							<input class="form-input inputColor" placeholder-class="form-input-placeholder" v-model="info3.eleCost" placeholder="初始刻度" />
-						<!-- </view> -->
 					</template>
 					
 				</evan-form-item>
 				<evan-form-item label="水费(元/月)" prop="waterCost">
 					<template v-slot:main>
-								<!-- <view style="display: flex;">
-									<input class="form-input0"  disabled placeholder-class="form-input-placeholder" v-model="info3.water" placeholder="30元/月" /> -->
 									<input class="form-input inputColor"  placeholder-class="form-input-placeholder" v-model="info3.waterCost" placeholder="30元/月" />
-								<!-- </view> -->
 					</template>
 							
 				</evan-form-item>
 				<evan-form-item label="宽带(元/月)" prop="netCost" :border="false">
 					<template v-slot:main>
-						<!-- <view style="display: flex;">
-							<input class="form-input0" disabled placeholder-class="form-input-placeholder"  v-model="info3.net" placeholder="30元/月" /> -->
 							<input class="form-input inputColor"  placeholder-class="form-input-placeholder" v-model="info3.netCost" placeholder="30元/月" />
-						<!-- </view> -->
 					</template>
 							
 				</evan-form-item>
@@ -333,6 +320,10 @@
 				this.$refs.form3.setRules(this.rules3)
 			})
 			this.getRentCycleList()
+			if(!this.isEdit){
+				//默认选择一年
+				this.chooseLi(1)
+			}
 		},
 		methods: {
 			getUserInfo(id){
@@ -501,10 +492,10 @@
 			},
 			espInput(e){
 				console.log(this.rentCycleList)
-				
-				if(this.rentCycleList.length != 0 && this.info2.rentUnitPrice / this.rentCycleList[0] !=0){
-					this.info2.deposit = Math.ceil((this.info2.rentUnitPrice / this.rentCycleList[0]))
-				}
+				this.info2.deposit = this.info2.rentUnitPrice
+				// if(this.rentCycleList.length != 0 && this.info2.rentUnitPrice / this.rentCycleList[0] !=0){
+				// 	this.info2.deposit = Math.ceil((this.info2.rentUnitPrice / this.rentCycleList[0]))
+				// }
 			},
 			blur(){
 				this.listShow = false
@@ -683,14 +674,14 @@
 		width: 100%;
 		height: 180rpx;
 		padding: 32rpx 0 30rpx 0;
-		font-size: 30rpx;
+		font-size: 34rpx;
 		color: #333333;
 		/* border-bottom: 2rpx solid #EBEBEB; */
 	}
 	.textPlaceholder{
 		padding: 32rpx 0 30rpx 0;
 		color: #999999;
-		font-size: 30rpx;
+		font-size: 34rpx;
 	}
 	.sureBtn{
 		width: 257rpx;
