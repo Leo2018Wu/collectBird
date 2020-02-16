@@ -24,19 +24,19 @@
 			<view class="bannerTop">
 				<view @click="toHouseList">
 					<view class="bannerItem"><image class="bannerImg" src="../../static/homeIcon1.png" mode=""></image></view>
-					<span class="bannerText">房源管理</span>
+					<span class="bannerText">房源</span>
 				</view>
 				<view @click="goRenterMange">
 					<view class="bannerItem"><image class="bannerImg" src="../../static/homeIcon2.png" mode=""></image></view>
-					<span class="bannerText">租客管理</span>
+					<span class="bannerText">租客</span>
 				</view>
 				<view @click="goBillManage">
 					<view class="bannerItem"><image class="bannerImg" src="../../static/homeIcon3.png" mode=""></image></view>
-					<span class="bannerText">账单管理</span>
+					<span class="bannerText">账单</span>
 				</view>
 				<view @click="goReportForm">
 					<view class="bannerItem"><image class="bannerImg" src="../../static/statistical.png" mode=""></image></view>
-					<span class="bannerText">统计报表</span>
+					<span class="bannerText">统计</span>
 				</view>
 			</view>
 		</view>
@@ -66,43 +66,52 @@ export default {
 			billDuein: '0', //本月账单待收
 			billReceived: '0', //本月账单已收
 			todayReceived: '0', //今日已收金额
-			loginFlag: false
+			loginFlag: false,
+			isPopUpModal: false
 		};
 	},
-	onShow(option) {
-		this.checkLoginStatus().then((res) => {
+	onLoad() {
+		this.checkLoginStatus().then(res => {
 			this.loginFlag = res;
-		})
+		});
 		console.log(this.$store.state.isloginStatus);
 	},
+	onShow(option) {
+		if (this.isPopUpModal) {
+			this.checkLoginStatus().then(res => {
+				this.loginFlag = res;
+			});
+			console.log(this.$store.state.isloginStatus);
+		}
+	},
 	methods: {
-		checkLoginStatus(){
+		checkLoginStatus() {
 			let _this = this;
-			return new Promise((reslove,rej)=>{
+			return new Promise((reslove, rej) => {
 				//判断用户是否授权过
 				uni.getSetting({
 					success(res) {
-						console.log(res)
+						console.log(res);
 						if (res.authSetting['scope.userInfo']) {
-							_this.$store.commit('isloginStatus',true)
-							_this.getUserInfo()
+							_this.$store.commit('isloginStatus', true);
+							_this.getUserInfo();
 						}
 					},
 					complete() {
-						reslove(!_this.$store.state.isloginStatus)
+						reslove(!_this.$store.state.isloginStatus);
 					}
-				})
-			})
+				});
+			});
 		},
 		getLandLadyInfo(userInfo) {
 			let _this = this;
 			console.log(_this.$store.state.userOpenId);
 			_this.$request
-				.post('user/findByOpenId',userInfo)
+				.post('user/findByOpenId', userInfo)
 				.then(res => {
-					console.log(res)
+					console.log(res);
 					_this.$store.commit('landladyInfo', res.data.data);
-					_this.getMoneyInfo() 
+					_this.getMoneyInfo();
 				})
 				.catch(err => {});
 		},
@@ -175,7 +184,7 @@ export default {
 										userImg: infoRes.userInfo.avatarUrl,
 										userSex: self.gender
 									};
-									self.getLandLadyInfo(userInfo) 
+									self.getLandLadyInfo(userInfo);
 								}
 							},
 							fail: function(res) {
@@ -245,7 +254,7 @@ export default {
 
 .paymentText {
 	margin-bottom: 10rpx;
-	font-size: 24rpx;
+	font-size: 26rpx;
 }
 
 .bannerBox {
@@ -270,9 +279,9 @@ export default {
 }
 .bannerText {
 	color: #333333;
-	font-size: 26rpx;
+	font-size: 28rpx;
 	font-family: PingFang-SC-Medium;
-	font-weight: 500;
+	font-weight: 600;
 }
 
 /* 登录弹窗 */

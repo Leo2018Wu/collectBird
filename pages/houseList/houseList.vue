@@ -27,6 +27,7 @@
 				</view>
 			</mescroll-uni>
 		</view>
+		<is-login v-show="loginFlag" :childLoginFlag="loginFlag" v-on:childByValue="childByValue"></is-login>
 	</view>
 </template>
 
@@ -35,18 +36,21 @@ import { mapState, mapMutations } from 'vuex';
 import scrollTab from '../../components/scrollTab.vue';
 import houseSku from '../../components/houseSku.vue';
 import addBar from '../../components/addBar.vue';
+import isLogin from '../../components/isLogin.vue';
 import MescrollUni from '../../components/mescroll-uni/mescroll-uni.vue';
 export default {
 	components: {
 		'scroll-tab': scrollTab,
 		'house-sku': houseSku,
 		'add-Bar': addBar,
+		'is-login': isLogin,
 		MescrollUni
 	},
 	data() {
 		return {
 			wordList: [],
 			mescroll: {},
+			loginFlag: false, //登录弹窗
 			para: {
 				landlordId: "",
 				pageNum: 1,
@@ -78,6 +82,11 @@ export default {
 		...mapState(['login', 'landladyInfo'])
 	},
 	onShow() {
+		this.checkLoginStatus().then(res => {
+			console.log('进入onshow',res);
+			this.loginFlag = res;
+		});
+		console.log(this.$store.state.isloginStatus);
 		// let _this = this;
 		// this.$request
 		// 	.post('user/findByOpenId', {
@@ -94,6 +103,15 @@ export default {
 		_this.getWords();
 	},
 	methods: {
+		childByValue(value){
+			console.log(value,'弹不弹登录提示')
+			if(value == false){
+				this.loginFlag = false;
+				uni.navigateTo({
+					url: '../home/home'
+				});
+			}
+		},
 		updateData() {
 			console.log('wwww');
 			this.getWords();
@@ -101,9 +119,15 @@ export default {
 		},
 		addCommunity() {
 			console.log('我被点击阿玛尼极');
-			uni.navigateTo({
-				url: '../addCommunity/addCommunity'
-			});
+			if(this.$store.state.isloginStatus){
+				uni.navigateTo({
+					url: '../addCommunity/addCommunity'
+				});
+			}else{
+				console.log('是否登录',this.$store.state.isloginStatus);
+				console.log(this.loginFlag);
+				this.loginFlag = true;
+			}
 		},
 		goDetail(id, landlodId) {
 			uni.navigateTo({
@@ -171,7 +195,25 @@ export default {
 			_this.$nextTick(() => {
 				mescroll.endSuccess(curPageData.length, res.hasNextPage);
 			});
-		}
+		},
+		checkLoginStatus() {
+			let _this = this;
+			return new Promise((reslove, rej) => {
+				//判断用户是否授权过
+				uni.getSetting({
+					success(res) {
+						console.log(res);
+						if (res.authSetting['scope.userInfo']) {
+							_this.$store.commit('isloginStatus', true);
+							// _this.getUserInfo();
+						}
+					},
+					complete() {
+						reslove(!_this.$store.state.isloginStatus);
+					}
+				});
+			});
+		},
 	}
 };
 </script>

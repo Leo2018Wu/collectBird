@@ -93,14 +93,14 @@
 					<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form" :model="info">
 						<evan-form-item prop="invitationCode">
 							<template v-slot:main>
-								<input type="text" value="" maxlength="4" v-model="info.invitationCode" placeholder="请输入邀请码" style="font-size: 30rpx;" />
+								<input type="text" value="" maxlength="6" v-model="info.invitationCode" placeholder="请输入邀请码(仅填写1次)" style="font-size: 30rpx;" />
 							</template>
 						</evan-form-item>
 					</evan-form>
-					<view class="reminder">
+					<!-- <view class="reminder">
 						<view class="reminderSymbol">!</view>
 						<view class="reminderText">邀请码仅填写一次</view>
-					</view>
+					</view> -->
 				</view>
 				<view class="button">
 					<view class="btn_cancle" @click="cancle" data-statu="close">取消</view>
@@ -144,7 +144,7 @@ export default {
 			gender: '', //用户性别
 			openId: '',
 			show: false, //是否显示点击登录
-			roomNum: '0',
+			roomNum: '50',
 			inviCode: '', // 我的邀请码
 			usedInviCode: '', //填写邀请码
 			level: '',
@@ -619,10 +619,10 @@ export default {
 	z-index: 500;
 }
 .modalTitle {
-	height: 25%;
+	height: 28%;
 }
 .modalContent {
-	height: 75%;
+	height: 72%;
 }
 .modalBox {
 	width: 540rpx;
@@ -638,6 +638,7 @@ export default {
 }
 
 .modalTitle {
+	height: 28%;
 	padding-top: 40rpx;
 	font-size: 36rpx;
 	font-family: PingFang SC;
@@ -647,12 +648,12 @@ export default {
 }
 
 .modalInput {
-	padding: 25rpx 0rpx 10rpx 0rpx;
-	/* border-bottom: 1rpx solid #eeeeee; */
-	width: 80%;
+	padding: 25rpx 0rpx 0rpx 0rpx;
 	text-align: center;
 	margin: 0 auto;
 	font-size: 30rpx;
+	width: 376rpx;
+	height: 172rpx;
 }
 .reminderText {
 	font-size: 22rpx;
@@ -775,11 +776,7 @@ export default {
 	width: 185rpx;
 	height: 70rpx;
 }
-/* .isLogin {
-	margin-left: 37rpx;
-	width: 185rpx;
-	height: 70rpx;
-} */
+
 .notLogin image {
 	width: 100%;
 	height: 100%;

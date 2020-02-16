@@ -30,7 +30,6 @@ export default {
 			this.$emit('childByValue', false); //关键点
 		},
 		getUserInfo() {
-			this.loginFlag = false;
 			console.log(11111);
 			let self = this;
 			uni.login({
@@ -53,7 +52,7 @@ export default {
 										success: function(infoRes) {
 											console.log(infoRes);
 											if (infoRes.userInfo) {
-												self.show = true;
+												// self.show = true;
 												// 微信的gender 1 男 2 女 0 未知
 												// 收租鸟userSex 0 男 1 女
 												if (infoRes.userInfo.gender == '1') {
@@ -70,6 +69,10 @@ export default {
 													userSex: self.gender
 												};
 												self.getMineMsg(userInfo);
+												self.$emit('childByValue', false); 
+												uni.navigateTo({
+													url: '../home/home'
+												});
 											}
 										},
 										fail: function(res) {

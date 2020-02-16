@@ -28,11 +28,11 @@
 						</view>
 						<view class="billListright">
 							<view class="billSum" v-show="currentIndex != 3" :class="{ bule: currentIndex == 2 }">{{ item.total }}</view>
-							<view class="overdueNum" v-show="currentIndex == 1">{{ item.overdueDays }}天后交租</view>
+							<view class="overdueNum" v-show="currentIndex == 1&& item.overdueDays > 0">{{ item.overdueDays }}天后交租</view>
 							<view class="overdueNum" v-show="currentIndex == 0 && item.overdueDays > 0">逾期{{ item.overdueDays }}天</view>
 							<view class="" v-show="currentIndex == 3">
 								<view class="billSum" :class="{ bule: item.billStatus == 4 }">{{ item.total }}</view>
-								<view class="overdueNum" v-show="item.billStatus == 0">{{ item.overdueDays }}天后交租</view>
+								<view class="overdueNum" v-show="item.billStatus == 0&& item.overdueDays > 0">{{ item.overdueDays }}天后交租</view>
 								<view class="overdueNum" v-show="item.billStatus == 3 && item.overdueDays > 0">逾期{{ item.overdueDays }}天</view>
 							</view>
 						</view>
