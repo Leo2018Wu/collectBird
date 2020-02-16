@@ -694,10 +694,8 @@ export default {
 	.keepDateLi:last-of-type{
 		margin-right: unset;
 	}
-	.form-input0{
-		width: 50%;
-		height: 100%;
-		text-align: right;
+	.form-input{
+		font-size: 32rpx;
 	}
 	.secTip{
 		width: 100%;

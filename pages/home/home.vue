@@ -102,7 +102,6 @@ export default {
 		},
 		getLandLadyInfo(userInfo) {
 			let _this = this;
-			console.log(_this.$store.state.userOpenId);
 			_this.$request
 				.post('user/findByOpenId', userInfo)
 				.then(res => {

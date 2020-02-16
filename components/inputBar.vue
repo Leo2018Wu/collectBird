@@ -61,6 +61,7 @@ export default {
   justify-content: space-between;
   white-space: nowrap;
   font-weight: bold;
+  color: #333333;
 }
 input {
   width: calc(100% - 180rpx);

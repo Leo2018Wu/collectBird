@@ -49,7 +49,7 @@
 				</view>
 			</view>
 			
-			<view class="costDetail">费用明细</view>
+			<!-- <view class="costDetail">费用明细</view>
 			<view class="electricBox" v-for="(item,index) in billInfo.items" :key="index">
 				<view class="elecRight" >
 					<view  class="unitPrice">
@@ -59,7 +59,8 @@
 					<view v-if="item.type == 1">抄表日期: {{item.noteDate}}</view>
 				</view>
 				<view class="priceTotal">{{item.amout}}</view>
-			</view>
+			</view> -->
+			
 			<!-- <view class="waterBox">
 				<view class="waterOuter">
 					<span class="waterBar">水费</span>
