@@ -47,8 +47,8 @@
 					<view class="jumpPortalText">手机号</view>
 				</view>
 				<view class="rightPart">
-					<button class="getTelNumImg" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber"></button>
-					<view class="getTelNum" v-if="false">已绑定 {{ phoneNumber }}</view>
+					<button class="getTelNumImg" v-if="showTelNum" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber"></button>
+					<view class="getTelNum" v-if="!showTelNum">已绑定 {{ phoneNumber }}</view>
 				</view>
 			</view>
 			<view class="jumpPortalitem" @click="openInviteFriends">
@@ -133,6 +133,7 @@ export default {
 	},
 	data() {
 		return {
+			showTelNum: true,
 			invitationCodeFlag: false, // 是否显示填写邀请码弹窗
 			loginFlag: false, //登录弹窗
 			userImg: '../../static/tourist.png', //用户头像
@@ -147,7 +148,7 @@ export default {
 			// landladyInfo: {},
 			remainDay: '0', //剩余天数
 			trialDate: '2030-01-01',
-			phoneNumber: '17521774352', // 绑定手机号
+			phoneNumber: '', // 绑定手机号
 			info: {
 				invitationCode: ''
 			},
@@ -175,20 +176,20 @@ export default {
 				this.show = false;
 			} else {
 				this.show = true;
-				this.getMineMsg({openId: _this.$store.state.userOpenId})
+				this.getMineMsg({ openId: this.$store.state.userOpenId });
 			}
 		});
 	},
 	methods: {
-		ffffff(value){
+		ffffff(value) {
 			console.log(value);
 			this.show = value;
 		},
-		childByValue(value){
-			let _this = this
-			console.log('进入父组件获取到子组件传来数据',value);
+		childByValue(value) {
+			let _this = this;
+			console.log('进入父组件获取到子组件传来数据', value);
 			_this.loginFlag = false;
-			if(value){
+			if (value) {
 				_this.userName = value.userName;
 				_this.userImg = value.userImg;
 				_this.usedInviCode = value.usedInviCode;
@@ -296,7 +297,72 @@ export default {
 		// 		}
 		// 	});
 		// },
+		getPhoneNumber(e) {
+			console.log('telNum11111');
+			// let _this = this;
+			// console.log('errMsg', e.detail.errMsg);
+			// console.log('iv', e.detail.iv);
+			// console.log('encryptedData', e.detail.encryptedData);
+			// let res = {
+			// 	encryptedData: encodeURIComponent(e.detail.encryptedData),
+			// 	iv: e.detail.iv,
+			// 	sessionKey: this.$store.state.sessionKey
+			// };
+			// console.log('解密参数',res);
+			// this.getTelNum(res);
+			// if (e.detail.errMsg == 'getPhoneNumber:fail user deny') {
+			// 	uni.showModal({
+			// 		title: '提示',
+			// 		showCancel: false,
+			// 		content: '未授权',
+			// 		success: function(res) {}
+			// 	});
+			// } else {
+			// 	uni.showModal({
+			// 		title: '提示',
+			// 		showCancel: false,
+			// 		content: '同意授权',
+			// 		success: function(res) {
+			// 			console.log('同意授权后拿到的res', res);
+			// 		}
+			// 	});
+			// }
 
+			// uni.login({
+			// 	provider: 'weixin',
+			// 	success: function(loginRes) {
+			// 		console.log(loginRes, '1111');
+			// 		uni.checkSession({
+			// 			success() {
+			// 				let res = {
+			// 					encryptedData: encodeURIComponent(e.detail.encryptedData),
+			// 					iv: e.detail.iv,
+			// 					sessionKey: this.$store.state.sessionKey
+			// 				};
+			// 				this.getTelNum(res);
+			// 			},
+			// 			fail() {
+			// 				self.show = false;
+			// 				// session_key 已经失效，需要重新执行登录流程
+			// 				// 重新登录
+			// 				uni.login({
+			// 					provider: 'weixin',
+			// 					success: function(loginRes) {
+			// 						let res = {
+			// 							encryptedData: encodeURIComponent(e.detail.encryptedData),
+			// 							iv: e.detail.iv,
+			// 							sessionKey: this.$store.state.sessionKey
+			// 						};
+			// 						this.getTelNum(res);
+			// 					}
+			// 				});
+			// 			}
+			// 		});
+			// 	},
+			// 	fail: function(res) {
+			// 	}
+			// });
+		},
 		getMineMsg(userInfo) {
 			let _this = this;
 			_this.$request
@@ -318,21 +384,20 @@ export default {
 				});
 		},
 
-
-	// 弹窗其他页面跳转
-		openPhoneNumber(){
-				this.checkLoginStatus().then(res => {
-					this.loginFlag = res;
-					// if(!this.loginFlag && !this.usedInviCode){
-					// 	this.invitationCodeFlag = true;
-					// }
-				});
+		// 弹窗其他页面跳转
+		openPhoneNumber() {
+			this.checkLoginStatus().then(res => {
+				this.loginFlag = res;
+				// if(!this.loginFlag && !this.usedInviCode){
+				// 	this.invitationCodeFlag = true;
+				// }
+			});
 		},
 		// 打开填写邀请码弹窗
 		openNewsInvitationCode(e) {
 			this.checkLoginStatus().then(res => {
 				this.loginFlag = res;
-				if(!this.loginFlag && !this.usedInviCode){
+				if (!this.loginFlag && !this.usedInviCode) {
 					this.invitationCodeFlag = true;
 				}
 			});
@@ -348,13 +413,12 @@ export default {
 		openFeedBack(e) {
 			this.checkLoginStatus().then(res => {
 				this.loginFlag = res;
-				if(!this.loginFlag){
+				if (!this.loginFlag) {
 					uni.navigateTo({
 						url: '../feedback/feedback'
 					});
 				}
 			});
-
 		},
 		//跳转关于收租鸟
 		openAboutUs(e) {
@@ -368,8 +432,17 @@ export default {
 				url: '../help/help'
 			});
 		},
-
-
+		// 跳转邀请好友
+		openInviteFriends(e) {
+			this.checkLoginStatus().then(res => {
+				this.loginFlag = res;
+				// if (!this.loginFlag) {
+				// 	uni.navigateTo({
+				// 		url: '../feedback/feedback'
+				// 	});
+				// }
+			});
+		},
 		submit() {
 			let _this = this;
 			this.$refs.form.validate(res => {
@@ -410,7 +483,21 @@ export default {
 		},
 		// 未登录状态下点击登录
 		openLogin(e) {
-			this.getUserInfo();
+			this.loginFlag = true;
+			// this.getUserInfo();
+		},
+		getTelNum(res) {
+			this.$request
+				.post('/wx/takeWxDecode', res)
+				.then(v => {
+					if (v && v.phoneNumber) {
+						this.showTelNum = false;
+						this.phoneNumber = v.phoneNumber;
+					}
+				})
+				.catch(err => {
+					console.log(err);
+				});
 		}
 	}
 };

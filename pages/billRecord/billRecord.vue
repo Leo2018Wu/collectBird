@@ -55,9 +55,7 @@
 				communityInfo:{}
 			}
 		},
-
 		onLoad(options) {
-			
 			this.roomId = options.roomId;
 			this.userInfo = JSON.parse(options.userInfo) 
 			console.log(this.userInfo)
@@ -84,7 +82,7 @@
 			},
 			showBillDetail(id){
 				uni.navigateTo({
-					url:'../billDetail/billDetail?billId='+id
+					url:'../billDetail/billDetail?billId='+id+'&tenantId='+this.userInfo.id
 				})
 			},
 			// checkIsHaveLatestBill(endDate){

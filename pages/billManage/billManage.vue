@@ -23,7 +23,7 @@
 					<view class="billListItem" v-for="(item, idx) in billListInfo" :key="idx" @click="showBill(item)">
 						<view class="billListLeft">
 							<view class="billDateText">账单日期</view>
-							<view class="billDate">{{ item.endDate.substr(0, 10) }}</view>
+							<view class="billDate">{{ item.payRentDate.substr(0, 10) }}</view>
 							<view class="billAdress">{{ item.roomNo }}</view>
 						</view>
 						<view class="billListright">
