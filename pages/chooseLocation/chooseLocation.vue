@@ -188,22 +188,22 @@ export default {
 	margin-right: 6rpx;
 }
 .headContent span{
-	font-size: 30rpx;
+	font-size: 32rpx;
 	color: #333333;
 }
 .locationImg2{
 	width: 16rpx;
 	height: 16rpx;
-	margin-left: 6rpx;
+	margin-left: 10rpx;
 	margin-right: auto;
 }
 .inputClass{
 	border-radius: 5rpx;
 	background: #F5F5F5;
-	width: 520rpx;
+	width: 530rpx;
 	height: 100%;
-	color: #333333;
-	font-size: 30rpx;
+	color: #9B9B9B;
+	font-size: 32rpx;
 	padding-left: 20rpx;
 }
 .inputPlaceHolder{
