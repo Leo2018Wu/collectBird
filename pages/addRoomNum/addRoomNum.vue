@@ -42,7 +42,7 @@
 				<span class="inputSpan"></span>
 			</view> -->
 			
-			<view class="switchBox" @click="showTip()">
+			<view class="switchBox" @click="changeSwitch()">
 				<span>是否整租</span>
 				<switch :disabled="isHaveRenter" :checked="isWholeRent" @change="changeType" color="#F09A42" />
 			</view>
@@ -155,7 +155,11 @@
 		methods: {
 			
 			showList(){
-				this.listShow = true;
+				this.showTip().then(res=>{
+					if(res){
+						this.listShow = true;
+					}
+				})
 			},
 			hideList(){
 				this.listShow = false;
@@ -273,14 +277,21 @@
 					}
 				})
 			},
+			changeSwitch(){
+				this.showTip()
+			},
 			showTip(){
-				if(this.isHaveRenter){
-					uni.showToast({
-						title:'当前房号下已经有房间有租客入驻，不可调整出租方式。',
-						icon:'none',
-						duration:1500
-					})
-				}
+				return new Promise((res,rej) =>{
+					if(this.isHaveRenter){
+						uni.showToast({
+							title:'当前房号下已经有房间有租客入驻，不可调整出租方式。',
+							icon:'none',
+							duration:1500
+						})
+					}else{
+						res(true)
+					}
+				})
 			},
 			changeType(e){
 				console.log(e)

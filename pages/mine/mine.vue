@@ -318,28 +318,28 @@ export default {
 				});
 		},
 
-
-	// 弹窗其他页面跳转
-		openPhoneNumber(){
-				this.checkLoginStatus().then(res => {
-					this.loginFlag = res;
-					// if(!this.loginFlag && !this.usedInviCode){
-					// 	this.invitationCodeFlag = true;
-					// }
-				});
-		},
-		// 打开填写邀请码弹窗
-		openNewsInvitationCode(e) {
-			this.checkLoginStatus().then(res => {
-				this.loginFlag = res;
-				if(!this.loginFlag && !this.usedInviCode){
-					this.invitationCodeFlag = true;
-				}
-			});
-			// if (!this.usedInviCode) {
-			// 	this.invitationCodeFlag = true;
-			// }
-		},
+  // 弹窗其他页面跳转
+                //打开获取手机号
+                openPhoneNumber() {
+                        this.checkLoginStatus().then(res => {
+                                this.loginFlag = res;
+                                // if(!this.loginFlag && !this.usedInviCode){
+                                //         this.invitationCodeFlag = true;
+                                // }
+                        });
+                },
+                // 打开填写邀请码弹窗
+                openNewsInvitationCode(e) {
+                        this.checkLoginStatus().then(res => {
+                                this.loginFlag = res;
+                                if (!this.loginFlag && !this.usedInviCode) {
+                                        this.invitationCodeFlag = true;
+                                }
+                        });
+                        // if (!this.usedInviCode) {
+                        //         this.invitationCodeFlag = true;
+                        // }
+                },
 		// 关闭填写邀请码弹窗
 		cancle() {
 			this.invitationCodeFlag = false;
