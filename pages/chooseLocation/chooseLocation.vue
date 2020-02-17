@@ -17,13 +17,11 @@
 			<input v-else class="inputClass textOverFlow" @input="getsuggest" v-model="inputValue"  placeholder="地址" placeholder-class="inputPlaceHolder"/>
 		</view>
 	</view>
-	<view class="welContent">
-		您可以直接选择
-	</view>
+	<view class="welContent" v-if="suggestion.length != 0"></view>
     <view v-for="(item,index) in suggestion" :key="index" class="locationList">
       <view class="locationLi"  @click="backfill(index)">
         <view class="textOverFlow" >{{item.title}}</view>
-        <span class="textOverFlow">{{item.addr}}</span>
+        <span class="">{{item.addr}}</span>
       </view>
     </view>
   </view>
@@ -165,7 +163,7 @@ export default {
 	height: 100rpx;
 	width: 100%;
 	padding: 20rpx 30rpx 18rpx 30rpx;
-	border-bottom: 2rpx solid #ECECEC;
+	border-bottom: 1rpx solid #ECECEC;
 }
 .headContent{
 	width: 100%;
@@ -218,7 +216,7 @@ export default {
 	text-align: left;
 }
 .locationLi{
-	font-size: 30rpx;
+	font-size: 32rpx;
 	padding: 25rpx 0;
 	border-bottom: 2rpx solid #F4F4F4;
 }
@@ -226,7 +224,7 @@ export default {
 	font-weight: bold;
 }
 .locationLi span{
-	font-size: 24rpx;
+	font-size: 26rpx;
 	color: #999999;
 	margin-top: 20rpx;
 }

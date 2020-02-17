@@ -64,9 +64,9 @@
 			console.log(option)
 			this.houseId = option.id
 			this.landlordId = option.landlordId
-			this.getCommuny(option.id)
 		},
 		onShow(){
+			this.getCommuny(this.houseId)
 			this.getHouseInfo(this.houseId,this.landlordId)
 		},
 		methods: {
@@ -208,9 +208,8 @@
 	.liNumber span:first-of-type{
 		display: inline-block;
 		/* padding: 8rpx; */
-		/* width: 30rpx; */
-		padding: 0 4rpx;
 		min-width: 30rpx;
+		/* padding: 0 4rpx; */
 		height: 30rpx;
 		text-align: center;
 		line-height: 30rpx;

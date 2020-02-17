@@ -115,6 +115,7 @@
 					console.log(res)
 					// _this.commonFacBarList = res.data.data.houseConfigure.split(',')
 					_this.roomInfo = res.data.data
+					_this.communityInfo.roomPrice = res.data.data.roomPrice
 					if(_this.roomInfo.tenants && _this.roomInfo.tenants.length == 0){
 							this.isShowAddBtn = true;
 					}else{
@@ -142,6 +143,7 @@
 				})
 			},
 			addRenter(){
+				console.log('你打')
 				let communInfo = {
 					name:this.communityInfo.name,
 					houseNo:this.communityInfo.houseNo,
