@@ -77,7 +77,7 @@
 			</view>
 		</view>
 		<view class="section2" v-else>
-			<view class="sendBillBox" >
+			<view class="sendBillBox" @click="openMeterRead">
 				<image class="sendIcon" src="../../static/eleWater.png" mode="aspectFit"></image>
 				<view>抄表</view>
 			</view>
@@ -132,6 +132,11 @@
 					}
 					_this.getBillDetail(this.billId)
 				})
+			},
+			openMeterRead(){
+				uni.navigateTo({
+					url: '../meterRead/meterRead'
+				});
 			}
 		},
 		
