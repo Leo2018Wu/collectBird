@@ -5,9 +5,7 @@
 				<view class="myContainer">
 					<view class=""><image class="myPhoto" :src="userImg"></image></view>
 					<!-- class="login" -->
-					<view v-if="!show">
-						<button class="login" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true">登录</button>
-					</view>
+					<view v-if="!show"><button class="login" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true">登录</button></view>
 					<view class="detail" v-if="show">
 						<view class="detailTop">
 							<view class="myName">{{ userName }}</view>
@@ -39,7 +37,7 @@
 				<view class="leftPart">
 					<image class="jumpPortalImg" src="../../static/myIcon1.png" mode=""></image>
 					<view class="jumpPortalText">填写邀请码</view>
-					<view class="modalNum">{{ usedInviCode ? usedInviCode : ''}}</view>
+					<view class="modalNum">{{ usedInviCode ? usedInviCode : '' }}</view>
 				</view>
 				<view class="rightPart"><image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image></view>
 			</view>
@@ -319,19 +317,17 @@ export default {
 					console.log(err);
 				});
 		},
-		
-		
+
+
 	// 弹窗其他页面跳转
 		openPhoneNumber(){
-			openNewsInvitationCode(e) {
 				this.checkLoginStatus().then(res => {
 					this.loginFlag = res;
 					// if(!this.loginFlag && !this.usedInviCode){
 					// 	this.invitationCodeFlag = true;
 					// }
 				});
-			},
-		}
+		},
 		// 打开填写邀请码弹窗
 		openNewsInvitationCode(e) {
 			this.checkLoginStatus().then(res => {
@@ -358,7 +354,7 @@ export default {
 					});
 				}
 			});
-			
+
 		},
 		//跳转关于收租鸟
 		openAboutUs(e) {
@@ -372,8 +368,8 @@ export default {
 				url: '../help/help'
 			});
 		},
-		
-		
+
+
 		submit() {
 			let _this = this;
 			this.$refs.form.validate(res => {
