@@ -108,7 +108,7 @@ export default {
 			// 	}
 			// ];
 			_this.billInfo.items.map( v =>{
-				if(v.itemName == "net"){
+				if(v.itemName == "电费"){
 					v.noteDate = _this.date;
 					v.prevNum= _this.prevNum
 					v.currentNum =  _this.currentNum
@@ -120,7 +120,7 @@ export default {
 			// _this.billInfo = { ..._this.billInfo, item: item };
 			// _this.billInfo = { ..._this.billInfo };
 			console.log('传参数', _this.billInfo);
-			_this.$request.post('/bill/undate', _this.billInfo).then(res => {
+			_this.$request.post('/bill/update', _this.billInfo).then(res => {
 				console.log('请求反回', res);
 				if (res) {
 					setTimeout(() => {
