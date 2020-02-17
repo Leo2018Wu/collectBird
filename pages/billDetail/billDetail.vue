@@ -142,7 +142,8 @@ export default {
 					tenantId
 				})
 				.then(res => {
-					_this.houseAddrInfo = res.data.data;
+					console.log(res);
+					_this.houseAddrInfo = res.data.data[0];
 				});
 		},
 		checkMoney() {

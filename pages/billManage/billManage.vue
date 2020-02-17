@@ -27,12 +27,12 @@
 							<view class="billAdress">{{ item.roomNo }}</view>
 						</view>
 						<view class="billListright">
-							<view class="billSum" v-show="currentIndex != 3" :class="{ bule: currentIndex == 2 }">{{ item.total }}</view>
-							<view class="overdueNum" v-show="currentIndex == 1&& item.overdueDays > 0">{{ item.overdueDays }}天后交租</view>
+							<view class="billSum" v-show="currentIndex != 3" :class="{ bule: currentIndex == 2 }">{{ item.countTotal }}</view>
+							<view class="overdueNum" v-show="currentIndex == 1 && item.overdueDays > 0">{{ item.overdueDays }}天后交租</view>
 							<view class="overdueNum" v-show="currentIndex == 0 && item.overdueDays > 0">逾期{{ item.overdueDays }}天</view>
 							<view class="" v-show="currentIndex == 3">
-								<view class="billSum" :class="{ bule: item.billStatus == 4 }">{{ item.total }}</view>
-								<view class="overdueNum" v-show="item.billStatus == 0&& item.overdueDays > 0">{{ item.overdueDays }}天后交租</view>
+								<view class="billSum" :class="{ bule: item.billStatus == 4 }">{{ item.countTotal }}</view>
+								<view class="overdueNum" v-show="item.billStatus == 0 && item.overdueDays > 0">{{ item.overdueDays }}天后交租</view>
 								<view class="overdueNum" v-show="item.billStatus == 3 && item.overdueDays > 0">逾期{{ item.overdueDays }}天</view>
 							</view>
 						</view>
@@ -65,6 +65,7 @@ export default {
 				pageNum: 1,
 				billStatus: '3'
 			},
+			countTotal: '',
 			// 下拉刷新的常用配置
 			downOption: {
 				use: true, // 是否启用下拉刷新; 默认true
@@ -185,7 +186,16 @@ export default {
 			if (mescroll.num == 1) _this.billListInfo = []; //如果是第一页需手动置空列表
 			let res = await _this.getBillList(pageNum, _this.billStatus);
 			let curPageData = res;
+			console.log(curPageData);
 			_this.billListInfo = _this.billListInfo.concat(curPageData); //追加新数据
+			console.log(_this.billListInfo);
+			let arryNew = [];
+			_this.billListInfo.map((item, index) => {
+				let countTotal = parseInt(item.depositAmount) + parseInt(item.total);
+				arryNew.push(Object.assign({}, item, { countTotal: countTotal }));
+			});
+			console.log(arryNew);
+			_this.billListInfo = arryNew;
 			_this.$nextTick(() => {
 				mescroll.endSuccess(curPageData.length, res.hasNextPage);
 			});
