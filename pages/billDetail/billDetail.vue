@@ -68,7 +68,8 @@
 				</view>
 			</view> -->
 		</view>
-		<view class="remarks">暂无备注</view>
+		<!-- <view class="remarks">暂无备注</view> -->
+		<view class="remarks">{{billInfo.remarks}}</view>
 		<view class="section3" v-if="billInfo.billStatus == 4">
 			<view class="sendBillBox">
 				<image class="sendIcon" src="../../static/sendBill.png" mode="aspectFit"></image>

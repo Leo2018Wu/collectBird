@@ -110,7 +110,7 @@ export default {
 					console.log(res.data.data);
 					let myMsgs = res.data.data;
 					this.$emit('childByValue', res.data.data);
-					this.$emit('ffffff', false);
+					this.$emit('ffffff', true);
 				})
 				.catch(err => {
 					console.log(err);

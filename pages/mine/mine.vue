@@ -8,8 +8,6 @@
 					<view v-if="!show">
 						<button class="login" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true">登录</button>
 					</view>
-					<!-- <view class="login" v-if="!show" @click="openLogin"><view class="logintext">登录</view></view> -->
-					<!-- <view class="login" v-if="!show" @click="openLogin"><view class="logintext">登录</view></view> -->
 					<view class="detail" v-if="show">
 						<view class="detailTop">
 							<view class="myName">{{ userName }}</view>
@@ -45,7 +43,7 @@
 				</view>
 				<view class="rightPart"><image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image></view>
 			</view>
-			<view class="jumpPortalitem">
+			<view class="jumpPortalitem" @click="openPhoneNumber">
 				<view class="leftPart">
 					<image class="jumpPortalImg" src="../../static/telphone.png" mode=""></image>
 					<view class="jumpPortalText">手机号</view>
@@ -55,7 +53,7 @@
 					<view class="getTelNum" v-if="false">已绑定 {{ phoneNumber }}</view>
 				</view>
 			</view>
-			<view class="jumpPortalitem">
+			<view class="jumpPortalitem" @click="openInviteFriends">
 				<view class="leftPart">
 					<image class="jumpPortalImg" src="../../static/myIcon5.png" mode=""></image>
 					<view class="jumpPortalText">邀请好友</view>
@@ -111,7 +109,7 @@
 		</view>
 		<!-- 授权弹窗 -->
 		<is-login v-show="loginFlag" v-on:ffffff="ffffff" :childLoginFlag="loginFlag" v-on:childByValue="childByValue"></is-login>
-		<view class="isloginModal" v-show="loginFlag" @click="cancleLogin"></view>
+		<!-- <view class="isloginModal" v-show="loginFlag" @click="cancleLogin"></view> -->
 		<!-- <view class="isloginBox" v-show="loginFlag">
 			<image class="bgcImg" src="../../static/authorization.png" mode=""></image>
 			<view class="deleteImg" @click="cancleLogin"><image src="../../static/delete.png" mode=""></image></view>
@@ -128,12 +126,12 @@
 import evanFormItem from '../../components/evan-form/evan-form-item.vue';
 import evanForm from '../../components/evan-form/evan-form.vue';
 import { mapState, mapMutations } from 'vuex';
-// import { isLogin } from '../../components/isLogin.vue';
+import { isLogin } from '../../components/isLogin.vue';
 export default {
 	components: {
 		evanFormItem,
-		evanForm
-		// 'is-login': isLogin
+		evanForm,
+		'is-login': isLogin
 	},
 	data() {
 		return {
@@ -172,17 +170,36 @@ export default {
 			this.$refs.form.setRules(this.rules);
 		});
 	},
-	onShow() {
+	onShow(options) {
 		this.checkLoginStatus().then(res => {
 			console.log(res);
 			if (res) {
 				this.show = false;
 			} else {
 				this.show = true;
+				this.getMineMsg({openId: _this.$store.state.userOpenId})
 			}
 		});
 	},
 	methods: {
+		ffffff(value){
+			console.log(value);
+			this.show = value;
+		},
+		childByValue(value){
+			let _this = this
+			console.log('进入父组件获取到子组件传来数据',value);
+			_this.loginFlag = false;
+			if(value){
+				_this.userName = value.userName;
+				_this.userImg = value.userImg;
+				_this.usedInviCode = value.usedInviCode;
+				_this.level = value.level;
+				_this.inviCode = value.inviCode;
+				_this.trialDate = value.trialDate;
+				_this.remainDay = value.remainDay;
+			}
+		},
 		checkLoginStatus() {
 			let _this = this;
 			return new Promise((reslove, rej) => {
@@ -208,79 +225,79 @@ export default {
 				});
 			});
 		},
-		getUserInfo() {
-			this.loginFlag = false;
-			console.log(11111);
-			let self = this;
-			uni.login({
-				provider: 'weixin',
-				success: function(loginRes) {
-					console.log(loginRes, '1111');
-					uni.checkSession({
-						success() {
-							// session_key 未过期，并且在本生命周期一直有效
-							self.$store.commit('openCode', loginRes.code);
-							self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
-								console.log(res);
-								if (res) {
-									self.openId = res.data.data.openid;
-									self.$store.commit('isloginStatus', true);
-									self.$store.commit('userOpenId', res.data.data.openid);
-									self.$store.commit('sessionKey', res.data.data.session_key);
-									uni.getUserInfo({
-										provider: 'weixin',
-										success: function(infoRes) {
-											if (infoRes.userInfo) {
-												self.show = true;
-												// 微信的gender 1 男 2 女 0 未知
-												// 收租鸟userSex 0 男 1 女
-												if (infoRes.userInfo.gender == '1') {
-													self.gender = '0';
-												} else if (infoRes.userInfo.gender == '2') {
-													self.gender = '1';
-												} else {
-													self.gender = '未知';
-												}
-												let userInfo = {
-													openId: res.data.data.openid,
-													userName: infoRes.userInfo.nickName,
-													userImg: infoRes.userInfo.avatarUrl,
-													userSex: self.gender
-												};
-												self.getMineMsg(userInfo);
+		// getUserInfo() {
+		// 	this.loginFlag = false;
+		// 	console.log(11111);
+		// 	let self = this;
+		// 	uni.login({
+		// 		provider: 'weixin',
+		// 		success: function(loginRes) {
+		// 			console.log(loginRes, '1111');
+		// 			uni.checkSession({
+		// 				success() {
+		// 					// session_key 未过期，并且在本生命周期一直有效
+		// 					self.$store.commit('openCode', loginRes.code);
+		// 					self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
+		// 						console.log(res);
+		// 						if (res) {
+		// 							self.openId = res.data.data.openid;
+		// 							self.$store.commit('isloginStatus', true);
+		// 							self.$store.commit('userOpenId', res.data.data.openid);
+		// 							self.$store.commit('sessionKey', res.data.data.session_key);
+		// 							uni.getUserInfo({
+		// 								provider: 'weixin',
+		// 								success: function(infoRes) {
+		// 									if (infoRes.userInfo) {
+		// 										self.show = true;
+		// 										// 微信的gender 1 男 2 女 0 未知
+		// 										// 收租鸟userSex 0 男 1 女
+		// 										if (infoRes.userInfo.gender == '1') {
+		// 											self.gender = '0';
+		// 										} else if (infoRes.userInfo.gender == '2') {
+		// 											self.gender = '1';
+		// 										} else {
+		// 											self.gender = '未知';
+		// 										}
+		// 										let userInfo = {
+		// 											openId: res.data.data.openid,
+		// 											userName: infoRes.userInfo.nickName,
+		// 											userImg: infoRes.userInfo.avatarUrl,
+		// 											userSex: self.gender
+		// 										};
+		// 										self.getMineMsg(userInfo);
 
-												console.log(infoRes);
-											}
-										},
-										fail: function(res) {
-											uni.showToast({
-												title: '微信授权不成功！',
-												duration: 2000
-											});
-										}
-									});
-								}
-							});
-						},
-						fail() {
-							self.show = false;
-							// session_key 已经失效，需要重新执行登录流程
-							uni.login({
-								provider: 'weixin',
-								success: function(loginRes) {
-									self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
-										console.log(res);
-									});
-								}
-							}); // 重新登录
-						}
-					});
-				},
-				fail: function(res) {
-					self.show = false;
-				}
-			});
-		},
+		// 										console.log(infoRes);
+		// 									}
+		// 								},
+		// 								fail: function(res) {
+		// 									uni.showToast({
+		// 										title: '微信授权不成功！',
+		// 										duration: 2000
+		// 									});
+		// 								}
+		// 							});
+		// 						}
+		// 					});
+		// 				},
+		// 				fail() {
+		// 					self.show = false;
+		// 					// session_key 已经失效，需要重新执行登录流程
+		// 					uni.login({
+		// 						provider: 'weixin',
+		// 						success: function(loginRes) {
+		// 							self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
+		// 								console.log(res);
+		// 							});
+		// 						}
+		// 					}); // 重新登录
+		// 				}
+		// 			});
+		// 		},
+		// 		fail: function(res) {
+		// 			self.show = false;
+		// 		}
+		// 	});
+		// },
 
 		getMineMsg(userInfo) {
 			let _this = this;
@@ -302,21 +319,46 @@ export default {
 					console.log(err);
 				});
 		},
+		
+		
+	// 弹窗其他页面跳转
+		openPhoneNumber(){
+			openNewsInvitationCode(e) {
+				this.checkLoginStatus().then(res => {
+					this.loginFlag = res;
+					// if(!this.loginFlag && !this.usedInviCode){
+					// 	this.invitationCodeFlag = true;
+					// }
+				});
+			},
+		}
+		// 打开填写邀请码弹窗
+		openNewsInvitationCode(e) {
+			this.checkLoginStatus().then(res => {
+				this.loginFlag = res;
+				if(!this.loginFlag && !this.usedInviCode){
+					this.invitationCodeFlag = true;
+				}
+			});
+			// if (!this.usedInviCode) {
+			// 	this.invitationCodeFlag = true;
+			// }
+		},
 		// 关闭填写邀请码弹窗
 		cancle() {
 			this.invitationCodeFlag = false;
 		},
-		// 打开填写邀请码弹窗
-		openNewsInvitationCode(e) {
-			if (!this.usedInviCode) {
-				this.invitationCodeFlag = true;
-			}
-		},
 		//跳转意见反馈
 		openFeedBack(e) {
-			uni.navigateTo({
-				url: '../feedback/feedback'
+			this.checkLoginStatus().then(res => {
+				this.loginFlag = res;
+				if(!this.loginFlag){
+					uni.navigateTo({
+						url: '../feedback/feedback'
+					});
+				}
 			});
+			
 		},
 		//跳转关于收租鸟
 		openAboutUs(e) {
@@ -330,12 +372,14 @@ export default {
 				url: '../help/help'
 			});
 		},
+		
+		
 		submit() {
 			let _this = this;
 			this.$refs.form.validate(res => {
 				if (isNaN(this.info.invitationCode) && this.info.invitationCode.length <= 4) {
 					uni.showToast({
-						title: '请填写4位数字邀请码!'
+						title: '请填写6位邀请码!'
 					});
 				} else {
 					uni.showLoading({
@@ -368,6 +412,7 @@ export default {
 		cancleLogin(e) {
 			this.loginFlag = false;
 		},
+		// 未登录状态下点击登录
 		openLogin(e) {
 			this.getUserInfo();
 		}
