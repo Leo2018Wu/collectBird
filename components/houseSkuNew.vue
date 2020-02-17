@@ -50,6 +50,7 @@
 	.contentBox{
 		width: 100%;
 		height: 100%;
+		background-color: #FFFFFF;
 		text-align: center;
 		font-size: 34rpx;
 		font-weight: bold;
@@ -68,6 +69,7 @@
 		width: fit-content;
 		text-align: center;
 		font-size: 24rpx;
+		font-weight: normal;
 	}
 	.communityBox .bottomItem{
 		color: #999999;
