@@ -23,7 +23,8 @@
 		<view class="section3">
 			<mescroll-uni :down="downOption" @down="downCallback" :up="upOption" @up="upCallback" :fixed="false" @init="init">
 				<view class="houseSkuBox" v-for="(item, index) in houseInfoList" :key="index" @click="goDetail(item.id, item.landlordId)">
-					<house-sku :houseInfoList="item"></house-sku>
+					<!-- <house-sku :houseInfoList="item"></house-sku> -->
+					<new-house-sku :item="item"></new-house-sku>
 				</view>
 			</mescroll-uni>
 		</view>
@@ -32,6 +33,7 @@
 </template>
 
 <script>
+	import newHouseSku from '../../components/houseSkuNew.vue';
 import { mapState, mapMutations } from 'vuex';
 import scrollTab from '../../components/scrollTab.vue';
 import houseSku from '../../components/houseSku.vue';
@@ -44,7 +46,8 @@ export default {
 		'house-sku': houseSku,
 		'add-Bar': addBar,
 		'is-login': isLogin,
-		MescrollUni
+		MescrollUni,
+		newHouseSku
 	},
 	data() {
 		return {
@@ -310,7 +313,7 @@ export default {
 }
 .houseSkuBox {
 	width: 670rpx;
-	height: 218rpx;
-	margin: 0 auto 14rpx auto;
+	height: fit-content;
+	margin: 0 auto 18rpx auto;
 }
 </style>

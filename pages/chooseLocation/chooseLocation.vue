@@ -17,7 +17,7 @@
 			<input v-else class="inputClass textOverFlow" @input="getsuggest" v-model="inputValue"  placeholder="地址" placeholder-class="inputPlaceHolder"/>
 		</view>
 	</view>
-	<view class="welContent" v-if="suggestion.length != 0"></view>
+	<view class="welContent" v-if="suggestion.length != 0">您可以直接选择</view>
     <view v-for="(item,index) in suggestion" :key="index" class="locationList">
       <view class="locationLi"  @click="backfill(index)">
         <view class="textOverFlow" >{{item.title}}</view>
