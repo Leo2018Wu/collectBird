@@ -44,7 +44,7 @@
 			
 			<view class="switchBox" @click="showTip()">
 				<span>是否整租</span>
-				<switch :disabled="tempRoomList[0].tenantNum > 0" :checked="isWholeRent" @change="changeType" color="#F09A42" />
+				<switch :disabled="isHaveRenter" :checked="isWholeRent" @change="changeType" color="#F09A42" />
 			</view>
 		</view>
 		<!-- <view class="section2">
@@ -89,6 +89,7 @@
 		},
 		data() {
 			return {
+				isHaveRenter:false,//房号下是否有租客
 				chooseIndex:null,
 				list: [
 					'1室1厅1卫',
@@ -183,8 +184,10 @@
 					this.info.roomNo = res.data.data.houseNo;
 					this.rentType = res.data.data.rentType;
 					this.returnHouseId = res.data.data.id
+					this.tempRoomList.forEach((item)=>{
+						if(item.tenantNum > 0) this.isHaveRenter = true;
+					})
 					let temp = {
-						
 						index:parseInt(res.data.data.bedroomNum) - 1,
 						newVal:res.data.data.bedroomNum+'室1厅1卫'
 					}
@@ -271,7 +274,7 @@
 				})
 			},
 			showTip(){
-				if(this.tempRoomList[0].tenantNum > 0){
+				if(this.isHaveRenter){
 					uni.showToast({
 						title:'当前房号下已经有房间有租客入驻，不可调整出租方式。',
 						icon:'none',
