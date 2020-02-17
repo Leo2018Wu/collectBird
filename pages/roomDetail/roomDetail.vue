@@ -212,9 +212,7 @@
 			})
 			this.houseInfo = JSON.parse(options.houseInfo)
 			this.isWholeRent = options.isWholeRent
-			if(options.roomNo){
-				this.bedRoomNo = options.roomNo;
-			}
+			this.bedRoomNo = options.roomNo;
 			this.getRentCycleList()
 		},
 		onShow(){
@@ -256,6 +254,7 @@
 					console.log(res.data.data.roomList)
 							if(res.data.data.roomList.length != 0){
 						//处于编辑房间状态  
+						console.log('我处于编辑')
 						let depositNumIndex = parseInt(res.data.data.roomList[0].rentNum) - 1;
 						this.chooseIndex = depositNumIndex;
 						this.id = res.data.data.roomList[0].id;
@@ -351,7 +350,7 @@
 				})
 			},
 			save(){
-				console.log(this.rentCycleList)
+				
 				// 请求参数
 				let par = {
 					houseId:this.houseInfo.houseId,
@@ -368,6 +367,9 @@
 					depositNum:this.rentCycleList[1],
 					rentNum:this.rentCycleList[0]
 				};
+				if(this.isWholeRent == '1'){
+					par.roomNo = 'A'
+				}
 				if(this.isEditRoom){
 					par.id = this.id
 				}

@@ -238,7 +238,6 @@
 				this.$refs.form.validate((res) => {
 					if (res) {
 						_this.$request.post(requestPar,par).then(res=>{
-							console.log(res)
 							uni.showToast({
 								title:'保存成功',
 							})
@@ -261,6 +260,9 @@
 				let houseInfo = this.info;
 				houseInfo.communityName = this.communityName;
 				houseInfo.communityId = this.communityId;
+				if(this.isWholeRent){
+					item = 'A'
+				}
 				this.$refs.form.validate((res) => {
 					if (res) {
 						if(this.returnHouseId == null && !this.inEdit){

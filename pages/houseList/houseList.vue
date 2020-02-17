@@ -60,7 +60,7 @@ export default {
 			// 下拉刷新的常用配置
 			downOption: {
 				use: true, // 是否启用下拉刷新; 默认true
-				auto: true // 是否在初始化完毕之后自动执行下拉刷新的回调; 默认true
+				auto: false // 是否在初始化完毕之后自动执行下拉刷新的回调; 默认true
 			},
 			// 上拉加载的常用配置
 			upOption: {
@@ -83,6 +83,8 @@ export default {
 	},
 	onShow() {
 		let _this = this;
+		this.getWords();
+		this.downCallback(this.mescroll);
 		this.$request
 			.post('user/findByOpenId', {
 				openId: this.$store.state.userOpenId
@@ -107,11 +109,10 @@ export default {
 			}
 		},
 		updateData() {
-			this.getWords();
-			this.downCallback(this.mescroll);
+			// this.getWords();
+			// this.downCallback(this.mescroll);
 		},
 		addCommunity() {
-			console.log('我被点击阿玛尼极');
 			if(this.$store.state.isloginStatus){
 				uni.navigateTo({
 					url: '../addCommunity/addCommunity'

@@ -298,8 +298,8 @@ export default {
 				eleCost: '',
 				waterCost: '30',
 				netCost: '30',
-				net: '30元/月',
-				water: '30元/月',
+				// net: '30元/月',
+				// water: '30元/月',
 				// remarks: ''
 			},
 			rules3: {
@@ -340,13 +340,32 @@ export default {
 				this.$refs.form2.setRules(this.rules2)
 				this.$refs.form3.setRules(this.rules3)
 			})
-			this.getRentCycleList()
+			this.getRentCycleList().then(()=>{
+				if(!this.isEdit){
+					this.getRoomInfo(this.roomId)
+				}
+			})
 			if(!this.isEdit){
 				//默认选择一年
 				this.chooseLi(1)
 			}
 		},
 		methods: {
+			getRoomInfo(id){
+				this.$request.post('room/findRoomById',{id}).then(res=>{
+					let data = res.data.data;
+					this.info3.eleCost = data.eleUnitPrice; //
+					this.info3.waterCost = data.waterUnitPrice; //
+					this.info3.netCost = data.netCost; //
+					let rentIndex = parseInt(data.rentNum) - 1;
+					this.info2.rentCycle = this.list[rentIndex];
+					this.chooseIndex = rentIndex;
+					this.info2.rentUnitPrice = data.roomPrice;
+					this.info2.deposit = data.roomPrice;
+					this.rentCycleList[0] = data.rentNum;
+					this.rentCycleList[1] = data.depositNum;
+				})
+			},
 			getUserInfo(id){
 					this.$request.post('roomUser/findById',{
 						tenantId:id
@@ -532,12 +551,16 @@ export default {
 				this.info2.rentCycle = e.newVal
 			},
 			getRentCycleList(){
-				this.$request.post('/dict/findByParentName',{
-					name:'RENT_CYCLE'
-				}).then(res =>{
-					this.list = []
-					res.data.data.forEach(item =>{
-						this.list.push(item.name)
+				let _this = this;
+				return new Promise((reslove,rej)=>{
+					_this.$request.post('/dict/findByParentName',{
+						name:'RENT_CYCLE'
+					}).then(res =>{
+						_this.list = []
+						res.data.data.forEach(item =>{
+							_this.list.push(item.name)
+						})
+						reslove(true)
 					})
 				})
 			},
