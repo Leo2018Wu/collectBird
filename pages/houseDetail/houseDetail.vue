@@ -208,7 +208,9 @@
 	.liNumber span:first-of-type{
 		display: inline-block;
 		/* padding: 8rpx; */
-		width: 30rpx;
+		/* width: 30rpx; */
+		padding: 0 4rpx;
+		min-width: 30rpx;
 		height: 30rpx;
 		text-align: center;
 		line-height: 30rpx;

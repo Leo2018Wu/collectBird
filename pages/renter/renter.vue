@@ -142,7 +142,6 @@
 				})
 			},
 			addRenter(){
-				console.log('你打')
 				let communInfo = {
 					name:this.communityInfo.name,
 					houseNo:this.communityInfo.houseNo,
