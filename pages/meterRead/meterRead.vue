@@ -68,13 +68,11 @@ export default {
 			if (res.itemName == '电费') {
 				this.electricityInfo = res;
 				console.log(this.electricityInfo);
-				this.prevNum = this.electricityInfo.prevNum;
+				this.prevNum = this.electricityInfo.currentNum;
 			}
 		});
 	},
-	computed: {
-		// this.amount= (+this.currentNum - +this.prevNum) * this.electricityInfo.unitPrice
-	},
+	computed: {},
 	methods: {
 		bindDateChange(e) {
 			console.log('nihaoa', e);
@@ -89,7 +87,6 @@ export default {
 				return;
 			} else {
 				this.amount = (+this.currentNum - +this.prevNum) * this.electricityInfo.unitPrice;
-				// this.amount = Math.abs(+this.amount);
 			}
 		},
 		getDate(value) {
@@ -102,34 +99,17 @@ export default {
 			let year = date.getFullYear();
 			let month = date.getMonth() + 1;
 			let day = date.getDate();
-			// let hours = date.getHours()
-			// let minutes = date.getMinutes() + 1;
-			// let seconds = date.getSeconds()+1;
 			month = month > 9 ? month : '0' + month;
 			day = day > 9 ? day : '0' + day;
-			
-			// hours = hours > 9 ? hours : '0' + hours;
-			// minutes = minutes > 9 ? minutes : '0' + minutes;
-			// seconds = seconds > 9 ? seconds : '0' + seconds;
 			return `${year}-${month}-${day}`;
-			// return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 		},
 		submit() {
 			let _this = this;
 			if (!isNaN(_this.prevNum) && !isNaN(_this.currentNum)) {
 				if (+_this.currentNum > +_this.prevNum) {
-					// let date = new Date();
-					// let hours = date.getHours()
-					// let minutes = date.getMinutes() + 1;
-					// let seconds = date.getSeconds()+1;
-					// hours = hours > 9 ? hours : '0' + hours;
-					// minutes = minutes > 9 ? minutes : '0' + minutes;
-					// seconds = seconds > 9 ? seconds : '0' + seconds;
-					// let hms = ` ${hours}:${minutes}:${seconds}`
-					// _this.date = _this.date + hms
 					_this.billInfo.items.map(v => {
 						if (v.itemName == '电费') {
-							v.noteDate = _this.date;
+							v.noteDate = _this.date + ' 00:00:00';
 							v.prevNum = _this.prevNum;
 							v.currentNum = _this.currentNum;
 							v.amount = _this.amount;
@@ -140,11 +120,9 @@ export default {
 					_this.$request.post('/bill/update', _this.billInfo).then(res => {
 						console.log('请求反回', res);
 						if (res) {
-							setTimeout(() => {
-								uni.navigateBack({
-									delta: 1
-								});
-							}, 1500);
+							uni.navigateBack({
+								delta: 1
+							});
 						}
 					});
 				} else {
@@ -159,6 +137,18 @@ export default {
 					icon: 'none'
 				});
 			}
+		},
+		refreshLastPage() {
+			setTimeout(() => {
+				let pages = getCurrentPages();
+				if (pages.length > 1) {
+					let beforePage = pages[pages.length - 2];
+					beforePage.$vm.updateData();
+					uni.navigateBack({
+						delta: 1
+					});
+				}
+			}, 1500);
 		}
 	}
 };
