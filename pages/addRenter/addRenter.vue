@@ -354,7 +354,7 @@ export default {
 			getRoomInfo(id){
 				this.$request.post('room/findRoomById',{id}).then(res=>{
 					let data = res.data.data;
-					this.info3.eleCost = data.eleUnitPrice; //
+					// this.info3.eleCost = data.eleUnitPrice; // 因为房间录入的是电费单价
 					this.info3.waterCost = data.waterUnitPrice; //
 					this.info3.netCost = data.netCost; //
 					let rentIndex = parseInt(data.rentNum) - 1;
@@ -382,7 +382,7 @@ export default {
 						this.info1.IDNum = data.tenantIdNumber;
 						this.imgSideUrl = data.idCardImg1;
 						this.imgOtherSideUrl = data.idCardImg2;
-						this.info3.eleCost = data.eleUnitPrice; //
+						this.info3.eleCost = data.elePrevNum; //
 						this.info3.waterCost = data.waterPrice; //
 						this.info3.netCost = data.netPrice; //
 						this.info3.remarks = data.remarks;
