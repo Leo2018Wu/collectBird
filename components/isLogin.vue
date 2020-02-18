@@ -1,6 +1,5 @@
 <template>
 	<view class="">
-		<!--  v-if="loginFlag" -->
 		<view class="isloginModal" v-if="childLoginFlag" @click="cancleLogin"></view>
 		<view class="isloginBox" v-if="childLoginFlag">
 			<image class="bgcImg" src="../static/authorization.png" mode=""></image>
@@ -70,9 +69,7 @@ export default {
 												};
 												self.getMineMsg(userInfo);
 												self.$emit('childByValue', false); 
-												uni.navigateTo({
-													url: '../home/home'
-												});
+												
 											}
 										},
 										fail: function(res) {
@@ -110,7 +107,7 @@ export default {
 					console.log(res.data.data);
 					let myMsgs = res.data.data;
 					this.$emit('childByValue', res.data.data);
-					this.$emit('ffffff', true);
+					this.$emit('isShowloginBtn', false);
 				})
 				.catch(err => {
 					console.log(err);

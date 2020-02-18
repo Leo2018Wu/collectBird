@@ -4,15 +4,13 @@
 			<view class="profitContainer">
 				<view class="profitBox">
 					<view class="profitBar">应收(元)</view>
-					<span>{{ billInfo.countTotal }}</span>
+					<span>{{ billInfo.totalAmount? billInfo.totalAmount : '0'}}</span>
 				</view>
 				<view v-if="billInfo.billStatus == 4" class="profitBox">
 					<view class="profitBar">实收(元)</view>
-					<span>{{ billInfo.countTotal }}</span>
-					<!-- <span>{{billInfo.total}}</span> -->
+					<span>{{ billInfo.totalAmount ? billInfo.totalAmount : '0'}}</span>
 				</view>
 			</view>
-			<!-- <view class="houseAddr">新德公寓-202-快乐时光</view> -->
 			<view class="houseAddr">{{ houseAddrInfo.communityName }}-{{ houseAddrInfo.houseNo }}-{{ houseAddrInfo.roomNo }}</view>
 		</view>
 		<view class="section1">
@@ -50,19 +48,19 @@
 					<span class="billDate">{{ billInfo.depositAmount }}</span>
 				</view>
 			</view>
-			<!-- <view class="costDetail">费用明细</view>
-			<view class="electricBox" v-for="(item,index) in billInfo.items" :key="index">
-				<view class="elecRight" >
-					<view  class="unitPrice">
-						{{item.itemName}}<span>1.00元/度</span>
+			<view class="costDetail">费用明细</view>
+			<view class="electricBox" v-for="(item, index) in billInfo.items" :key="index">
+				<view class="elecRight">
+					<view class="unitPrice">
+						{{ item.itemName }}
+						<span>{{ item.unitPrice }}</span>
 					</view>
-					<view v-if="item.type == 1" class="eleCostTotal">{{item.quantity}}{{"度" | addSpace}} ({{item.currentNum}}-{{item.prevNum}}）</view>
-					<view v-if="item.type == 1">抄表日期: {{item.noteDate}}</view>
+					<view v-if="item.type == 1" class="eleCostTotal">{{ item.quantity }}{{ '度' | addSpace }} ({{ item.currentNum }}-{{ item.prevNum }}）</view>
+					<view v-if="item.type == 1">抄表日期: {{ item.noteDate }}</view>
 				</view>
-				<view class="priceTotal">{{item.amout}}</view>
-			</view> -->
-
-			<!-- <view class="waterBox">
+				<view class="priceTotal">{{ item.amout }}</view>
+			</view>
+			<!-- 	<view class="waterBox">
 				<view class="waterOuter">
 					<span class="waterBar">水费</span>
 					<span class="priceTotal">30.00</span>
@@ -70,7 +68,7 @@
 			</view> -->
 		</view>
 		<!-- <view class="remarks">暂无备注</view> -->
-		<view class="remarks">{{billInfo.remarks ? billInfo.remarks : '无备注'}}</view>
+		<view class="remarks">{{ billInfo.remarks ? billInfo.remarks : '无备注' }}</view>
 		<view class="section3" v-if="billInfo.billStatus == 4">
 			<view class="sendBillBox">
 				<image class="sendIcon" src="../../static/sendBill.png" mode="aspectFit"></image>
@@ -78,7 +76,7 @@
 			</view>
 		</view>
 		<view class="section2" v-else>
-			<view class="sendBillBox" @click="openMeterRead">
+			<view class="sendBillBox" v-if="billInfo.depositAmount" @click="openMeterRead">
 				<image class="sendIcon" src="../../static/eleWater.png" mode="aspectFit"></image>
 				<view>抄表</view>
 			</view>
@@ -88,20 +86,32 @@
 			</view>
 			<view class="sureBtn" @click="checkMoney">到账</view>
 		</view>
+
+		<!-- 提示未抄表弹窗 -->
+		<view class="modal" v-show="isShowMeterRead" @click="cancle"></view>
+		<view class="modalBox" v-show="isShowMeterRead">
+			<view class="modalTitle">尚未抄表，是否抄表后再确认到账？</view>
+			<view class="modalContent">
+				<view class="button">
+					<view class="btn_cancle" @click="submit" data-statu="close">是</view>
+					<view class="modalLine"></view>
+					<view class="btn_ok active" @click="cancle" data-statu="open">否</view>
+				</view>
+			</view>
+		</view>
 	</view>
 </template>
 
 <script>
 import dateForm from '../../util/index.js';
-// import toFixed0 from '../../util/index.js';
 export default {
 	data() {
 		return {
 			init: false,
 			billId: null,
-
 			houseAddrInfo: {},
-			billInfo: {}
+			billInfo: {},
+			isShowMeterRead: false
 		};
 	},
 	onLoad(option) {
@@ -119,19 +129,17 @@ export default {
 				})
 				.then(res => {
 					_this.billInfo = res.data.data;
-					if (_this.billInfo.remarks == null) {
-						_this.billInfo.remarks = '';
-					}
+					console.log(_this.billInfo);
 					_this.billInfo.startDate = dateForm.dateForm(_this.billInfo.startDate);
 					_this.billInfo.endDate = dateForm.dateForm(_this.billInfo.endDate);
 					_this.billInfo.payRentDate = dateForm.dateForm(_this.billInfo.payRentDate);
-					_this.billInfo.depositAmount= (parseFloat( _this.billInfo.depositAmount)).toFixed(0)
-					_this.billInfo.total= (parseFloat( _this.billInfo.total)).toFixed(0)
-					console.log( _this.billInfo.depositAmount + _this.billInfo.total);
-					console.log(countTotal);
-					let countTotal =  (+_this.billInfo.depositAmount) + (+_this.billInfo.total)
-					_this.billInfo = { ..._this.billInfo, countTotal: countTotal };
-					_this.billInfo = { ..._this.billInfo };
+					_this.billInfo.depositAmount = parseFloat(_this.billInfo.depositAmount).toFixed(2);
+					_this.billInfo.total = parseFloat(_this.billInfo.total).toFixed(2);
+					// console.log( _this.billInfo.depositAmount + _this.billInfo.total);
+					// console.log(countTotal);
+					// let countTotal =  (+_this.billInfo.depositAmount) + (+_this.billInfo.total)
+					// _this.billInfo = { ..._this.billInfo, countTotal: countTotal };
+					// _this.billInfo = { ..._this.billInfo };
 					_this.init = true;
 				});
 		},
@@ -148,6 +156,47 @@ export default {
 		},
 		checkMoney() {
 			let _this = this;
+			_this.billInfo.items.map(v => {
+				if (v.itemName == '电费') {
+					if (v.currentNum == '' || v.currentNum == null || v.currentNum == '0') {
+						_this.isShowMeterRead = true;
+					} else {
+						this.ll();
+						// _this.$request
+						// 	.post('/bill/updateStatus', {
+						// 		id: _this.billId,
+						// 		billStatus: '4'
+						// 	})
+						// 	.then(res => {
+						// 		console.log(res);
+						// 		if (res.data.code == '200') {
+						// 			uni.showToast({
+						// 				title: '到账成功'
+						// 			});
+						// 		}
+						// 		_this.getBillDetail(this.billId);
+						// 	});
+					}
+				}
+			});
+		},
+		openMeterRead() {
+			uni.navigateTo({
+				url: '../meterRead/meterRead?billInfo=' + JSON.stringify(this.billInfo)
+			});
+		},
+		cancle(e) {
+			this.isShowMeterRead = false;
+			this.ll();
+		},
+		submit(e) {
+			this.isShowMeterRead = false;
+			uni.navigateTo({
+				url: '../meterRead/meterRead'
+			});
+		},
+		ll(){
+			let _this = this
 			_this.$request
 				.post('/bill/updateStatus', {
 					id: _this.billId,
@@ -160,13 +209,8 @@ export default {
 							title: '到账成功'
 						});
 					}
-					_this.getBillDetail(this.billId);
+					_this.getBillDetail(_this.billId);
 				});
-		},
-		openMeterRead() {
-			uni.navigateTo({
-				url: '../meterRead/meterRead?billInfo='+JSON.stringify(this.billInfo)
-			});
 		}
 	}
 };
@@ -328,10 +372,10 @@ export default {
 	margin-top: 14rpx;
 	height: 128rpx;
 	width: 100%;
-	padding-right: 40rpx;
+	padding: 0rpx 40rpx;
 	background-color: #ffffff;
 	display: flex;
-	justify-content: flex-end;
+	justify-content: space-around;
 	align-items: center;
 	box-shadow: 0px -5px 16px 0px rgba(0, 0, 0, 0.04);
 	position: fixed;
@@ -374,5 +418,74 @@ export default {
 	width: 40rpx;
 	height: 40rpx;
 	margin: 0 auto;
+}
+
+/* 弹窗 */
+.modal {
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 1000;
+	background: #000;
+	opacity: 0.5;
+	overflow: hidden;
+	z-index: 500;
+}
+.modalBox {
+	width: 540rpx;
+	height: 362rpx;
+	overflow: hidden;
+	position: fixed;
+	top: 28%;
+	left: 15%;
+	z-index: 1001;
+	background: rgba(255, 255, 255, 1);
+	border-radius: 25rpx;
+}
+
+.modalContent {
+	height: 30%;
+
+}
+.modalTitle {
+	height:  65%;
+	padding: 80rpx;
+	font-size: 36rpx;
+	font-family: PingFang SC;
+	font-weight: bold;
+	color: rgba(51, 51, 51, 1);
+	text-align: center;
+}
+
+.button {
+	width: 100%;
+	height: 90rpx;
+	border-top: 1rpx solid rgba(238, 238, 238, 1);
+	display: flex;
+	justify-content: space-around;
+	font-size: 34rpx;
+	font-family: PingFang SC;
+	font-weight: 500;
+	color: rgba(51, 51, 51, 1);
+	position: relative;
+	line-height: 100rpx;
+	margin-top: 20rpx;
+}
+.modalLine {
+	width: 1rpx;
+	height: 108rpx;
+	background-color: rgba(238, 238, 238, 1);
+	position: absolute;
+	top: 0%;
+	left: 50%;
+}
+.active {
+	color: #ffa044;
+}
+.btn_cancle,.btn_ok {
+	width: 49%;
+	text-align: center;
 }
 </style>
