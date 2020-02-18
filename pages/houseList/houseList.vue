@@ -269,9 +269,6 @@ export default {
 .secBarItem:first-of-type span {
 	color: #f09a42;
 }
-.secBarItem:last-of-type {
-	border-left: 1rpx solid #dfdcdc80;
-}
 .secBarItem:last-of-type span {
 	color: #ed7275;
 }

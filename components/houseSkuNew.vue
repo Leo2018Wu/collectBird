@@ -1,6 +1,6 @@
 <template>
 	<view class="houseSkuNew">
-		<view class="contentBox" @click="myClick">
+		<view class="contentBox" :style="{paddingLeft:paddingSelf+'rpx',paddingRight:paddingSelf+'rpx'}" @click="myClick">
 			<view>{{item.communityName}}</view>
 			<view class="bottomBox">
 				<view class="communityBox">
@@ -31,6 +31,10 @@
 					roomNum:4,
 					idleRoom:3
 				}
+			},
+			paddingSelf:{
+				type:Number,
+				default:40,
 			}
 		},
 		data() {
