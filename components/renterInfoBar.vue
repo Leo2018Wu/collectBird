@@ -58,15 +58,15 @@
 		width: calc(100% - 140rpx);
 	}
 	.renterAvatar{
-		width: 80rpx;
-		height: 80rpx;
+		width: 90rpx;
+		height: 90rpx;
 		border-radius: 50%;
 		margin-right: 30rpx;
 	}
 	.infoTop{
 		display: flex;
 		align-items: center;
-		font-size: 33rpx;
+		font-size: 34rpx;
 	}
 	.renterSex{
 		width: 29rpx;
@@ -80,7 +80,7 @@
 		height: 56rpx;
 	}
 	.infoBottom{
-		font-size: 28rpx;
+		font-size: 30rpx;
 		color: #888888;
 	}
 </style>

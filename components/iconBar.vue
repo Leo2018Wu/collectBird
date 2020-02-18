@@ -36,7 +36,7 @@
 		display: inline-block;
 		padding: 4rpx 25rpx;
 		border-radius: 5rpx;
-		font-size: 26rpx;
+		font-size: 28rpx;
 	}
 	
 </style>

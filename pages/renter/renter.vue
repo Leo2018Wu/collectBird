@@ -167,13 +167,13 @@
 	}
 	.houseName{
 		font-weight: bold;
-		font-size: 30rpx;
+		font-size: 32rpx;
 		margin-bottom: 35rpx;
 	}	
 	
 	.houseDetail{
 		color: #999999;
-		font-size: 26rpx;
+		font-size: 28rpx;
 		font-weight: 500;
 		padding-left: 19rpx;
 		position: relative;
@@ -191,7 +191,7 @@
 		margin-bottom: 35rpx;
 	}
 	.houseDetail .houseNum{
-		font-size: 34rpx;
+		font-size: 32rpx;
 		font-weight: bold;
 		color: #333333;
 		margin-right: 17rpx;
@@ -210,7 +210,7 @@
 		width: 160rpx;
 		text-align: center;
 		line-height: 45rpx;
-		font-size: 26rpx;
+		font-size: 28rpx;
 		color: #EB5E61;
 		background-color: #FFECEC;
 		border-radius: 23rpx;
@@ -264,7 +264,7 @@
 		padding: 30rpx 0 30rpx 40rpx;
 		border-bottom: 1rpx solid #FAFAFA;
 		font-weight: bold;
-		font-size: 30rpx;
+		font-size: 32rpx;
 	}
 	.invite{
 		margin-right: 46rpx;
