@@ -265,7 +265,7 @@ export default {
 }
 
 .leftMsgTitle {
-	font-size: 24rpx;
+	font-size: 28rpx;
 	font-family: PingFang SC;
 	font-weight: 500;
 }
