@@ -42,7 +42,7 @@
 			<view class="banner">
 				<swiper class="swiper" indicator-dots="true" autoplay="true" interval="5000" duration="1000">
 					<block v-for="(item, index) in imgUrls" :key="index">
-						<swiper-item><image :src="item" class="slide-image" mode="aspectFill" /></swiper-item>
+						<swiper-item class="radius"><image :src="item" class="slide-image" mode="aspectFill" /></swiper-item>
 					</block>
 				</swiper>
 			</view>
@@ -407,6 +407,7 @@ button::after {
 	width: 643rpx;
 	height: 191rpx;
 	padding:0rpx 54rpx;
+	border-radius:12rpx;
 }
 .slide-image {
 	width: 100%;
@@ -417,5 +418,8 @@ button::after {
 	top: 260rpx;
 	left: 0rpx;
 	width: 100%;
+}
+.radius{
+	border-radius:12rpx;
 }
 </style>

@@ -27,9 +27,9 @@
 			<view class="">费用</view>
 		</view>
 		<view class="money">
-			<view class="" style="width:33.33%"><input type="text" value="" v-model="prevNum" /></view>
-			<view class="" style="width:30%"><input type="text" value="" bindinput="inputChangeHandle" v-model="currentNum" /></view>
-			<view class="" style="width:9%"><input type="text" value="" v-model="amount" /></view>
+			<view class=""><input type="text" value="" maxlength="5" v-model="prevNum" /></view>
+			<view class="" style="text-align: center;"><input type="text" value="" maxlength="5" @change="inputChangeHandle" v-model="currentNum" /></view>
+			<view class="" style="text-align: right;"><input type="text" value="" v-model="amount" readonly /></view>
 		</view>
 		<view class="button" @click="submit">完成</view>
 	</view>
@@ -51,7 +51,7 @@ export default {
 		const currentDate = this.getDate();
 		return {
 			date: currentDate,
-			prevNum: '',
+			prevNum: '0',
 			currentNum: '',
 			amount: '',
 			info: {
@@ -62,13 +62,12 @@ export default {
 		};
 	},
 	onLoad(option) {
-		console.log(option);
-		console.log('onLoad', option);
 		this.billInfo = JSON.parse(option.billInfo);
 		console.log(this.billInfo);
-		billInfo.items.map(res => {
+		this.billInfo.items.map(res => {
 			if (res.itemName == '电费') {
 				this.electricityInfo = res;
+				console.log(this.electricityInfo);
 				this.prevNum = this.electricityInfo.prevNum;
 			}
 		});
@@ -82,8 +81,16 @@ export default {
 			this.date = e.detail.value;
 		},
 		inputChangeHandle(value) {
-			console.log(value);
-			this.amount = (+this.currentNum - +this.prevNum) * this.electricityInfo.unitPrice;
+			if (+value.detail.value < +this.prevNum) {
+				uni.showToast({
+					title: '本期读数不能小于上期读数!',
+					icon: 'none'
+				});
+				return;
+			} else {
+				this.amount = (+this.currentNum - +this.prevNum) * this.electricityInfo.unitPrice;
+				// this.amount = Math.abs(+this.amount);
+			}
 		},
 		getDate(value) {
 			let date;
@@ -95,35 +102,63 @@ export default {
 			let year = date.getFullYear();
 			let month = date.getMonth() + 1;
 			let day = date.getDate();
+			// let hours = date.getHours()
+			// let minutes = date.getMinutes() + 1;
+			// let seconds = date.getSeconds()+1;
 			month = month > 9 ? month : '0' + month;
 			day = day > 9 ? day : '0' + day;
+			
+			// hours = hours > 9 ? hours : '0' + hours;
+			// minutes = minutes > 9 ? minutes : '0' + minutes;
+			// seconds = seconds > 9 ? seconds : '0' + seconds;
 			return `${year}-${month}-${day}`;
+			// return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 		},
 		submit() {
 			let _this = this;
-			_this.billInfo.items.map(v => {
-				if (v.itemName == '电费') {
-					v.noteDate = _this.date;
-					v.prevNum = _this.prevNum;
-					v.currentNum = _this.currentNum;
-					v.amount = _this.amount;
+			if (!isNaN(_this.prevNum) && !isNaN(_this.currentNum)) {
+				if (+_this.currentNum > +_this.prevNum) {
+					// let date = new Date();
+					// let hours = date.getHours()
+					// let minutes = date.getMinutes() + 1;
+					// let seconds = date.getSeconds()+1;
+					// hours = hours > 9 ? hours : '0' + hours;
+					// minutes = minutes > 9 ? minutes : '0' + minutes;
+					// seconds = seconds > 9 ? seconds : '0' + seconds;
+					// let hms = ` ${hours}:${minutes}:${seconds}`
+					// _this.date = _this.date + hms
+					_this.billInfo.items.map(v => {
+						if (v.itemName == '电费') {
+							v.noteDate = _this.date;
+							v.prevNum = _this.prevNum;
+							v.currentNum = _this.currentNum;
+							v.amount = _this.amount;
+						}
+					});
+					_this.billInfo.items = [..._this.billInfo.items];
+					console.log('传参数', _this.billInfo);
+					_this.$request.post('/bill/update', _this.billInfo).then(res => {
+						console.log('请求反回', res);
+						if (res) {
+							setTimeout(() => {
+								uni.navigateBack({
+									delta: 1
+								});
+							}, 1500);
+						}
+					});
+				} else {
+					uni.showToast({
+						title: '本期读数不能小于上期读数!',
+						icon: 'none'
+					});
 				}
-			});
-			_this.billInfo.items = [..._this.billInfo.items];
-
-			// _this.billInfo = { ..._this.billInfo, item: item };
-			// _this.billInfo = { ..._this.billInfo };
-			console.log('传参数', _this.billInfo);
-			_this.$request.post('/bill/update', _this.billInfo).then(res => {
-				console.log('请求反回', res);
-				if (res) {
-					setTimeout(() => {
-						uni.navigateBack({
-							delta: 1
-						});
-					}, 1500);
-				}
-			});
+			} else {
+				uni.showToast({
+					title: '上期读数和本期读数必须要为数字!',
+					icon: 'none'
+				});
+			}
 		}
 	}
 };
@@ -190,7 +225,7 @@ export default {
 	font-weight: 500;
 }
 .money {
-	padding: 0rpx 48rpx 0rpx 70rpx;
+	padding: 0rpx 45rpx 0rpx 60rpx;
 	color: rgba(153, 153, 153, 1);
 }
 .text {

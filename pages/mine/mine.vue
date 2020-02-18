@@ -346,7 +346,7 @@ export default {
 						});
 				} else {
 					uni.showToast({
-						title: '请输入包含数字和字母的6位邀请码!',
+						title: '请输入包含数字和大写字母的6位邀请码!',
 						icon: 'none'
 					});
 				}
