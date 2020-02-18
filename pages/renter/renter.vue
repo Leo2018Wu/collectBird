@@ -127,7 +127,7 @@
 			showBill(){
 				console.log('我点击了')
 				uni.navigateTo({
-					url:'../billDetail/billDetail?billId='+this.roomInfo.billId
+					url:'../billDetail/billDetail?billId='+this.roomInfo.billId+'&tenantId='+this.roomInfo.tenants[0].id
 				})
 			},
 			getEmit(e){
