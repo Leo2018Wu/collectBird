@@ -204,7 +204,18 @@ export default {
 	height: 100%;
 	color: #9B9B9B;
 	font-size: 32rpx;
-	padding-left: 20rpx;
+	padding-left: 52rpx;
+	position: relative;
+}
+.inputClass::after{
+	content: '';
+	width: 26rpx;
+	height: 26rpx;
+	position: absolute;
+	left: 16rpx;
+	top: calc((100% - 26rpx) / 2);
+	background-image: url('../../static/locationSearchBtn.png');
+	background-size: 100% 100%;
 }
 .inputPlaceHolder{
 	color: #9B9B9B;
