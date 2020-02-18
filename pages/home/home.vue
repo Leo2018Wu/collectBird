@@ -42,7 +42,9 @@
 			<view class="banner">
 				<swiper class="swiper" indicator-dots="true" autoplay="true" interval="5000" duration="1000">
 					<block v-for="(item, index) in imgUrls" :key="index">
-						<swiper-item class="radius"><image :src="item" class="slide-image" mode="aspectFill" /></swiper-item>
+						<navigator :url="item.link">
+							<swiper-item class="radius"><image :src="item.url" class="slide-image" mode="aspectFill" /></swiper-item>
+						</navigator>
 					</block>
 				</swiper>
 			</view>
@@ -74,8 +76,17 @@ export default {
 			isPopUpModal: false,
 			swiperCurrent: 0,
 			circular: true,
-			background: ['color1', 'color2', 'color3'],
-			imgUrls: ['../../static/banner1.jpg', '../../static/banner2.jpg'],
+			// background: ['color1', 'color2', 'color3'],
+			imgUrls: [
+				{
+					link: '../addRenter/addRenter',
+					url: '../../static/banner1.jpg'
+				},
+				{
+					link: '../addCommunity/addCommunity',
+					url: '../../static/banner2.jpg'
+				}
+			],
 			indicatorDots: true,
 			autoplay: true,
 			interval: 3000,
@@ -229,7 +240,7 @@ export default {
 		//点击图片触发事件
 		swipclick(e) {
 			console.log(this.data.swiperCurrent);
-			wx.switchTab({
+			uni.switchTab({
 				url: this.data.links[this.data.swiperCurrent]
 			});
 		}
@@ -406,8 +417,8 @@ button::after {
 .swiper {
 	width: 643rpx;
 	height: 191rpx;
-	padding:0rpx 54rpx;
-	border-radius:12rpx;
+	padding: 0rpx 54rpx;
+	border-radius: 12rpx;
 }
 .slide-image {
 	width: 100%;
@@ -419,7 +430,7 @@ button::after {
 	left: 0rpx;
 	width: 100%;
 }
-.radius{
-	border-radius:12rpx;
+.radius {
+	border-radius: 12rpx;
 }
 </style>
