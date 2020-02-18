@@ -6,7 +6,7 @@
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form" :model="info">
 					<evan-form-item label="楼栋号" prop="houseNo">
 						<template v-slot:main>
-							<input class="form-input" type="number" placeholder-class="form-input-placeholder" v-model="info.houseNo" placeholder="请输入楼栋号" />
+							<input class="form-input" type="number" maxlength="2" placeholder-class="form-input-placeholder" v-model="info.houseNo" @input="inputTip" placeholder="请输入楼栋号" />
 						</template>
 						<template v-slot:tip>
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -14,7 +14,7 @@
 					</evan-form-item>
 					<evan-form-item label="房号" prop="roomNo">
 						<template v-slot:main>
-							<input class="form-input" type="number" placeholder-class="form-input-placeholder" v-model="info.roomNo" placeholder="请输入房号" />
+							<input class="form-input" type="number"  maxlength="4" placeholder-class="form-input-placeholder" v-model="info.roomNo" placeholder="请输入房号" />
 						</template>
 						<template v-slot:tip>
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -153,7 +153,16 @@
 			}
 		},
 		methods: {
-			
+			inputTip(e){
+				console.log(e)
+				if(e.detail.value.length >= 2){
+					uni.showToast({
+						title:'请输入不超过两位数楼栋号！',
+						icon:'none',
+						duration:1500
+					})
+				}
+			},
 			showList(){
 				this.showTip().then(res=>{
 					if(res){
