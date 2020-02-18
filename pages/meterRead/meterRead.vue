@@ -27,9 +27,9 @@
 			<view class="">费用</view>
 		</view>
 		<view class="money">
-			<view class="" style="width:33.33%"><input type="text" value="" v-model="prevNum" /></view>
-			<view class="" style="width:30%"><input type="text" value="" bindinput="inputChangeHandle" v-model="currentNum" /></view>
-			<view class="" style="width:9%"><input type="text" value="" v-model="amount" /></view>
+			<view class=""><input type="text" value="" maxlength="5" v-model="prevNum" /></view>
+			<view class="" style="text-align: center;"><input type="text" value="" maxlength="5" @change="inputChangeHandle" v-model="currentNum" /></view>
+			<view class="" style="text-align: right;"><input type="text" value="" v-model="amount" readonly /></view>
 		</view>
 		<view class="button" @click="submit">完成</view>
 	</view>
@@ -51,7 +51,7 @@ export default {
 		const currentDate = this.getDate();
 		return {
 			date: currentDate,
-			prevNum: '',
+			prevNum: '0',
 			currentNum: '',
 			amount: '',
 			info: {
@@ -62,28 +62,32 @@ export default {
 		};
 	},
 	onLoad(option) {
-		console.log(option);
-		console.log('onLoad', option);
 		this.billInfo = JSON.parse(option.billInfo);
 		console.log(this.billInfo);
-		billInfo.items.map(res => {
+		this.billInfo.items.map(res => {
 			if (res.itemName == '电费') {
 				this.electricityInfo = res;
-				this.prevNum = this.electricityInfo.prevNum;
+				console.log(this.electricityInfo);
+				this.prevNum = this.electricityInfo.currentNum;
 			}
 		});
 	},
-	computed: {
-		// this.amount= (+this.currentNum - +this.prevNum) * this.electricityInfo.unitPrice
-	},
+	computed: {},
 	methods: {
 		bindDateChange(e) {
 			console.log('nihaoa', e);
 			this.date = e.detail.value;
 		},
 		inputChangeHandle(value) {
-			console.log(value);
-			this.amount = (+this.currentNum - +this.prevNum) * this.electricityInfo.unitPrice;
+			if (+value.detail.value < +this.prevNum) {
+				uni.showToast({
+					title: '本期读数不能小于上期读数!',
+					icon: 'none'
+				});
+				return;
+			} else {
+				this.amount = (+this.currentNum - +this.prevNum) * this.electricityInfo.unitPrice;
+			}
 		},
 		getDate(value) {
 			let date;
@@ -101,29 +105,50 @@ export default {
 		},
 		submit() {
 			let _this = this;
-			_this.billInfo.items.map(v => {
-				if (v.itemName == '电费') {
-					v.noteDate = _this.date;
-					v.prevNum = _this.prevNum;
-					v.currentNum = _this.currentNum;
-					v.amount = _this.amount;
+			if (!isNaN(_this.prevNum) && !isNaN(_this.currentNum)) {
+				if (+_this.currentNum > +_this.prevNum) {
+					_this.billInfo.items.map(v => {
+						if (v.itemName == '电费') {
+							v.noteDate = _this.date + ' 00:00:00';
+							v.prevNum = _this.prevNum;
+							v.currentNum = _this.currentNum;
+							v.amount = _this.amount;
+						}
+					});
+					_this.billInfo.items = [..._this.billInfo.items];
+					console.log('传参数', _this.billInfo);
+					_this.$request.post('/bill/update', _this.billInfo).then(res => {
+						console.log('请求反回', res);
+						if (res) {
+							uni.navigateBack({
+								delta: 1
+							});
+						}
+					});
+				} else {
+					uni.showToast({
+						title: '本期读数不能小于上期读数!',
+						icon: 'none'
+					});
 				}
-			});
-			_this.billInfo.items = [..._this.billInfo.items];
-
-			// _this.billInfo = { ..._this.billInfo, item: item };
-			// _this.billInfo = { ..._this.billInfo };
-			console.log('传参数', _this.billInfo);
-			_this.$request.post('/bill/update', _this.billInfo).then(res => {
-				console.log('请求反回', res);
-				if (res) {
-					setTimeout(() => {
-						uni.navigateBack({
-							delta: 1
-						});
-					}, 1500);
+			} else {
+				uni.showToast({
+					title: '上期读数和本期读数必须要为数字!',
+					icon: 'none'
+				});
+			}
+		},
+		refreshLastPage() {
+			setTimeout(() => {
+				let pages = getCurrentPages();
+				if (pages.length > 1) {
+					let beforePage = pages[pages.length - 2];
+					beforePage.$vm.updateData();
+					uni.navigateBack({
+						delta: 1
+					});
 				}
-			});
+			}, 1500);
 		}
 	}
 };
@@ -190,7 +215,7 @@ export default {
 	font-weight: 500;
 }
 .money {
-	padding: 0rpx 48rpx 0rpx 70rpx;
+	padding: 0rpx 45rpx 0rpx 60rpx;
 	color: rgba(153, 153, 153, 1);
 }
 .text {

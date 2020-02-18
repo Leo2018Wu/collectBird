@@ -4,11 +4,11 @@
 			<view class="profitContainer">
 				<view class="profitBox">
 					<view class="profitBar">应收(元)</view>
-					<span>{{ billInfo.totalAmount? billInfo.totalAmount : '0'}}</span>
+					<span>{{ billInfo.totalAmount ? billInfo.totalAmount : '0' }}</span>
 				</view>
 				<view v-if="billInfo.billStatus == 4" class="profitBox">
 					<view class="profitBar">实收(元)</view>
-					<span>{{ billInfo.totalAmount ? billInfo.totalAmount : '0'}}</span>
+					<span>{{ billInfo.totalAmount ? billInfo.totalAmount : '0' }}</span>
 				</view>
 			</view>
 			<view class="houseAddr">{{ houseAddrInfo.communityName }}-{{ houseAddrInfo.houseNo }}-{{ houseAddrInfo.roomNo }}</view>
@@ -23,15 +23,15 @@
 			<view class="billDateBox">
 				<view class="billDateLi">
 					<span class="billDateTitle">收租日期</span>
-					<span>{{ billInfo.startDate }}</span>
+					<span>{{startDate }}</span>
 				</view>
 				<view class="billDateLi">
 					<span class="billDateTitle">缴费周期</span>
-					<span class="billDate">{{ billInfo.startDate }} ~ {{ billInfo.endDate }}</span>
+					<span class="billDate">{{ startDate }} ~ {{ endDate }}</span>
 				</view>
 				<view class="billDateLi" v-if="billInfo.billStatus == 4">
 					<span class="billDateTitle">到账日期</span>
-					<span>{{ billInfo.payRentDate }}</span>
+					<span>{{ payRentDate }}</span>
 				</view>
 				<view class="billDateLi" v-if="billInfo.billStatus == 4">
 					<span class="billDateTitle">收款方式</span>
@@ -49,23 +49,55 @@
 				</view>
 			</view>
 			<view class="costDetail">费用明细</view>
-			<view class="electricBox" v-for="(item, index) in billInfo.items" :key="index">
+			<!-- <view class="electricBox" v-for="(item, index) in billInfo.items" :key="index">
 				<view class="elecRight">
 					<view class="unitPrice">
 						{{ item.itemName }}
 						<span>{{ item.unitPrice }}</span>
 					</view>
-					<view v-if="item.type == 1" class="eleCostTotal">{{ item.quantity }}{{ '度' | addSpace }} ({{ item.currentNum }}-{{ item.prevNum }}）</view>
-					<view v-if="item.type == 1">抄表日期: {{ item.noteDate }}</view>
+					<view v-if="item.itemType == 1" class="eleCostTotal">{{ item.quantity }}{{ '度' | addSpace }} ({{ item.currentNum?item.currentNum:"" }}-{{ item.prevNum ?item.prevNum:""}}）</view>
+					<view v-if="item.itemType == 1">抄表日期: {{ item.noteDate?item.noteDate:'' }}</view>
 				</view>
 				<view class="priceTotal">{{ item.amout }}</view>
+			</view> -->
+			<view class="electricBox">
+				<view class="elecRight">
+					<view class="unitPrice">
+						{{ electricityInfo.itemName }}
+						<span>{{ electricityInfo.unitPrice }}元/度</span>
+					</view>
+					<view v-if="electricityInfo.itemType == 1" class="eleCostTotal">
+						{{ quantity }}{{ '度' | addSpace }} ({{ electricityInfo.currentNum ? electricityInfo.currentNum : '' }}-{{
+							electricityInfo.prevNum ? electricityInfo.prevNum : ''
+						}}）
+					</view>
+					<view v-if="electricityInfo.itemType == 1">抄表日期: {{ electricityInfo.noteDate ? electricityInfo.noteDate : '' }}</view>
+				</view>
+				<view class="priceTotal">{{ electricityInfo.amount }}</view>
 			</view>
-			<!-- 	<view class="waterBox">
+			<!-- <view class="electricBox" v-for="(item, index) in billInfo.items" :key="index">
+				<view class="elecRight">
+					<view class="unitPrice">
+						{{ item.itemName }}
+						<span>{{ item.unitPrice }}</span>
+					</view>
+					<view v-if="item.itemType == 1" class="eleCostTotal">{{ item.quantity }}{{ '度' | addSpace }} ({{ item.currentNum?item.currentNum:"" }}-{{ item.prevNum ?item.prevNum:""}}）</view>
+					<view v-if="item.itemType == 1">抄表日期: {{ item.noteDate?item.noteDate:'' }}</view>
+				</view>
+				<view class="priceTotal">{{ item.amout }}</view>
+			</view> -->
+			<view class="waterBox">
 				<view class="waterOuter">
 					<span class="waterBar">水费</span>
-					<span class="priceTotal">30.00</span>
+					<span class="priceTotal">{{billInfo.items[1].amount}}元/方</span>
 				</view>
-			</view> -->
+			</view>
+			<view class="waterBox">
+				<view class="waterOuter">
+					<span class="waterBar">网费</span>
+					<span class="priceTotal">{{billInfo.items[0].amount}}元/月</span>
+				</view>
+			</view>
 		</view>
 		<!-- <view class="remarks">暂无备注</view> -->
 		<view class="remarks">{{ billInfo.remarks ? billInfo.remarks : '无备注' }}</view>
@@ -76,7 +108,8 @@
 			</view>
 		</view>
 		<view class="section2" v-else>
-			<view class="sendBillBox" v-if="billInfo.depositAmount" @click="openMeterRead">
+			<!-- v-if="!billInfo.depositAmount" -->
+			<view class="sendBillBox"  @click="openMeterRead">
 				<image class="sendIcon" src="../../static/eleWater.png" mode="aspectFit"></image>
 				<view>抄表</view>
 			</view>
@@ -111,10 +144,20 @@ export default {
 			billId: null,
 			houseAddrInfo: {},
 			billInfo: {},
-			isShowMeterRead: false
+			electricityInfo: {},
+			isShowMeterRead: false,
+			startDate:'',
+			endDate:'',
+			payRentDate:'',
+			quantity :''
 		};
 	},
+	onShow(){
+		console.log('调用onshow');
+		this.getBillDetail(this.billId);
+	},
 	onLoad(option) {
+		console.log('调用onload');
 		console.log(option);
 		this.billId = option.billId;
 		this.getBillDetail(option.billId);
@@ -128,18 +171,16 @@ export default {
 					id
 				})
 				.then(res => {
+					console.log(res)
 					_this.billInfo = res.data.data;
 					console.log(_this.billInfo);
-					_this.billInfo.startDate = dateForm.dateForm(_this.billInfo.startDate);
-					_this.billInfo.endDate = dateForm.dateForm(_this.billInfo.endDate);
-					_this.billInfo.payRentDate = dateForm.dateForm(_this.billInfo.payRentDate);
+					_this.electricityInfo = _this.billInfo.items[2];
+					_this.startDate = dateForm.dateForm(_this.billInfo.startDate);
+					_this.endDate = dateForm.dateForm(_this.billInfo.endDate);
+					_this.payRentDate = dateForm.dateForm(_this.billInfo.payRentDate);
 					_this.billInfo.depositAmount = parseFloat(_this.billInfo.depositAmount).toFixed(2);
 					_this.billInfo.total = parseFloat(_this.billInfo.total).toFixed(2);
-					// console.log( _this.billInfo.depositAmount + _this.billInfo.total);
-					// console.log(countTotal);
-					// let countTotal =  (+_this.billInfo.depositAmount) + (+_this.billInfo.total)
-					// _this.billInfo = { ..._this.billInfo, countTotal: countTotal };
-					// _this.billInfo = { ..._this.billInfo };
+					_this.quantity = (+_this.electricityInfo.currentNum)-(+_this.electricityInfo.prevNum)
 					_this.init = true;
 				});
 		},
@@ -195,8 +236,8 @@ export default {
 				url: '../meterRead/meterRead'
 			});
 		},
-		ll(){
-			let _this = this
+		ll() {
+			let _this = this;
 			_this.$request
 				.post('/bill/updateStatus', {
 					id: _this.billId,
@@ -328,7 +369,7 @@ export default {
 }
 .unitPrice {
 	width: 100%;
-	text-align: right;
+	text-align: left;
 	color: #333333;
 	font-size: 30rpx;
 }
@@ -447,10 +488,9 @@ export default {
 
 .modalContent {
 	height: 30%;
-
 }
 .modalTitle {
-	height:  65%;
+	height: 65%;
 	padding: 80rpx;
 	font-size: 36rpx;
 	font-family: PingFang SC;
@@ -484,7 +524,8 @@ export default {
 .active {
 	color: #ffa044;
 }
-.btn_cancle,.btn_ok {
+.btn_cancle,
+.btn_ok {
 	width: 49%;
 	text-align: center;
 }
