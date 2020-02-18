@@ -224,10 +224,10 @@
 	}
 
 	.liNumber .liTop span:first-of-type {
+		box-sizing: border-box;
+		padding: 0 4rpx;
 		display: inline-block;
-		/* padding: 8rpx; */
 		min-width: 34rpx;
-		/* padding: 0 4rpx; */
 		height: 34rpx;
 		text-align: center;
 		line-height: 34rpx;
