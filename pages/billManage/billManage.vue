@@ -27,12 +27,15 @@
 							<view class="billAdress">{{ item.roomNo }}</view>
 						</view>
 						<view class="billListright">
-							<view class="billSum" v-show="currentIndex != 3" :class="{ bule: currentIndex == 2 }">{{ item.countTotal }}</view>
-							<view class="overdueNum" v-show="currentIndex == 1 && item.overdueDays > 0">{{ item.overdueDays }}天后交租</view>
+							<view class="billSum" v-show="currentIndex != 3" :class="{ bule: currentIndex == 2 }">
+								<view class="">{{ item.totalAmount }}</view>
+								<view class="reminder" v-if="item.depositAmount">(含押金)</view>
+							</view>
+							<view class="overdueNum" v-show="currentIndex == 1 && item.overdueDays >= 0">{{ item.overdueDays }}天后交租</view>
 							<view class="overdueNum" v-show="currentIndex == 0 && item.overdueDays > 0">逾期{{ item.overdueDays }}天</view>
 							<view class="" v-show="currentIndex == 3">
-								<view class="billSum" :class="{ bule: item.billStatus == 4 }">{{ item.countTotal }}</view>
-								<view class="overdueNum" v-show="item.billStatus == 0 && item.overdueDays > 0">{{ item.overdueDays }}天后交租</view>
+								<view class="billSum" :class="{ bule: item.billStatus == 4 }">{{ item.totalAmount }}</view>
+								<view class="overdueNum" v-show="item.billStatus == 0 && item.overdueDays >= 0">{{ item.overdueDays }}天后交租</view>
 								<view class="overdueNum" v-show="item.billStatus == 3 && item.overdueDays > 0">逾期{{ item.overdueDays }}天</view>
 							</view>
 						</view>
@@ -135,8 +138,9 @@ export default {
 			}
 		},
 		showBill(item) {
+			console.log(item);
 			uni.navigateTo({
-				url: '../billDetail/billDetail?billId=' + item.id
+				url: '../billDetail/billDetail?billId=' + item.id + '&tenantId=' + item.tenantId
 			});
 		},
 		init(e) {
@@ -320,21 +324,23 @@ export default {
 }
 
 .billListLeft {
-	width: 75%;
+	width: 60%;
 }
 
 .billListright {
-	width: 25%;
+	width: 40%;
 	text-align: right;
 }
+.billListLeft{
+	padding: 25rpx 0rpx 25rpx 34rpx;
+}
 
-.billListLeft,
 .billListright {
-	margin: 32rpx 34rpx 32rpx;
+	padding: 25rpx 34rpx 25rpx 0rpx;
 }
 
 .billListItem {
-	height: 190rpx;
+	height: calc(100%-280rpx);
 	background-color: #fff;
 	margin: 17rpx 30rpx 17rpx;
 	display: flex;
@@ -365,6 +371,7 @@ export default {
 	font-family: PingFang SC;
 	font-weight: 500;
 	color: #999999;
+	
 }
 
 .billSum {
@@ -372,8 +379,17 @@ export default {
 	font-family: PingFang SC;
 	font-weight: bold;
 	color: #eb5e61;
-}
+	width: 100%;
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
 
+}
+.reminder{
+	font-size: 26rpx;
+	color: #999999;
+	width: 100rpx;
+}
 .overdueNum {
 	font-size: 26rpx;
 	font-family: PingFang SC;

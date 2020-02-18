@@ -14,7 +14,7 @@
 					<view class="billTitle">{{item.startDate.substr(0,10)}}账单</view>
 					<view class="checkDate textOverFlow active">收租日期：{{item.payRentDate.substr(0,10)}}</view>
 				</view>
-				<view>{{item.total}}</view>
+				<view>{{item.totalAmount}}</view>
 				</view>
 			</view>
 		</view>
@@ -28,7 +28,7 @@
 					<view class="billTitle">租金收入</view>
 					<view class="checkDate textOverFlow">到账日期：{{item.payRentDate.substr(0,10)}}</view>
 				</view>
-				<view>{{item.total}}</view>
+				<view>{{item.totalAmount}}</view>
 				</view>
 				
 			</view>
@@ -107,10 +107,7 @@
 						}
 						this.latestBill = arr1;
 						this.returnBillRecord = arr2;
-						console.log(this.latestBill)
-						console.log(this.returnBillRecord)
 					});
-					// _this.checkIsHaveLatestBill(_this.returnBillRecord[0].endDate)
 				}).catch(err=>{
 					
 				})
