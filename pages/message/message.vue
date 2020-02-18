@@ -3,34 +3,39 @@
 		<view class="messageItem">
 			<image class="messageIcon" src="../../static/messageIcon1.png" mode="aspectFit"></image>
 			<view class="content">
-				<view class="top">
-					<view>账单提醒</view>
-					<span>星期二</span>
+				<view class="myBox">
+					<view class="top">
+						<view>账单提醒</view>
+						<span>星期二</span>
+					</view>
+					<view class="bottom">暂无消息</view>
 				</view>
-				<view class="bottom">暂无消息</view>
-				<view class="line"></view>
 			</view>
 		</view>
 		<view class="messageItem">
 			<image class="messageIcon" src="../../static/messageIcon2.png" mode="aspectFit"></image>
 			<view class="content">
-				<view class="top">
-					<view>租客提醒</view>
-					<span>星期二</span>
+				<view class="myBox">
+					<view class="top">
+						<view>租客提醒</view>
+						<span>星期二</span>
+					</view>
+					<view class="bottom">暂无消息</view>
 				</view>
-				<view class="bottom">暂无消息</view>
-				<view class="line"></view>
+
 			</view>
 		</view>
 		<view class="messageItem">
 			<image class="messageIcon" src="../../static/messageIcon3.png" mode="aspectFit"></image>
 			<view class="content">
-				<view class="top">
-					<view>系统消息</view>
-					<span>星期二</span>
+				<view class="myBox">
+					<view class="top">
+						<view>系统消息</view>
+						<span>星期二</span>
+					</view>
+					<view class="bottom">暂无消息</view>
 				</view>
-				<view class="bottom">暂无消息</view>
-				<view class="line"></view>
+
 			</view>
 		</view>
 	</view>
@@ -58,7 +63,7 @@
 	.messageItem {
 		height: 127rpx;
 		width: 100%;
-		padding: 0 29rpx;
+		padding-left: 30rpx;
 		display: flex;
 		align-items: center;
 		justify-content: flex-start;
@@ -69,11 +74,17 @@
 		width: calc(100% - 124rpx);
 		height: 100%;
 		display: flex;
+		padding-right: 30rpx;
+		border-bottom: 1rpx solid #F5F5F5;
+	}
+	.myBox{
+		margin: auto 0;
+		height: 90rpx;
+		width: 100%;
+		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
-		padding: 10rpx;
 	}
-
 	.messageIcon {
 		margin-right: 30rpx;
 		width: 90rpx;
