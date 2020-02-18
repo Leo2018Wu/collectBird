@@ -23,15 +23,15 @@
 			<view class="billDateBox">
 				<view class="billDateLi">
 					<span class="billDateTitle">收租日期</span>
-					<span>{{ billInfo.startDate }}</span>
+					<span>{{startDate }}</span>
 				</view>
 				<view class="billDateLi">
 					<span class="billDateTitle">缴费周期</span>
-					<span class="billDate">{{ billInfo.startDate }} ~ {{ billInfo.endDate }}</span>
+					<span class="billDate">{{ startDate }} ~ {{ endDate }}</span>
 				</view>
 				<view class="billDateLi" v-if="billInfo.billStatus == 4">
 					<span class="billDateTitle">到账日期</span>
-					<span>{{ billInfo.payRentDate }}</span>
+					<span>{{ payRentDate }}</span>
 				</view>
 				<view class="billDateLi" v-if="billInfo.billStatus == 4">
 					<span class="billDateTitle">收款方式</span>
@@ -67,7 +67,7 @@
 						<span>{{ electricityInfo.unitPrice }}元/度</span>
 					</view>
 					<view v-if="electricityInfo.itemType == 1" class="eleCostTotal">
-						{{ electricityInfo.quantity }}{{ '度' | addSpace }} ({{ electricityInfo.currentNum ? item.currentNum : '' }}-{{
+						{{ quantity }}{{ '度' | addSpace }} ({{ electricityInfo.currentNum ? electricityInfo.currentNum : '' }}-{{
 							electricityInfo.prevNum ? electricityInfo.prevNum : ''
 						}}）
 					</view>
@@ -145,10 +145,14 @@ export default {
 			houseAddrInfo: {},
 			billInfo: {},
 			electricityInfo: {},
-			isShowMeterRead: false
+			isShowMeterRead: false,
+			startDate:'',
+			endDate:'',
+			payRentDate:'',
+			quantity :''
 		};
 	},
-	onshow(){
+	onShow(){
 		console.log('调用onshow');
 		this.getBillDetail(this.billId);
 	},
@@ -167,19 +171,16 @@ export default {
 					id
 				})
 				.then(res => {
+					console.log(res)
 					_this.billInfo = res.data.data;
 					console.log(_this.billInfo);
 					_this.electricityInfo = _this.billInfo.items[2];
-					_this.billInfo.startDate = dateForm.dateForm(_this.billInfo.startDate);
-					_this.billInfo.endDate = dateForm.dateForm(_this.billInfo.endDate);
-					_this.billInfo.payRentDate = dateForm.dateForm(_this.billInfo.payRentDate);
+					_this.startDate = dateForm.dateForm(_this.billInfo.startDate);
+					_this.endDate = dateForm.dateForm(_this.billInfo.endDate);
+					_this.payRentDate = dateForm.dateForm(_this.billInfo.payRentDate);
 					_this.billInfo.depositAmount = parseFloat(_this.billInfo.depositAmount).toFixed(2);
 					_this.billInfo.total = parseFloat(_this.billInfo.total).toFixed(2);
-					// console.log( _this.billInfo.depositAmount + _this.billInfo.total);
-					// console.log(countTotal);
-					// let countTotal =  (+_this.billInfo.depositAmount) + (+_this.billInfo.total)
-					// _this.billInfo = { ..._this.billInfo, countTotal: countTotal };
-					// _this.billInfo = { ..._this.billInfo };
+					_this.quantity = (+_this.electricityInfo.currentNum)-(+_this.electricityInfo.prevNum)
 					_this.init = true;
 				});
 		},
