@@ -319,7 +319,7 @@ export default {
 				// 校验方法
 				// console.log(/^[A-Z]\d{5}$/.test(_this.usedInviCode));
 				// console.log(_this.usedInviCode.replace(/^[A-Z]\d{4}$/,true));
-				let checkoutFlag = /^[A-Z]\d{5}$/.test(_this.usedInviCode);
+				let checkoutFlag = /^[A-Z0-9]{6}$/.test(_this.usedInviCode);
 				if (checkoutFlag) {
 					uni.showLoading({
 						title: '正在提交'
@@ -346,12 +346,14 @@ export default {
 						});
 				} else {
 					uni.showToast({
-						title: '请填6位邀请码'
+						title: '请输入包含数字和字母的6位邀请码!',
+						icon: 'none'
 					});
 				}
 			} else {
 				uni.showToast({
-					title: '请填写邀请码!'
+					title: '请填写邀请码!',
+					icon: 'none'
 				});
 			}
 		},

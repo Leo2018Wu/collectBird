@@ -404,8 +404,9 @@ button::after {
 
 /* 轮播图 */
 .swiper {
-	width: 100%;
+	width: 643rpx;
 	height: 191rpx;
+	padding:0rpx 54rpx;
 }
 .slide-image {
 	width: 100%;
