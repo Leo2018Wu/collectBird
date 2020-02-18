@@ -39,7 +39,15 @@
 					<span class="bannerText">统计</span>
 				</view>
 			</view>
+			<view class="banner">
+				<swiper class="swiper" indicator-dots="true" autoplay="true" interval="5000" duration="1000">
+					<block v-for="(item, index) in imgUrls" :key="index">
+						<swiper-item><image :src="item" class="slide-image" mode="aspectFill" /></swiper-item>
+					</block>
+				</swiper>
+			</view>
 		</view>
+
 		<!-- 授权弹窗 -->
 		<view class="isloginModal" v-if="loginFlag" @click="cancleLogin"></view>
 		<view class="isloginBox" v-if="loginFlag">
@@ -63,7 +71,15 @@ export default {
 			billReceived: '0', //本月账单已收
 			todayReceived: '0', //今日已收金额
 			loginFlag: false,
-			isPopUpModal: false
+			isPopUpModal: false,
+			swiperCurrent: 0,
+			circular: true,
+			background: ['color1', 'color2', 'color3'],
+			imgUrls: ['../../static/banner1.jpg', '../../static/banner2.jpg'],
+			indicatorDots: true,
+			autoplay: true,
+			interval: 3000,
+			duration: 500
 		};
 	},
 	onLoad() {
@@ -79,7 +95,7 @@ export default {
 			});
 			console.log(this.$store.state.isloginStatus);
 		}
-		this.getMoneyInfo()
+		this.getMoneyInfo();
 	},
 	methods: {
 		checkLoginStatus() {
@@ -197,6 +213,25 @@ export default {
 		},
 		cancleLogin(e) {
 			this.loginFlag = false;
+		},
+		//轮播图的切换事件
+		swiperChange(e) {
+			this.setData({
+				swiperCurrent: e.detail.current
+			});
+		},
+		//点击指示点切换
+		chuangEvent(e) {
+			this.setData({
+				swiperCurrent: e.currentTarget.id
+			});
+		},
+		//点击图片触发事件
+		swipclick(e) {
+			console.log(this.data.swiperCurrent);
+			wx.switchTab({
+				url: this.data.links[this.data.swiperCurrent]
+			});
 		}
 	}
 };
@@ -365,5 +400,21 @@ export default {
 }
 button::after {
 	border: none;
+}
+
+/* 轮播图 */
+.swiper {
+	width: 100%;
+	height: 191rpx;
+}
+.slide-image {
+	width: 100%;
+	height: 100%;
+}
+.banner {
+	position: absolute;
+	top: 260rpx;
+	left: 0rpx;
+	width: 100%;
 }
 </style>

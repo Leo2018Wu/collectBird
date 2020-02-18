@@ -4,9 +4,8 @@
 			<view class="myMsg">
 				<view class="myContainer">
 					<view class=""><image class="myPhoto" :src="userImg"></image></view>
-					<!-- class="login" -->
-					<view v-if="!show"><button class="login" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true">登录</button></view>
-					<view class="detail" v-if="show">
+					<view v-if="show"><button class="login" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true">登录</button></view>
+					<view class="detail" v-else>
 						<view class="detailTop">
 							<view class="myName">{{ userName }}</view>
 							<view class="myLevel">
@@ -86,17 +85,18 @@
 			<view class="modalTitle">填写邀请码</view>
 			<view class="modalContent">
 				<view class="modalInput">
-					<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form" :model="info">
-						<evan-form-item prop="invitationCode">
-							<template v-slot:main>
-								<input type="text" value="" maxlength="6" v-model="info.invitationCode" placeholder="请输入邀请码(仅填写1次)" style="font-size: 30rpx;" />
-							</template>
-						</evan-form-item>
-					</evan-form>
-					<!-- <view class="reminder">
-						<view class="reminderSymbol">!</view>
-						<view class="reminderText">邀请码仅填写一次</view>
-					</view> -->
+					<input
+						class="text"
+						type="text"
+						value=""
+						maxlength="6"
+						v-model="usedInviCode"
+						placeholder="请输入邀请码(仅填写1次)"
+						style="font-size: 30rpx;"
+						autofocus
+						required
+					/>
+					<view class="inputLine"></view>
 				</view>
 				<view class="button">
 					<view class="btn_cancle" @click="cancle" data-statu="close">取消</view>
@@ -106,7 +106,7 @@
 			</view>
 		</view>
 		<!-- 授权弹窗 -->
-		<is-login v-show="loginFlag" v-on:ffffff="ffffff" :childLoginFlag="loginFlag" v-on:childByValue="childByValue"></is-login>
+		<is-login v-show="loginFlag" v-on:isShowloginBtn="isShowloginBtn" :childLoginFlag="loginFlag" v-on:childByValue="childByValue"></is-login>
 		<!-- <view class="isloginModal" v-show="loginFlag" @click="cancleLogin"></view> -->
 		<!-- <view class="isloginBox" v-show="loginFlag">
 			<image class="bgcImg" src="../../static/authorization.png" mode=""></image>
@@ -133,55 +133,65 @@ export default {
 	},
 	data() {
 		return {
-			showTelNum: true,
+			showTelNum: true, // 默认展示获取手机号按钮
 			invitationCodeFlag: false, // 是否显示填写邀请码弹窗
 			loginFlag: false, //登录弹窗
 			userImg: '../../static/tourist.png', //用户头像
-			userName: '游客', //用户昵称
-			gender: '', //用户性别
-			openId: '',
-			show: false, //是否显示点击登录
-			roomNum: '50',
+			userName: '', //用户昵称
+			// gender: '', //用户性别
+			show: true, //是否显示点击登录
+			roomNum: '50', // 房间容量暂时写死
 			inviCode: '', // 我的邀请码
 			usedInviCode: '', //填写邀请码
-			level: '',
-			// landladyInfo: {},
+			level: '', // 级别
 			remainDay: '0', //剩余天数
 			trialDate: '2030-01-01',
 			phoneNumber: '', // 绑定手机号
-			info: {
-				invitationCode: ''
-			},
-			rules: {
-				invitationCode: {
-					required: true,
-					message: '请填写邀请码'
-				}
-			},
 			loginingStatus: false //登录状态
 		};
 	},
 	computed: {
 		...mapState(['landladyInfo'])
 	},
-	onLoad(options) {
-		this.$nextTick(() => {
-			this.$refs.form.setRules(this.rules);
-		});
-	},
+	onLoad(options) {},
 	onShow(options) {
 		this.checkLoginStatus().then(res => {
 			console.log(res);
 			if (res) {
-				this.show = false;
-			} else {
 				this.show = true;
+			} else {
+				this.show = false;
 				this.getMineMsg({ openId: this.$store.state.userOpenId });
 			}
 		});
 	},
 	methods: {
-		ffffff(value) {
+		checkLoginStatus() {
+			let _this = this;
+			return new Promise((reslove, rej) => {
+				//判断用户是否授权过
+				uni.getSetting({
+					success(res) {
+						console.log(res);
+						if (res.authSetting['scope.userInfo']) {
+							_this.$store.commit('isloginStatus', true);
+							_this.show = false;
+							let userInfo = {
+								openId: _this.$store.state.userOpenId,
+								userName: _this.$store.state.landladyInfo.userName,
+								userImg: _this.$store.state.landladyInfo.userImg,
+								userSex: _this.$store.state.landladyInfo.userSex
+							};
+							_this.getMineMsg(userInfo);
+						}
+					},
+					complete() {
+						reslove(!_this.$store.state.isloginStatus);
+					}
+				});
+			});
+		},
+		isShowloginBtn(value) {
 			console.log(value);
 			this.show = value;
 		},
@@ -199,104 +209,22 @@ export default {
 				_this.remainDay = value.remainDay;
 			}
 		},
-		checkLoginStatus() {
-			let _this = this;
-			return new Promise((reslove, rej) => {
-				//判断用户是否授权过
-				uni.getSetting({
-					success(res) {
-						console.log(res);
-						if (res.authSetting['scope.userInfo']) {
-							_this.$store.commit('isloginStatus', true);
-							_this.show = true;
-							let userInfo = {
-								openId: _this.$store.state.userOpenId,
-								userName: _this.$store.state.landladyInfo.userName,
-								userImg: _this.$store.state.landladyInfo.userImg,
-								userSex: _this.$store.state.landladyInfo.userSex
-							};
-							_this.getMineMsg(userInfo);
-						}
-					},
-					complete() {
-						reslove(!_this.$store.state.isloginStatus);
-					}
-				});
-			});
-		},
-		// getUserInfo() {
-		// 	this.loginFlag = false;
-		// 	console.log(11111);
-		// 	let self = this;
-		// 	uni.login({
-		// 		provider: 'weixin',
-		// 		success: function(loginRes) {
-		// 			console.log(loginRes, '1111');
-		// 			uni.checkSession({
-		// 				success() {
-		// 					// session_key 未过期，并且在本生命周期一直有效
-		// 					self.$store.commit('openCode', loginRes.code);
-		// 					self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
-		// 						console.log(res);
-		// 						if (res) {
-		// 							self.openId = res.data.data.openid;
-		// 							self.$store.commit('isloginStatus', true);
-		// 							self.$store.commit('userOpenId', res.data.data.openid);
-		// 							self.$store.commit('sessionKey', res.data.data.session_key);
-		// 							uni.getUserInfo({
-		// 								provider: 'weixin',
-		// 								success: function(infoRes) {
-		// 									if (infoRes.userInfo) {
-		// 										self.show = true;
-		// 										// 微信的gender 1 男 2 女 0 未知
-		// 										// 收租鸟userSex 0 男 1 女
-		// 										if (infoRes.userInfo.gender == '1') {
-		// 											self.gender = '0';
-		// 										} else if (infoRes.userInfo.gender == '2') {
-		// 											self.gender = '1';
-		// 										} else {
-		// 											self.gender = '未知';
-		// 										}
-		// 										let userInfo = {
-		// 											openId: res.data.data.openid,
-		// 											userName: infoRes.userInfo.nickName,
-		// 											userImg: infoRes.userInfo.avatarUrl,
-		// 											userSex: self.gender
-		// 										};
-		// 										self.getMineMsg(userInfo);
 
-		// 										console.log(infoRes);
-		// 									}
-		// 								},
-		// 								fail: function(res) {
-		// 									uni.showToast({
-		// 										title: '微信授权不成功！',
-		// 										duration: 2000
-		// 									});
-		// 								}
-		// 							});
-		// 						}
-		// 					});
-		// 				},
-		// 				fail() {
-		// 					self.show = false;
-		// 					// session_key 已经失效，需要重新执行登录流程
-		// 					uni.login({
-		// 						provider: 'weixin',
-		// 						success: function(loginRes) {
-		// 							self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
-		// 								console.log(res);
-		// 							});
-		// 						}
-		// 					}); // 重新登录
-		// 				}
-		// 			});
-		// 		},
-		// 		fail: function(res) {
-		// 			self.show = false;
-		// 		}
-		// 	});
-		// },
+		// 获取手机号方法
+		getTelNum(res) {
+			this.$request
+				.post('/wx/takeWxDecode', res)
+				.then(v => {
+					if (v && v.phoneNumber) {
+						this.showTelNum = false;
+						this.phoneNumber = v.phoneNumber;
+					}
+				})
+				.catch(err => {
+					console.log(err);
+				});
+		},
+		// 点击获取手机号
 		getPhoneNumber(e) {
 			console.log('telNum11111');
 			// let _this = this;
@@ -363,6 +291,7 @@ export default {
 			// 	}
 			// });
 		},
+		// 获取用户信息
 		getMineMsg(userInfo) {
 			let _this = this;
 			_this.$request
@@ -383,15 +312,56 @@ export default {
 					console.log(err);
 				});
 		},
+		// 提交邀请码
+		submit() {
+			let _this = this;
+			if (_this.usedInviCode) {
+				// 校验方法
+				// console.log(/^[A-Z]\d{5}$/.test(_this.usedInviCode));
+				// console.log(_this.usedInviCode.replace(/^[A-Z]\d{4}$/,true));
+				let checkoutFlag = /^[A-Z]\d{5}$/.test(_this.usedInviCode);
+				if (checkoutFlag) {
+					uni.showLoading({
+						title: '正在提交'
+					});
+					let v = {
+						id: _this.$store.state.landladyInfo.id,
+						usedInviCode: _this.usedInviCode
+					};
+					_this.$request
+						.post('/user/useInviCode', v)
+						.then(res => {
+							console.log(res);
+							if (res) {
+								uni.showToast({
+									title: '提交成功'
+								});
+								_this.usedInviCode = '';
+								_this.invitationCodeFlag = false;
+								_this.getMineMsg({ openId: _this.$store.state.userOpenId });
+							}
+						})
+						.catch(() => {
+							uni.hideLoading();
+						});
+				} else {
+					uni.showToast({
+						title: '请填6位邀请码'
+					});
+				}
+			} else {
+				uni.showToast({
+					title: '请填写邀请码!'
+				});
+			}
+		},
 
 		// 弹窗其他页面跳转
+
 		//打开获取手机号
 		openPhoneNumber() {
 			this.checkLoginStatus().then(res => {
 				this.loginFlag = res;
-				// if(!this.loginFlag && !this.usedInviCode){
-				//         this.invitationCodeFlag = true;
-				// }
 			});
 		},
 		// 打开填写邀请码弹窗
@@ -402,9 +372,6 @@ export default {
 					this.invitationCodeFlag = true;
 				}
 			});
-			// if (!this.usedInviCode) {
-			//         this.invitationCodeFlag = true;
-			// }
 		},
 		// 关闭填写邀请码弹窗
 		cancle() {
@@ -444,61 +411,13 @@ export default {
 				// }
 			});
 		},
-		submit() {
-			let _this = this;
-			this.$refs.form.validate(res => {
-				if (isNaN(this.info.invitationCode) && this.info.invitationCode.length <= 4) {
-					uni.showToast({
-						title: '请填写6位邀请码!'
-					});
-				} else {
-					uni.showLoading({
-						title: '正在提交'
-					});
-					let v = {
-						id: this.$store.state.landladyInfo.id,
-						usedInviCode: this.info.invitationCode
-					};
-					this.$request
-						.post('/user/useInviCode', v)
-						.then(res => {
-							console.log(res);
-							if (res) {
-								uni.showToast({
-									title: '提交成功'
-								});
-								this.info.invitationCode = '';
-								this.invitationCodeFlag = false;
-								// this.invitationCode = this.info.invitationCode;
-								this.getMineMsg({ openId: this.$store.state.userOpenId });
-							}
-						})
-						.catch(() => {
-							uni.hideLoading();
-						});
-				}
-			});
-		},
+		// 点击关闭登录弹窗
 		cancleLogin(e) {
 			this.loginFlag = false;
 		},
 		// 未登录状态下点击登录
 		openLogin(e) {
 			this.loginFlag = true;
-			// this.getUserInfo();
-		},
-		getTelNum(res) {
-			this.$request
-				.post('/wx/takeWxDecode', res)
-				.then(v => {
-					if (v && v.phoneNumber) {
-						this.showTelNum = false;
-						this.phoneNumber = v.phoneNumber;
-					}
-				})
-				.catch(err => {
-					console.log(err);
-				});
 		}
 	}
 };
@@ -777,12 +696,12 @@ export default {
 }
 
 .modalInput {
-	padding: 25rpx 0rpx 0rpx 0rpx;
+	padding: 80rpx 0rpx 0rpx 0rpx;
 	text-align: center;
 	margin: 0 auto;
 	font-size: 30rpx;
 	width: 376rpx;
-	height: 172rpx;
+	height: 151rpx;
 }
 .reminderText {
 	font-size: 22rpx;
@@ -824,8 +743,14 @@ export default {
 	color: rgba(51, 51, 51, 1);
 	position: relative;
 	line-height: 80rpx;
+	margin-top: 20rpx;
 }
-
+.inputLine {
+	width: 184px;
+	height: 1px;
+	background: rgba(238, 238, 238, 1);
+	margin-top: 10rpx;
+}
 .modalLine {
 	width: 1rpx;
 	height: 89rpx;
@@ -835,7 +760,9 @@ export default {
 	top: 0%;
 	left: 50%;
 }
-
+/* .text{
+	border-bottom: 1rpx solid rgba(238,238,238,1);
+} */
 .active {
 	color: #ffa044;
 }
