@@ -1,4 +1,3 @@
-
 <template>
 	<view class="message">
 		<view class="messageItem">
@@ -6,7 +5,8 @@
 			<view class="content">
 				<view class="top">
 					<view>账单提醒</view>
-					<span>星期二</span></view>
+					<span>星期二</span>
+				</view>
 				<view class="bottom">暂无消息</view>
 				<view class="line"></view>
 			</view>
@@ -16,7 +16,8 @@
 			<view class="content">
 				<view class="top">
 					<view>租客提醒</view>
-					<span>星期二</span></view>
+					<span>星期二</span>
+				</view>
 				<view class="bottom">暂无消息</view>
 				<view class="line"></view>
 			</view>
@@ -26,7 +27,8 @@
 			<view class="content">
 				<view class="top">
 					<view>系统消息</view>
-					<span>星期二</span></view>
+					<span>星期二</span>
+				</view>
 				<view class="bottom">暂无消息</view>
 				<view class="line"></view>
 			</view>
@@ -38,21 +40,22 @@
 	export default {
 		data() {
 			return {
-				
+
 			}
 		},
 		methods: {
-			
+
 		}
 	}
 </script>
 
 <style scoped>
-	.message{
+	.message {
 		height: 100vh;
 		width: 100%;
 	}
-	.messageItem{
+
+	.messageItem {
 		height: 127rpx;
 		width: 100%;
 		padding: 0 29rpx;
@@ -61,43 +64,47 @@
 		justify-content: flex-start;
 		margin-top: 30rpx;
 	}
-	.content{
+
+	.content {
 		width: calc(100% - 124rpx);
 		height: 100%;
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
 		padding: 10rpx;
-		/* border-bottom: 2rpx solid rgba(245,245,245,1); */
 	}
-	.messageIcon{
+
+	.messageIcon {
 		margin-right: 30rpx;
-		width: 84rpx;
-		height: 84rpx;
+		width: 90rpx;
+		height: 90rpx;
 		border-radius: 100%;
-		margin-bottom: 24rpx;
 
 	}
-	.top{
-		font-size: 32rpx;
+
+	.top {
+		font-size: 34rpx;
 		display: flex;
 		align-items: center;
 		justify-content: flex-end;
 	}
-	.top span{
+
+	.top span {
 		color: #999999;
-		font-size: 20rpx;
+		font-size: 22rpx;
 		margin-left: auto;
 	}
-	.bottom{
+
+	.bottom {
 		color: #999999;
-		font-size: 24rpx;
+		font-size: 26rpx;
 		/* margin-bottom: 20rpx; */
 	}
-	.line{
-		width:618rpx;
-		height:2rpx;
+
+	.line {
+		width: 618rpx;
+		height: 2rpx;
 		/* background-color: red; */
-		background:rgba(245,245,245,1);
+		background: rgba(245, 245, 245, 1);
 	}
 </style>

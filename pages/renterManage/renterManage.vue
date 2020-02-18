@@ -2,15 +2,15 @@
 	<view class="renterManage">
 		<view class="header">
 			<view class="headBar">
-			    <view class="headBarItem">
-			      在租租客
-			      <span>{{inRentTenantNum}}</span>
-			    </view>
+				<view class="headBarItem">
+					在租租客
+					<span>{{inRentTenantNum}}</span>
+				</view>
 				<view class="headBarItemLine"></view>
-			    <view class="headBarItem">
-			      即将到期
-			      <span>{{aboutToExpire}}</span>
-			    </view>
+				<view class="headBarItem">
+					即将到期
+					<span>{{aboutToExpire}}</span>
+				</view>
 			</view>
 		</view>
 		<view class="section" :class="{secFirst : index == 0}" v-for="(item,index) in renterList" :key="index">
@@ -40,11 +40,11 @@
 	export default {
 		data() {
 			return {
-				isShow:false,
-				renterList:[],
-				currentIndex:null,
-				aboutToExpire:'',
-				inRentTenantNum:''
+				isShow: false,
+				renterList: [],
+				currentIndex: null,
+				aboutToExpire: '',
+				inRentTenantNum: ''
 			}
 		},
 		onLoad() {
@@ -54,16 +54,16 @@
 			this.getTopNum(landordId)
 		},
 		methods: {
-			getTopNum(id){
-					this.$request.post('/roomUser/tenantNum',{
+			getTopNum(id) {
+				this.$request.post('/roomUser/tenantNum', {
 					id
-				}).then((res)=>{
+				}).then((res) => {
 					console.log(res)
 					this.aboutToExpire = res.data.data.aboutToExpire;
 					this.inRentTenantNum = res.data.data.inRentTenantNum;
 				})
 			},
-			goRenter(item,name){
+			goRenter(item, name) {
 				console.log(item)
 				let communityInfo = {}
 				communityInfo.name = name
@@ -75,25 +75,25 @@
 				communityInfo.roomPrice = item.map.roomPrice
 				let id = item.map.roomId
 				uni.navigateTo({
-					url:'../renter/renter?id='+id+'&communityInfo='+JSON.stringify(communityInfo)+'&houseId='+item.map.houseId
+					url: '../renter/renter?id=' + id + '&communityInfo=' + JSON.stringify(communityInfo) + '&houseId=' + item.map.houseId
 				})
 			},
-			getRenterList(id){
+			getRenterList(id) {
 				console.log(id)
-				this.$request.post('/roomUser/tenantList',{
+				this.$request.post('/roomUser/tenantList', {
 					id
-				}).then((res)=>{
+				}).then((res) => {
 					console.log(res)
 					this.renterList = res.data.data;
-					this.renterList.forEach((item,index)=>{
-						item.tenantList.sort(function(newVal,oldVal){
-							console.log(newVal,oldVal)
+					this.renterList.forEach((item, index) => {
+						item.tenantList.sort(function(newVal, oldVal) {
+							console.log(newVal, oldVal)
 							return newVal.map.buildingNo - oldVal.map.buildingNo
 						})
 					})
 				})
 			},
-			showRenterList(index){
+			showRenterList(index) {
 				this.currentIndex = index;
 				this.isShow = !this.isShow;
 			}
@@ -102,66 +102,74 @@
 </script>
 
 <style scoped>
-	.renterManage{
+	.renterManage {
 		width: 100%;
 		height: 100%;
 		min-height: 100vh;
 		background-color: #FAFAFA;
 	}
-	.header{
+
+	.header {
 		width: 100%;
 		height: 81rpx;
 		background-color: #F09A42;
 		position: relative;
 	}
+
 	.headBar {
-	  width: 670rpx;
-	  height: 114rpx;
-	  /* line-height: 114rpx; */
-	  box-shadow: 3px 5px 9px 1px rgba(225, 226, 226, 0.27);
-	  border-radius: 10rpx;
-	  position: absolute;
-	  left: 40rpx;
-	  bottom: -56rpx;
-	  background-color: #ffffff;
-	  font-size: 26rpx;
-	  font-weight: 500;
-	  display: flex;
-	  align-items: center;
+		width: 670rpx;
+		height: 114rpx;
+		/* line-height: 114rpx; */
+		box-shadow: 3px 5px 9px 1px rgba(225, 226, 226, 0.27);
+		border-radius: 10rpx;
+		position: absolute;
+		left: 40rpx;
+		bottom: -56rpx;
+		background-color: #ffffff;
+		font-size: 30rpx;
+		font-weight: 500;
+		display: flex;
+		align-items: center;
 	}
+
 	.headBarItem {
-	  width: 50%;
-	  height: 65rpx;
-	  display: flex;
-	  justify-content: center;
-	  align-items: center;
+		width: 50%;
+		height: 65rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 	}
+
 	.headBarItem span {
-	  font-size: 36rpx;
-	  font-weight: 800;
-	  margin-left: 20rpx;
-	  color: #f09a42;
+		font-size: 40rpx;
+		font-weight: 800;
+		margin-left: 20rpx;
+		color: #f09a42;
 	}
-	.headBarItemLine{
-		width:1rpx;
-		height:65rpx;
-		background-color:rgba(223,220,220,1);
+
+	.headBarItemLine {
+		width: 1rpx;
+		height: 65rpx;
+		background-color: rgba(223, 220, 220, 1);
 	}
-/* 	.headBarItem:first-of-type {
+
+	/* 	.headBarItem:first-of-type {
 	  border-right: 1rpx solid #dfdcdc80;
 	}
 	.headBarItem:last-of-type {
 	  border-left: 1rpx solid #dfdcdc80;
 	} */
-	.section{
+	.section {
 		width: 100%;
 		background-color: #FFFFFF;
 		margin-bottom: 17rpx;
 	}
-	.secFirst{
+
+	.secFirst {
 		margin-top: 73rpx;
 	}
-	.sectionBar{
+
+	.sectionBar {
 		height: 100rpx;
 		width: calc(100% - 80rpx);
 		padding-right: 44rpx;
@@ -171,14 +179,16 @@
 		justify-content: flex-start;
 		position: relative;
 	}
-	.renterListBox{
+
+	.renterListBox {
 		height: 100%;
 		width: 100%;
 		padding: 0 40rpx;
 		margin-bottom: 17rpx;
 		display: none;
 	}
-	.renterLi{
+
+	.renterLi {
 		width: 100%;
 		height: 160rpx;
 		padding: 24rpx 0;
@@ -187,11 +197,12 @@
 		align-items: center;
 		justify-content: flex-start;
 	}
-	.active{
+
+	.active {
 		display: block;
 	}
-	
-	.tips0{
+
+	.tips0 {
 		content: "";
 		width: 0;
 		height: 0;
@@ -202,7 +213,8 @@
 		border-left: 12rpx solid transparent;
 		border-right: 12rpx solid transparent;
 	}
-	.tips1{
+
+	.tips1 {
 		content: "";
 		width: 0;
 		height: 0;
@@ -214,25 +226,30 @@
 		border-left: 12rpx solid transparent;
 		border-right: 12rpx solid transparent;
 	}
-	.secName{
+
+	.secName {
 		margin-right: auto;
 		font-size: 32rpx;
 	}
-	.renters{
+
+	.renters {
 		color: #FFA344;
 		font-size: 28rpx;
 	}
-	.renters span{
+
+	.renters span {
 		font-weight: bold;
 		margin-left: 10rpx;
 	}
-	.renterImg{
+
+	.renterImg {
 		width: 94rpx;
 		height: 94rpx;
 		border-radius: 100%;
 		margin-right: 30rpx;
 	}
-	.renterInfoBox{
+
+	.renterInfoBox {
 		height: 100%;
 		width: fit-content;
 		max-width: 350rpx;
@@ -242,15 +259,19 @@
 		font-size: 33rpx;
 		margin-right: auto;
 	}
-	.renterTel,.roomNo{
+
+	.renterTel,
+	.roomNo {
 		color: #999999;
 		font-size: 26rpx;
 	}
-	.rightArr{
+
+	.rightArr {
 		width: 30rpx;
 		height: 28rpx;
 	}
-	.overDue{
+
+	.overDue {
 		background-color: #FFECEC;
 		border-radius: 20rpx;
 		height: 40rpx;
