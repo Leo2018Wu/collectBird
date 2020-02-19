@@ -40,7 +40,7 @@
 				</view>
 			</view>
 			<view class="banner">
-				<swiper class="swiper" indicator-dots="true" autoplay="true" interval="5000" duration="1000">
+				<swiper class="swiper" indicator-dots=false autoplay="true" interval="5000" duration="1000">
 					<block v-for="(item, index) in imgUrls" :key="index">
 						<navigator :url="item.link">
 							<swiper-item class="radius"><image :src="item.url" class="slide-image" mode="aspectFill" /></swiper-item>
@@ -49,7 +49,6 @@
 				</swiper>
 			</view>
 		</view>
-
 		<!-- 授权弹窗 -->
 		<view class="isloginModal" v-if="loginFlag" @click="cancleLogin"></view>
 		<view class="isloginBox" v-if="loginFlag">
@@ -79,11 +78,11 @@ export default {
 			// background: ['color1', 'color2', 'color3'],
 			imgUrls: [
 				{
-					link: '../addRenter/addRenter',
+					link: '',
 					url: '../../static/banner1.jpg'
 				},
 				{
-					link: '../addCommunity/addCommunity',
+					link: '../houseList/houseList',
 					url: '../../static/banner2.jpg'
 				}
 			],

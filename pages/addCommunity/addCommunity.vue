@@ -176,7 +176,7 @@
 					}
 				})
 			},
-			addRoom(){
+			addRoom() {
 				let _this = this;
 				this.$refs.form.validate((res) => {
 					if (res) {
@@ -216,10 +216,10 @@
 					this.$store.commit('chooseLocationInfo', {})
 					if (isRefresh) {
 						_this.refreshLastPage()
-					}else{
+					} else {
 						let tempInfo = data.data.data
 						uni.navigateTo({
-							url:'../addRoomNum/addRoomNum?communityId='+tempInfo.id+'&communityName='+tempInfo.communityName
+							url: '../addRoomNum/addRoomNum?communityId=' + tempInfo.id + '&communityName=' + tempInfo.communityName
 						})
 					}
 				})

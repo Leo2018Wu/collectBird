@@ -439,7 +439,8 @@ export default {
 }
 
 .topContent {
-	height: 36%;
+	/* height: 36%; */
+	height: 460rpx;
 	width: 100%;
 	position: relative;
 	overflow: hidden;

@@ -14,7 +14,9 @@
 		    "style" : {
 				"navigationBarTextStyle": "#fff",
 				"navigationBarTitleText": "抄表",
-				"navigationBarBackgroundColor": "#F09A42"
+				"navigationBarBackgroundColor": "#F09A42",
+				"disableScroll":true
+				
 			}
 		},
 		

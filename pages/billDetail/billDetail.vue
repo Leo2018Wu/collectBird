@@ -67,35 +67,18 @@
 						<span>{{ electricityInfo.unitPrice }}元/度</span>
 					</view>
 					<view v-if="electricityInfo.itemType == 1" class="eleCostTotal">
-						{{ quantity }}{{ '度' | addSpace }} ({{ electricityInfo.currentNum ? electricityInfo.currentNum : '' }}-{{
+						{{ quantity }}{{ '度' | addSpace }} ({{ electricityInfo.currentNum ? electricityInfo.currentNum : '0' }}~{{
 							electricityInfo.prevNum ? electricityInfo.prevNum : ''
 						}}）
 					</view>
-					<view v-if="electricityInfo.itemType == 1">抄表日期: {{ electricityInfo.noteDate ? electricityInfo.noteDate : '' }}</view>
+					<view v-if="electricityInfo.itemType == 1">抄表日期: {{ electricityInfo.noteDate ? electricityInfo.noteDate.substr(0,10) : '' }}</view>
 				</view>
 				<view class="priceTotal">{{ electricityInfo.amount }}</view>
 			</view>
-			<!-- <view class="electricBox" v-for="(item, index) in billInfo.items" :key="index">
-				<view class="elecRight">
-					<view class="unitPrice">
-						{{ item.itemName }}
-						<span>{{ item.unitPrice }}</span>
-					</view>
-					<view v-if="item.itemType == 1" class="eleCostTotal">{{ item.quantity }}{{ '度' | addSpace }} ({{ item.currentNum?item.currentNum:"" }}-{{ item.prevNum ?item.prevNum:""}}）</view>
-					<view v-if="item.itemType == 1">抄表日期: {{ item.noteDate?item.noteDate:'' }}</view>
-				</view>
-				<view class="priceTotal">{{ item.amout }}</view>
-			</view> -->
-			<view class="waterBox">
+			<view class="waterBox" v-for="(item,index) in billInfo.items" :key="index">
 				<view class="waterOuter">
-					<span class="waterBar">水费</span>
-					<span class="priceTotal">{{billInfo.items[1].amount}}元/方</span>
-				</view>
-			</view>
-			<view class="waterBox">
-				<view class="waterOuter">
-					<span class="waterBar">网费</span>
-					<span class="priceTotal">{{billInfo.items[0].amount}}元/月</span>
+					<span class="waterBar">{{item.itemName}}</span>
+					<span class="priceTotal">{{item.amount}}元</span>
 				</view>
 			</view>
 		</view>
@@ -109,7 +92,7 @@
 		</view>
 		<view class="section2" v-else>
 			<!-- v-if="!billInfo.depositAmount" -->
-			<view class="sendBillBox"  @click="openMeterRead">
+			<view class="sendBillBox" @click="openMeterRead">
 				<image class="sendIcon" src="../../static/eleWater.png" mode="aspectFit"></image>
 				<view>抄表</view>
 			</view>
@@ -136,397 +119,439 @@
 </template>
 
 <script>
-import dateForm from '../../util/index.js';
-export default {
-	data() {
-		return {
-			init: false,
-			billId: null,
-			houseAddrInfo: {},
-			billInfo: {},
-			electricityInfo: {},
-			isShowMeterRead: false,
-			startDate:'',
-			endDate:'',
-			payRentDate:'',
-			quantity :''
-		};
-	},
-	onShow(){
-		console.log('调用onshow');
-		this.getBillDetail(this.billId);
-	},
-	onLoad(option) {
-		console.log('调用onload');
-		console.log(option);
-		this.billId = option.billId;
-		this.getBillDetail(option.billId);
-		this.getAddr(option.tenantId);
-	},
-	methods: {
-		getBillDetail(id) {
-			let _this = this;
-			_this.$request
-				.post('/bill/findById', {
-					id
-				})
-				.then(res => {
-					console.log(res)
-					_this.billInfo = res.data.data;
-					console.log(_this.billInfo);
-					_this.electricityInfo = _this.billInfo.items[2];
-					_this.startDate = dateForm.dateForm(_this.billInfo.startDate);
-					_this.endDate = dateForm.dateForm(_this.billInfo.endDate);
-					_this.payRentDate = dateForm.dateForm(_this.billInfo.payRentDate);
-					_this.billInfo.depositAmount = parseFloat(_this.billInfo.depositAmount).toFixed(2);
-					_this.billInfo.total = parseFloat(_this.billInfo.total).toFixed(2);
-					_this.quantity = (+_this.electricityInfo.currentNum)-(+_this.electricityInfo.prevNum)
-					_this.init = true;
-				});
+	import dateForm from '../../util/index.js';
+	export default {
+		data() {
+			return {
+				init: false,
+				billId: null,
+				houseAddrInfo: {},
+				billInfo: {},
+				electricityInfo: {},
+				isShowMeterRead: false,
+				startDate: '',
+				endDate: '',
+				payRentDate: '',
+				quantity: ''
+			};
 		},
-		getAddr(tenantId) {
-			let _this = this;
-			_this.$request
-				.post('/bill/findByTenantId', {
-					tenantId
-				})
-				.then(res => {
-					console.log(res);
-					_this.houseAddrInfo = res.data.data[0];
-				});
+		onShow() {
+			console.log('调用onshow');
+			this.getBillDetail(this.billId);
 		},
-		checkMoney() {
-			let _this = this;
-			_this.billInfo.items.map(v => {
-				if (v.itemName == '电费') {
-					if (v.currentNum == '' || v.currentNum == null || v.currentNum == '0') {
+		onLoad(option) {
+			console.log('调用onload');
+			console.log(option);
+			this.billId = option.billId;
+			this.getBillDetail(option.billId);
+			this.getAddr(option.tenantId);
+		},
+		methods: {
+			getBillDetail(id) {
+				let _this = this;
+				_this.$request
+					.post('/bill/findById', {
+						id
+					})
+					.then(res => {
+						console.log(res)
+						_this.billInfo = res.data.data;
+						console.log(_this.billInfo);
+						let tempArr = []
+						_this.billInfo.items.forEach((item, index) => {
+							if (item.itemName == '电费') {
+								_this.electricityInfo = _this.billInfo.items[index];
+							} else {
+								tempArr.push(item)
+							}
+						})
+						_this.billInfo.items = tempArr
+						_this.startDate = dateForm.dateForm(_this.billInfo.startDate);
+						_this.endDate = dateForm.dateForm(_this.billInfo.endDate);
+						_this.payRentDate = dateForm.dateForm(_this.billInfo.payRentDate);
+						_this.billInfo.depositAmount = parseFloat(_this.billInfo.depositAmount).toFixed(2);
+						_this.billInfo.total = parseFloat(_this.billInfo.total).toFixed(2);
+						_this.quantity = (+_this.electricityInfo.currentNum) - (+_this.electricityInfo.prevNum)
+						_this.init = true;
+					});
+			},
+			getAddr(tenantId) {
+				let _this = this;
+				_this.$request
+					.post('/bill/findByTenantId', {
+						tenantId
+					})
+					.then(res => {
+						console.log(res);
+						_this.houseAddrInfo = res.data.data[0];
+					});
+			},
+			checkMoney() {
+				console.log('你好')
+				let _this = this;
+				if (_this.electricityInfo.itemName == '电费') {
+					if (_this.electricityInfo.currentNum == '' || _this.electricityInfo.currentNum == null || _this.electricityInfo.currentNum ==
+						'0') {
 						_this.isShowMeterRead = true;
 					} else {
 						this.ll();
-						// _this.$request
-						// 	.post('/bill/updateStatus', {
-						// 		id: _this.billId,
-						// 		billStatus: '4'
-						// 	})
-						// 	.then(res => {
-						// 		console.log(res);
-						// 		if (res.data.code == '200') {
-						// 			uni.showToast({
-						// 				title: '到账成功'
-						// 			});
-						// 		}
-						// 		_this.getBillDetail(this.billId);
-						// 	});
 					}
 				}
-			});
-		},
-		openMeterRead() {
-			uni.navigateTo({
-				url: '../meterRead/meterRead?billInfo=' + JSON.stringify(this.billInfo)
-			});
-		},
-		cancle(e) {
-			this.isShowMeterRead = false;
-			this.ll();
-		},
-		submit(e) {
-			this.isShowMeterRead = false;
-			uni.navigateTo({
-				url: '../meterRead/meterRead'
-			});
-		},
-		ll() {
-			let _this = this;
-			_this.$request
-				.post('/bill/updateStatus', {
-					id: _this.billId,
-					billStatus: '4'
-				})
-				.then(res => {
-					console.log(res);
-					if (res.data.code == '200') {
-						uni.showToast({
-							title: '到账成功'
-						});
-					}
-					_this.getBillDetail(_this.billId);
+			},
+			openMeterRead() {
+				let par = this.billInfo
+				par.items.push(this.electricityInfo)
+				uni.navigateTo({
+					url: '../meterRead/meterRead?billInfo=' + JSON.stringify(par)
 				});
+			},
+			cancle(e) {
+				this.isShowMeterRead = false;
+				this.ll();
+			},
+			submit(e) {
+				this.isShowMeterRead = false;
+				uni.navigateTo({
+					url: '../meterRead/meterRead'
+				});
+			},
+			ll() {
+				let _this = this;
+
+				_this.$request
+					.post('/bill/updateStatus', {
+						id: _this.billId,
+						billStatus: '4'
+					})
+					.then(res => {
+						console.log(res);
+						if (res.data.code == '200') {
+							uni.showToast({
+								title: '到账成功'
+							});
+						}
+						_this.getBillDetail(_this.billId);
+						let pages = getCurrentPages();
+						if (pages.length > 1) {
+							let beforePage = pages[pages.length - 2];
+							if (beforePage.route == "pages/billManage/billManage") {
+								beforePage.$vm.updateData()
+							}
+						}
+					});
+			}
 		}
-	}
-};
+	};
 </script>
 
 <style scoped>
-.billDetail {
-	width: 100%;
-	height: 100%;
-	min-height: 100vh;
-	background-color: #fafafa;
-}
-.section0 {
-	width: 100%;
-	/* height: 234rpx; */
-	background-color: #f09a42;
-	color: #ffffff;
-	padding: 18rpx 40rpx 20rpx 40rpx;
-	font-size: 34rpx;
-}
-.profitContainer {
-	display: flex;
-	justify-content: space-between;
-}
-.profitBox {
-	width: fit-content;
-}
-.profitBar {
-	margin-bottom: 20rpx;
-}
-.profitBox span {
-	font-size: 60rpx;
-	font-weight: bold;
-}
-.houseAddr {
-	font-size: 30rpx;
-	margin-top: 10rpx;
-}
-.section1 {
-	padding: 17rpx;
-}
-.billStatus,
-.billDateLi {
-	height: 93rpx;
-	width: 100%;
-	padding: 24rpx;
-	border-radius: 5rpx;
-	background-color: #ffffff;
-	display: flex;
-	justify-content: flex-start;
-	align-items: center;
-	position: relative;
-	font-size: 30rpx;
-	margin-bottom: 17rpx;
-}
-.billDateLi {
-	margin-bottom: 0;
-	height: 100%;
-}
-.billDateLi:not(:last-of-type)::after {
-	content: '';
-	width: calc(100% - 48rpx);
-	height: 4rpx;
-	background-color: #ebebeb80;
-	position: absolute;
-	bottom: -2rpx;
-	left: 24rpx;
-}
-.billStatusBg {
-	position: absolute;
-	width: 140rpx;
-	height: 140rpx;
-	top: -16rpx;
-	right: 160rpx;
-	z-index: 10;
-}
-.billTitle {
-	margin-right: auto;
-}
-.billDateTitle {
-	color: #999999;
-	margin-right: auto;
-}
+	.billDetail {
+		width: 100%;
+		height: 100%;
+		min-height: 100vh;
+		padding-bottom: 140rpx;
+		background-color: #fafafa;
+	}
 
-.statusDes1 {
-	color: #37bf6a;
-}
-.statusDes0 {
-	color: #eb5e61;
-}
-.billDateBox {
-	margin-bottom: 14rpx;
-	border-radius: 5rpx;
-}
-.costDetail {
-	padding: 25rpx;
-	font-size: 30rpx;
-}
-.electricBox {
-	padding: 32rpx 26rpx;
-	background-color: #ffffff;
-	display: flex;
-	justify-content: flex-start;
-	align-items: center;
-	color: #999999;
-	font-size: 26rpx;
-	border-radius: 5rpx;
-}
-.elecRight {
-	margin-right: auto;
-}
-.priceTotal {
-	font-size: 30rpx;
-	color: #444444;
-}
-.unitPrice {
-	width: 100%;
-	text-align: left;
-	color: #333333;
-	font-size: 30rpx;
-}
-.unitPrice span {
-	margin-left: 20rpx;
-	color: #999999;
-	font-size: 26rpx;
-}
-.eleCostTotal {
-	margin: 22rpx 0;
-}
-.waterBox {
-	padding: 0 26rpx;
-	background-color: #ffffff;
-	border-radius: 5rpx;
-}
-.waterOuter {
-	display: flex;
-	justify-content: flex-start;
-	align-items: center;
-	border-top: 3rpx solid #ebebeb80;
-	height: 94rpx;
-}
-.waterBar {
-	font-size: 30rpx;
-	color: #333333;
-	margin-right: auto;
-}
-.remarks {
-	width: calc(100% - 34rpx);
-	margin: 14rpx 0 0 17rpx;
-	height: 93rpx;
-	line-height: 93rpx;
-	padding-left: 26rpx;
-	color: #999999;
-	font-size: 30rpx;
-	background-color: #ffffff;
-	border-radius: 5rpx;
-}
-.section2 {
-	margin-top: 14rpx;
-	height: 128rpx;
-	width: 100%;
-	padding: 0rpx 40rpx;
-	background-color: #ffffff;
-	display: flex;
-	justify-content: space-around;
-	align-items: center;
-	box-shadow: 0px -5px 16px 0px rgba(0, 0, 0, 0.04);
-	position: fixed;
-	bottom: 0;
-	left: 0;
-}
-.section3 {
-	height: 128rpx;
-	width: 100%;
-	background-color: #ffffff;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	box-shadow: 0px -5px 16px 0px rgba(0, 0, 0, 0.04);
-	position: fixed;
-	bottom: 0;
-	left: 0;
-}
-.sureBtn {
-	width: 218rpx;
-	height: 92rpx;
-	background: linear-gradient(-90deg, rgba(243, 183, 73, 1) 0%, rgba(240, 154, 66, 1) 100%);
-	border-radius: 18rpx;
-	color: #ffffff;
-	font-size: 34rpx;
-	text-align: center;
-	line-height: 92rpx;
-	margin-left: 82rpx;
-}
-.sendBillBox {
-	height: 82rpx;
-	width: fit-content;
-	text-align: center;
-	font-size: 28rpx;
-}
-.sendBillBox:first-of-type {
-	margin-right: 82rpx;
-}
-.sendIcon {
-	width: 40rpx;
-	height: 40rpx;
-	margin: 0 auto;
-}
+	.section0 {
+		width: 100%;
+		/* height: 234rpx; */
+		background-color: #f09a42;
+		color: #ffffff;
+		padding: 18rpx 40rpx 20rpx 40rpx;
+		font-size: 34rpx;
+	}
 
-/* 弹窗 */
-.modal {
-	width: 100%;
-	height: 100%;
-	position: fixed;
-	top: 0;
-	left: 0;
-	z-index: 1000;
-	background: #000;
-	opacity: 0.5;
-	overflow: hidden;
-	z-index: 500;
-}
-.modalBox {
-	width: 540rpx;
-	height: 362rpx;
-	overflow: hidden;
-	position: fixed;
-	top: 28%;
-	left: 15%;
-	z-index: 1001;
-	background: rgba(255, 255, 255, 1);
-	border-radius: 25rpx;
-}
+	.profitContainer {
+		display: flex;
+		justify-content: space-between;
+	}
 
-.modalContent {
-	height: 30%;
-}
-.modalTitle {
-	height: 65%;
-	padding: 80rpx;
-	font-size: 36rpx;
-	font-family: PingFang SC;
-	font-weight: bold;
-	color: rgba(51, 51, 51, 1);
-	text-align: center;
-}
+	.profitBox {
+		width: fit-content;
+	}
 
-.button {
-	width: 100%;
-	height: 90rpx;
-	border-top: 1rpx solid rgba(238, 238, 238, 1);
-	display: flex;
-	justify-content: space-around;
-	font-size: 34rpx;
-	font-family: PingFang SC;
-	font-weight: 500;
-	color: rgba(51, 51, 51, 1);
-	position: relative;
-	line-height: 100rpx;
-	margin-top: 20rpx;
-}
-.modalLine {
-	width: 1rpx;
-	height: 108rpx;
-	background-color: rgba(238, 238, 238, 1);
-	position: absolute;
-	top: 0%;
-	left: 50%;
-}
-.active {
-	color: #ffa044;
-}
-.btn_cancle,
-.btn_ok {
-	width: 49%;
-	text-align: center;
-}
+	.profitBar {
+		margin-bottom: 20rpx;
+	}
+
+	.profitBox span {
+		font-size: 60rpx;
+		font-weight: bold;
+	}
+
+	.houseAddr {
+		font-size: 30rpx;
+		margin-top: 10rpx;
+	}
+
+	.section1 {
+		padding: 17rpx;
+	}
+
+	.billStatus,
+	.billDateLi {
+		height: 93rpx;
+		width: 100%;
+		padding: 24rpx;
+		border-radius: 5rpx;
+		background-color: #ffffff;
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+		position: relative;
+		font-size: 30rpx;
+		margin-bottom: 17rpx;
+	}
+
+	.billDateLi {
+		margin-bottom: 0;
+		height: 100%;
+	}
+
+	.billDateLi:not(:last-of-type)::after {
+		content: '';
+		width: calc(100% - 48rpx);
+		height: 4rpx;
+		background-color: #ebebeb80;
+		position: absolute;
+		bottom: -2rpx;
+		left: 24rpx;
+	}
+
+	.billStatusBg {
+		position: absolute;
+		width: 140rpx;
+		height: 140rpx;
+		top: -16rpx;
+		right: 160rpx;
+		z-index: 10;
+	}
+
+	.billTitle {
+		margin-right: auto;
+	}
+
+	.billDateTitle {
+		color: #999999;
+		margin-right: auto;
+	}
+
+	.statusDes1 {
+		color: #37bf6a;
+	}
+
+	.statusDes0 {
+		color: #eb5e61;
+	}
+
+	.billDateBox {
+		margin-bottom: 14rpx;
+		border-radius: 5rpx;
+	}
+
+	.costDetail {
+		padding: 25rpx;
+		font-size: 30rpx;
+	}
+
+	.electricBox {
+		padding: 32rpx 26rpx;
+		background-color: #ffffff;
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+		color: #999999;
+		font-size: 26rpx;
+		border-radius: 5rpx;
+	}
+
+	.elecRight {
+		margin-right: auto;
+	}
+
+	.priceTotal {
+		font-size: 30rpx;
+		color: #444444;
+	}
+
+	.unitPrice {
+		width: 100%;
+		text-align: left;
+		color: #333333;
+		font-size: 30rpx;
+	}
+
+	.unitPrice span {
+		margin-left: 20rpx;
+		color: #999999;
+		font-size: 26rpx;
+	}
+
+	.eleCostTotal {
+		margin: 22rpx 0;
+	}
+
+	.waterBox {
+		padding: 0 26rpx;
+		background-color: #ffffff;
+		border-radius: 5rpx;
+	}
+
+	.waterOuter {
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+		border-top: 3rpx solid #ebebeb80;
+		height: 94rpx;
+	}
+
+	.waterBar {
+		font-size: 30rpx;
+		color: #333333;
+		margin-right: auto;
+	}
+
+	.remarks {
+		width: calc(100% - 34rpx);
+		margin: 14rpx 0 0 17rpx;
+		height: 93rpx;
+		line-height: 93rpx;
+		padding-left: 26rpx;
+		color: #999999;
+		font-size: 30rpx;
+		background-color: #ffffff;
+		border-radius: 5rpx;
+	}
+
+	.section2 {
+		margin-top: 14rpx;
+		height: 128rpx;
+		width: 100%;
+		padding: 0rpx 40rpx;
+		background-color: #ffffff;
+		display: flex;
+		justify-content: space-around;
+		align-items: center;
+		box-shadow: 0px -5px 16px 0px rgba(0, 0, 0, 0.04);
+		position: fixed;
+		bottom: 0;
+		left: 0;
+	}
+
+	.section3 {
+		height: 128rpx;
+		width: 100%;
+		background-color: #ffffff;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		box-shadow: 0px -5px 16px 0px rgba(0, 0, 0, 0.04);
+		position: fixed;
+		bottom: 0;
+		left: 0;
+	}
+
+	.sureBtn {
+		width: 218rpx;
+		height: 92rpx;
+		background: linear-gradient(-90deg, rgba(243, 183, 73, 1) 0%, rgba(240, 154, 66, 1) 100%);
+		border-radius: 18rpx;
+		color: #ffffff;
+		font-size: 34rpx;
+		text-align: center;
+		line-height: 92rpx;
+		margin-left: 82rpx;
+	}
+
+	.sendBillBox {
+		height: 82rpx;
+		width: fit-content;
+		text-align: center;
+		font-size: 28rpx;
+	}
+
+	.sendBillBox:first-of-type {
+		margin-right: 82rpx;
+	}
+
+	.sendIcon {
+		width: 40rpx;
+		height: 40rpx;
+		margin: 0 auto;
+	}
+
+	/* 弹窗 */
+	.modal {
+		width: 100%;
+		height: 100%;
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 1000;
+		background: #000;
+		opacity: 0.5;
+		overflow: hidden;
+		z-index: 500;
+	}
+
+	.modalBox {
+		width: 540rpx;
+		height: 362rpx;
+		overflow: hidden;
+		position: fixed;
+		top: 28%;
+		left: 15%;
+		z-index: 1001;
+		background: rgba(255, 255, 255, 1);
+		border-radius: 25rpx;
+	}
+
+	.modalContent {
+		height: 30%;
+	}
+
+	.modalTitle {
+		height: 65%;
+		padding: 80rpx;
+		font-size: 36rpx;
+		font-family: PingFang SC;
+		font-weight: bold;
+		color: rgba(51, 51, 51, 1);
+		text-align: center;
+	}
+
+	.button {
+		width: 100%;
+		height: 90rpx;
+		border-top: 1rpx solid rgba(238, 238, 238, 1);
+		display: flex;
+		justify-content: space-around;
+		font-size: 34rpx;
+		font-family: PingFang SC;
+		font-weight: 500;
+		color: rgba(51, 51, 51, 1);
+		position: relative;
+		line-height: 100rpx;
+		margin-top: 20rpx;
+	}
+
+	.modalLine {
+		width: 1rpx;
+		height: 108rpx;
+		background-color: rgba(238, 238, 238, 1);
+		position: absolute;
+		top: 0%;
+		left: 50%;
+	}
+
+	.active {
+		color: #ffa044;
+	}
+
+	.btn_cancle,
+	.btn_ok {
+		width: 49%;
+		text-align: center;
+	}
 </style>
