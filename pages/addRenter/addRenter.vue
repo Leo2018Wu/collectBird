@@ -70,7 +70,8 @@
 				</evan-form-item>
 				<evan-form-item label="租期" prop="keepDate" :border="false">
 					<template v-slot:main>
-						<input class="form-input" placeholder-class="form-input-placeholder" v-model="info2.keepDate" placeholder="请选择" />
+						<picker class="form-input" mode="date" :value="pickerKeepDate" :start="startDate" @change="bindKeepDateChange">{{ pickerKeepDate }}</picker>
+						<input v-show="false" class="form-input" placeholder-class="form-input-placeholder" v-model="info2.keepDate" placeholder="请选择" />
 					</template>
 					<template v-slot:tip>
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -186,6 +187,7 @@
 				uImgList: [],
 				listShow: false,
 				date: currentDate,
+				pickerKeepDate:'',
 				currentLiIndex: null,
 				rentCycleList: [],
 				keepDateList: ['半年', '1年', '2年', '其他'],
@@ -287,7 +289,7 @@
 					// },
 					eleCost: {
 						required: true,
-						message: '请输入电费'
+						message: '请输入初始刻度'
 					},
 					waterCost: {
 						required: true,
@@ -369,6 +371,8 @@
 					this.info3.remarks = data.remarks;
 					this.info2.startDate = data.startDate.substr(0, 10);
 					this.info2.keepDate = data.endDate.substr(0, 10);
+					this.date = data.startDate.substr(0, 10);
+					this.pickerKeepDate = data.endDate.substr(0, 10);
 					this.info2.rentUnitPrice = data.rentPrice;
 					this.info2.deposit = data.depositAmount;
 					this.info2.rentCycle = this.list[rentIndex];
@@ -424,13 +428,13 @@
 					tenantIdNumber: _this.info1.IDNum,
 					idCardImg1: _this.imgSideUrl,
 					idCardImg2: _this.imgOtherSideUrl,
-					eleUnitPrice: _this.eleUnitPrice,
+					eleUnitPrice: _this.eleUnitPrice ? _this.eleUnitPrice : 1,
 					elePrevNum: _this.info3.eleCost,
 					waterPrice: _this.info3.waterCost,
 					netPrice: _this.info3.netCost,
-					startDate: _this.info2.startDate ? _this.info2.startDate + ' 00:00:00' : this.date + ' 00:00:00',
+					startDate: _this.info2.startDate ? _this.info2.startDate + ' 00:00:00' : _this.date + ' 00:00:00',
 					rentMonthNum: _this.rentMonthNum,
-					endDate: _this.info2.keepDate + ' 00:00:00',
+					endDate:_this.info2.keepDate ? _this.info2.keepDate + ' 00:00:00' : _this.pickerKeepDate + ' 00:00:00',
 					payRentCycle: _this.rentCycleList[0],
 					rentPrice: _this.info2.rentUnitPrice,
 					depositAmount: _this.info2.deposit,
@@ -456,6 +460,7 @@
 							if (res2) {
 								_this.$refs.form3.validate(res3 => {
 									if (res3) {
+										console.log(par)
 										_this.$request.post(postUrl, par).then(responce => {
 											uni.hideLoading();
 											let tipContent = this.isEdit ? '编辑成功' : '添加成功';
@@ -551,9 +556,10 @@
 			},
 			chooseLi(index, temp) {
 				if (temp) {
-					this.currentLiIndex = index == 6 ? 0 : (index == 12 ? 1 : 2)
+					this.currentLiIndex = index == 6 ? 0 : (index == 12 ? 1 : (index == 24 ? 2 : 3))
 				} else {
 					this.currentLiIndex = index
+					this.pickerKeepDate = this.getKeepDate(index)
 					this.info2.keepDate = this.getKeepDate(index)
 				}
 			},
@@ -608,6 +614,36 @@
 				console.log('nihaoa', e);
 				this.date = e.detail.value;
 				this.info2.startDate = e.detail.value;
+			},
+			getRentMonth(date1,date2){
+				//用-分成数组
+				date1 = date1.split("-");
+				date2 = date2.split("-");
+				//获取年,月数
+				var year1 = parseInt(date1[0]),
+				month1 = parseInt(date1[1]),
+				year2 = parseInt(date2[0]),
+				month2 = parseInt(date2[1]),
+				//通过年,月差计算月份差
+				months = (year2 - year1) * 12 + (month2 - month1);
+				this.chooseLi(months,true)
+				return months;
+			},
+			bindKeepDateChange(e){
+				let _this = this
+				let time1 = new Date((e.detail.value).replace(/\-/g,'/'))
+				let time2 = new Date((_this.date).replace(/\-/g,'/'))
+				if(Date.parse(time1) < Date.parse(time2)){
+					uni.showToast({
+						title:'选择租期时间必须必起租时间大',
+						icon:'none',
+						duration:1500
+					})
+				}else{
+					this.pickerKeepDate = e.detail.value;
+					this.info2.keepDate = e.detail.value;
+					this.rentMonthNum = this.getRentMonth(_this.date,_this.pickerKeepDate)
+				}
 			}
 		}
 	};

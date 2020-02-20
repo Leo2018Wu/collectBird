@@ -67,11 +67,11 @@
 						<span>{{ electricityInfo.unitPrice }}元/度</span>
 					</view>
 					<view v-if="electricityInfo.itemType == 1" class="eleCostTotal">
-						{{ quantity }}{{ '度' | addSpace }} ({{ electricityInfo.currentNum ? electricityInfo.currentNum : '0' }}~{{
+						{{ quantity }}<span>度</span>({{ electricityInfo.currentNum ? electricityInfo.currentNum : '0' }}~{{
 							electricityInfo.prevNum ? electricityInfo.prevNum : ''
 						}}）
 					</view>
-					<view v-if="electricityInfo.itemType == 1">抄表日期: {{ electricityInfo.noteDate ? electricityInfo.noteDate.substr(0,10) : '' }}</view>
+					<view v-if="electricityInfo.itemType == 1">抄表日期: {{ electricityInfo.noteDate ? electricityInfo.noteDate.substr(0,10) : '暂无抄表日期' }}</view>
 				</view>
 				<view class="priceTotal">{{ electricityInfo.amount }}</view>
 			</view>
@@ -171,7 +171,11 @@
 						_this.payRentDate = dateForm.dateForm(_this.billInfo.payRentDate);
 						_this.billInfo.depositAmount = parseFloat(_this.billInfo.depositAmount).toFixed(2);
 						_this.billInfo.total = parseFloat(_this.billInfo.total).toFixed(2);
-						_this.quantity = (+_this.electricityInfo.currentNum) - (+_this.electricityInfo.prevNum)
+						if (Number(_this.electricityInfo.currentNum) > Number(_this.electricityInfo.prevNum)) {
+							_this.quantity = (+_this.electricityInfo.currentNum) - (+_this.electricityInfo.prevNum)
+						} else {
+							_this.quantity = ''
+						}
 						_this.init = true;
 					});
 			},
@@ -201,9 +205,17 @@
 			openMeterRead() {
 				let par = this.billInfo
 				par.items.push(this.electricityInfo)
-				uni.navigateTo({
-					url: '../meterRead/meterRead?billInfo=' + JSON.stringify(par)
-				});
+				if (this.billInfo.sortNo == 1) {
+					uni.showToast({
+						title: '该账单为首期，无需抄表。',
+						icon: 'none',
+						duration: 1500
+					})
+				} else {
+					uni.navigateTo({
+						url: '../meterRead/meterRead?billInfo=' + JSON.stringify(par)
+					});
+				}
 			},
 			cancle(e) {
 				this.isShowMeterRead = false;
@@ -211,9 +223,7 @@
 			},
 			submit(e) {
 				this.isShowMeterRead = false;
-				uni.navigateTo({
-					url: '../meterRead/meterRead'
-				});
+				this.openMeterRead()
 			},
 			ll() {
 				let _this = this;
