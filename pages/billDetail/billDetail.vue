@@ -45,7 +45,7 @@
 				</view>
 				<view class="billDateLi">
 					<span class="billDateTitle">押金</span>
-					<span class="billDate">{{ billInfo.depositAmount }}</span>
+					<span class="billDate">{{ !billInfo.depositAmount ? 0 : billInfo.depositAmount }}</span>
 				</view>
 			</view>
 			<view class="costDetail">费用明细</view>
@@ -170,6 +170,9 @@
 						_this.endDate = dateForm.dateForm(_this.billInfo.endDate);
 						_this.payRentDate = dateForm.dateForm(_this.billInfo.payRentDate);
 						_this.billInfo.depositAmount = parseFloat(_this.billInfo.depositAmount).toFixed(2);
+						if(isNaN(_this.billInfo.depositAmount)){
+							_this.billInfo.depositAmount = 0
+						}
 						_this.billInfo.total = parseFloat(_this.billInfo.total).toFixed(2);
 						if (Number(_this.electricityInfo.currentNum) > Number(_this.electricityInfo.prevNum)) {
 							_this.quantity = (+_this.electricityInfo.currentNum) - (+_this.electricityInfo.prevNum)
@@ -203,8 +206,6 @@
 				}
 			},
 			openMeterRead() {
-				let par = this.billInfo
-				par.items.push(this.electricityInfo)
 				if (this.billInfo.sortNo == 1) {
 					uni.showToast({
 						title: '该账单为首期，无需抄表。',
@@ -213,7 +214,7 @@
 					})
 				} else {
 					uni.navigateTo({
-						url: '../meterRead/meterRead?billInfo=' + JSON.stringify(par)
+						url: '../meterRead/meterRead?billInfo=' + JSON.stringify(this.billInfo) +'&electricityInfo='+JSON.stringify(this.electricityInfo)
 					});
 				}
 			},
@@ -227,12 +228,11 @@
 			},
 			ll() {
 				let _this = this;
-
+				let par = this.billInfo
+				par.items.push(this.electricityInfo)
+				par.billStatus = 4
 				_this.$request
-					.post('/bill/updateStatus', {
-						id: _this.billId,
-						billStatus: '4'
-					})
+					.post('/bill/update', par)
 					.then(res => {
 						console.log(res);
 						if (res.data.code == '200') {

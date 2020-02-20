@@ -1,47 +1,70 @@
 <template>
 	<view class="billManage">
-		<view class="billManageBgc">
-			<view class="amountMsg">
-				<view class="background"></view>
-				<view class="houseTotalMsg">
-					<view class="leftMsg">
-						<view class="leftMsgTitle">未收金额</view>
-						<view class="leftMsgValue">{{ unIncome }}</view>
-					</view>
-					<view class="line"></view>
-					<view class="rightMsg">
-						<view class="rightMsgTitle">已收金额</view>
-						<view class="rightMsgValue">{{ income }}</view>
-					</view>
+		<view class="amountMsg">
+			<view class="background"></view>
+			<view class="houseTotalMsg">
+				<view class="leftMsg">
+					<view class="leftMsgTitle">未收金额</view>
+					<view class="leftMsgValue">{{ unIncome }}</view>
+				</view>
+				<view class="line"></view>
+				<view class="rightMsg">
+					<view class="rightMsgTitle">已收金额</view>
+					<view class="rightMsgValue">{{ income }}</view>
 				</view>
 			</view>
-			<view class="billBar">
-				<view class="billBaritem" @click="changeIndex(index)" v-for="(item, index) in arr" :key="index" :class="{ active: currentIndex == index }">{{ item }}</view>
-			</view>
-			<view class="billList">
-				<mescroll-uni :down="downOption" @down="downCallback" :up="upOption" @up="upCallback" :fixed="false" @init="init">
-					<view class="billListItem" v-for="(item, idx) in billListInfo" :key="idx" @click="showBill(item)">
-						<view class="billListLeft">
-							<view class="billDateText">账单日期</view>
-							<view class="billDate">{{ item.payRentDate.substr(0, 10) }}</view>
-							<view class="billAdress">{{ item.roomNo }}</view>
+		</view>
+		<view class="billBar">
+			<view class="billBaritem" @click="changeIndex(index)" v-for="(item, index) in arr" :key="index" :class="{ active: currentIndex == index }">{{ item }}</view>
+		</view>
+		<view class="billList">
+			<mescroll-uni :down="downOption" @down="downCallback" :up="upOption" @up="upCallback" :fixed="false" @init="init">
+				<view v-for="(item, idx) in selectList" :key="idx" @click="showBill(item)">
+					<view class="myBillItem">
+						<view class="itemFlex itemTop">
+							<view class="myBillName">租金账单</view>
+							<view class="topRight">￥{{ item.totalAmount }}<span class="reminder"
+								 v-if="item.depositAmount">(含押金)</span></view>
 						</view>
-						<view class="billListright">
-							<view class="billSum" v-show="currentIndex != 3" :class="{ bule: currentIndex == 2 }">
-								<view class="">{{ item.totalAmount }}</view>
-								<view class="reminder" v-if="item.depositAmount">(含押金)</view>
+						<view class="itemFlex itemMiddle">
+							<view class="myBillDate">{{ item.payRentDate.substr(0, 10) }}</view>
+							<view class="myOverDueNum" v-if="currentIndex != 3 && currentIndex != 2">
+								<span v-if="currentIndex == 0">逾期{{ item.overdueDays }}天</span>
+								<span v-if="currentIndex == 1 && item.overdueDays < 0">{{ -item.overdueDays }}天后交租</span>
+								<span v-if="currentIndex == 1 && item.overdueDays == 0">当天交租</span>
 							</view>
-							<view class="overdueNum" v-show="currentIndex == 1 && item.overdueDays >= 0">{{ item.overdueDays }}天后交租</view>
-							<view class="overdueNum" v-show="currentIndex == 0 && item.overdueDays > 0">逾期{{ item.overdueDays }}天</view>
-							<view class="" v-show="currentIndex == 3">
-								<view class="billSum" :class="{ bule: item.billStatus == 4 }">{{ item.totalAmount }}</view>
-								<view class="overdueNum" v-show="item.billStatus == 0 && item.overdueDays >= 0">{{ item.overdueDays }}天后交租</view>
-								<view class="overdueNum" v-show="item.billStatus == 3 && item.overdueDays > 0">逾期{{ item.overdueDays }}天</view>
+							<view class="myOverDueNum" v-if="currentIndex == 3 && item.billStatus != 4">
+								<span v-if="item.overdueDays > 0">逾期{{ item.overdueDays }}天</span>
+								<span v-if="item.overdueDays < 0">{{ -item.overdueDays }}天后交租</span>
+								<span v-if="item.overdueDays == 0">当天交租</span>
 							</view>
 						</view>
+						<view class="itemBottom itemFlex">
+							<view class="bottomNo">{{ item.roomNo }}</view>
+							<view class="bottomName">{{item.tenantName}}</view>
+						</view>
+							<!-- <view class="topLeft">
+								<view class="myBillName">租金账单</view>
+								<view class="myBillDate">{{ item.payRentDate.substr(0, 10) }}</view>
+							</view>
+							<view class="topLeft">
+								<view class="topRight" :class="{ bule:  item.billStatus == 4 }">{{ item.totalAmount }}<span class="reminder"
+									 v-if="item.depositAmount">(含押金)</span></view>
+								<view class="myOverDueNum" v-if="currentIndex != 3">
+									<span v-if="currentIndex == 0">逾期{{ item.overdueDays }}天</span>
+									<span v-if="currentIndex == 1 && item.overdueDays < 0">{{ -item.overdueDays }}天后交租</span>
+									<span v-if="currentIndex == 1 && item.overdueDays == 0">当天交租</span>
+								</view>
+								<view class="myOverDueNum" v-if="currentIndex == 3 && item.billStatus != 4">
+									<span v-if="item.overdueDays > 0">逾期{{ item.overdueDays }}天</span>
+									<span v-if="item.overdueDays < 0">{{ -item.overdueDays }}天后交租</span>
+									<span v-if="item.overdueDays == 0">当天交租</span>
+								</view>
+							</view> -->
 					</view>
-				</mescroll-uni>
-			</view>
+				</view>
+
+			</mescroll-uni>
 		</view>
 	</view>
 </template>
@@ -56,7 +79,8 @@
 		data() {
 			return {
 				billListInfo: [],
-				billStatus: '3', // 默认展示已逾期
+				// billStatus: '3', // 默认展示已逾期
+				billStatus: '0', // 默认展示已逾期
 				userId: '',
 				arr: ['已逾期', '未收款', '已收款', '全部'],
 				currentIndex: 0,
@@ -91,6 +115,22 @@
 				}
 			};
 		},
+		computed: {
+			selectList() {
+				const overdueList = function(item) {
+					return item.overdueDays > 0
+				}
+				const normalList = function(item) {
+					return item.overdueDays <= 0
+				}
+				const fullList = function(item) {
+					return item
+				}
+				let par = this.currentIndex == 0 ? overdueList : (this.currentIndex == 1 ? normalList : fullList)
+				let arr = this.billListInfo.filter(par)
+				return arr
+			}
+		},
 		onLoad() {
 			this.getMoney();
 		},
@@ -119,7 +159,8 @@
 				this.currentIndex = index;
 				switch (index) {
 					case 0:
-						this.billStatus = '3';
+						// this.billStatus = '3';
+						this.billStatus = '0';
 						this.downCallback(this.mescroll);
 						break;
 					case 1:
@@ -148,7 +189,6 @@
 				this.mescroll = e;
 			},
 			async getBillList(pageNum, billStatus) {
-				console.log('进来了进来了');
 				let _this = this;
 				_this.para.pageNum = pageNum;
 				_this.para.landlordId = _this.$store.state.landladyInfo.id;
@@ -220,11 +260,75 @@
 		background-color: #fafafa;
 	}
 
-	/* .billManageBgc{
-	height: 100vh;
-	width: 100%;
-	background-color: #fafafa;
-} */
+	.myBillItem {
+		width: calc(100% - 60rpx);
+		margin: 17rpx 0 17rpx 30rpx;
+		height: fit-content;
+		padding:24rpx 32rpx 20rpx 32rpx;
+		background-color: #FFFFFF;
+		border-radius: 12rpx;
+		font-size: 28rpx;
+	}
+	.itemFlex{
+		width: 100%;
+		height: fit-content;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+	.itemTop {
+		color: #333333;
+		font-size: 34rpx;
+		align-items: baseline;
+	}
+	.itemMiddle{
+		padding-bottom: 12rpx;
+		border-bottom: 1rpx solid #EBEBEB;
+	}
+	.myBillName {
+		color: #3333333;
+		font-size: 32rpx;
+		font-weight: bold;
+		margin-bottom: 10rpx;
+	}
+	.myBillDate{
+		font-size: 30rpx;
+		color: #999999;
+	}
+	.topLeft{
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+	}
+	.topLeft:last-of-type{
+		align-items: flex-end;
+		margin-bottom: 10rpx;
+	}
+	.topRight {
+		font-size: 36rpx;
+		font-weight: bold;
+		color: #333333;
+		margin-bottom: 10rpx;
+	}
+
+	.itemBottom {
+		font-size: 26rpx;
+		color: #333333;
+		margin-top: 10rpx;
+	}
+	.bottomNo{
+		max-width: 450rpx;
+	}
+
+	.myOverDueNum {
+		font-size: 22rpx;
+		padding: 6rpx 12rpx;
+		background-color: #EB5E61;
+		color: #FFFFFF;
+		border-radius: 5rpx;
+		width: fit-content;
+	}
+
 	.amountMsg {
 		background-color: #fff;
 		position: relative;
@@ -324,7 +428,7 @@
 	}
 
 	.billList {
-		height: 67%;
+		height: calc(100% - 200rpx);
 		background-color: #fafafa;
 	}
 
@@ -395,7 +499,7 @@
 	.reminder {
 		font-size: 26rpx;
 		color: #999999;
-		width: 100rpx;
+		font-weight: normal;
 	}
 
 	.overdueNum {
@@ -404,12 +508,5 @@
 		font-weight: 500;
 		color: #eb5e61;
 		margin-top: 30rpx;
-	}
-
-	.bule {
-		font-size: 45rpx;
-		font-family: PingFang SC;
-		font-weight: bold;
-		color: rgba(79, 147, 245, 1);
 	}
 </style>

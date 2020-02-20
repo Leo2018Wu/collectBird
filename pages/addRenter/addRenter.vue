@@ -118,19 +118,19 @@
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form3" :model="info3">
 				<evan-form-item label="电费(1元/度)" prop="eleCost">
 					<template v-slot:main>
-						<input class="form-input inputColor" maxlength="5" placeholder-class="form-input-placeholder" v-model="info3.eleCost"
+						<input class="form-input inputColor" type="digit" maxlength="5" placeholder-class="form-input-placeholder" v-model="info3.eleCost"
 						 placeholder="初始刻度" />
 					</template>
 				</evan-form-item>
 				<evan-form-item label="水费(元/月)" prop="waterCost">
 					<template v-slot:main>
-						<input class="form-input inputColor" placeholder-class="form-input-placeholder" v-model="info3.waterCost"
+						<input class="form-input inputColor" type="digit" placeholder-class="form-input-placeholder" v-model="info3.waterCost"
 						 placeholder="30元/月" />
 					</template>
 				</evan-form-item>
 				<evan-form-item label="宽带(元/月)" prop="netCost" :border="false">
 					<template v-slot:main>
-						<input class="form-input inputColor" placeholder-class="form-input-placeholder" v-model="info3.netCost"
+						<input class="form-input inputColor" type="digit" placeholder-class="form-input-placeholder" v-model="info3.netCost"
 						 placeholder="30元/月" />
 					</template>
 				</evan-form-item>
@@ -587,14 +587,16 @@
 						break;
 					case 3:
 						uni.showToast({
-							title: '请自己填写',
+							title: '请自己选择租期',
 							icon: 'none'
 						});
 						break;
 					default:
 						break;
 				}
-				return this.getDate(keepDate);
+				if(index != 3){
+					return this.getDate(keepDate);
+				}
 			},
 			getDate(value) {
 				let date;

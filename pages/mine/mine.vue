@@ -166,6 +166,76 @@ export default {
 		});
 	},
 	methods: {
+		getUserInfo(){
+			console.log(11111);
+			let self = this;
+			uni.login({
+				provider: 'weixin',
+				success: function(loginRes) {
+					console.log(loginRes, '1111');
+					uni.checkSession({
+						success() {
+							// session_key 未过期，并且在本生命周期一直有效
+							self.$store.commit('openCode', loginRes.code);
+							self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
+								console.log(res);
+								if (res) {
+									self.openId = res.data.data.openid;
+									self.$store.commit('isloginStatus', true);
+									self.$store.commit('userOpenId', res.data.data.openid);
+									self.$store.commit('sessionKey', res.data.data.session_key);
+									uni.getUserInfo({
+										provider: 'weixin',
+										success: function(infoRes) {
+											console.log(infoRes);
+											if (infoRes.userInfo) {
+												self.show = false;
+												// 微信的gender 1 男 2 女 0 未知
+												// 收租鸟userSex 0 男 1 女
+												if (infoRes.userInfo.gender == '1') {
+													self.gender = '0';
+												} else if (infoRes.userInfo.gender == '2') {
+													self.gender = '1';
+												} else {
+													self.gender = '未知';
+												}
+												let userInfo = {
+													openId: res.data.data.openid,
+													userName: infoRes.userInfo.nickName,
+													userImg: infoRes.userInfo.avatarUrl,
+													userSex: self.gender
+												};
+												self.getMineMsg(userInfo);
+												
+											}
+										},
+										fail: function(res) {
+											uni.showToast({
+												title: '微信授权不成功！',
+												icon:'none',
+												duration: 2000
+											});
+										}
+									});
+								}
+							});
+						},
+						fail() {
+							// session_key 已经失效，需要重新执行登录流程
+							uni.login({
+								provider: 'weixin',
+								success: function(loginRes) {
+									self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
+										console.log(res);
+									});
+								}
+							}); // 重新登录
+						}
+					});
+				},
+				fail: function(res) {}
+			});
+		},
 		checkLoginStatus() {
 			let _this = this;
 			return new Promise((reslove, rej) => {

@@ -1,6 +1,5 @@
 {
 	"pages": [
-		
 		{
 			"path": "pages/home/home",
 			"style": {
@@ -10,16 +9,21 @@
 			}
 		},
 		{
-		    "path" : "pages/meterRead/meterRead",
+		    "path" : "pages/addLandLord/addLandLord",
 		    "style" : {
+				"navigationBarTitleText": "房东信息"
+			}
+		},
+		{
+			"path": "pages/meterRead/meterRead",
+			"style": {
 				"navigationBarTextStyle": "#fff",
 				"navigationBarTitleText": "抄表",
 				"navigationBarBackgroundColor": "#F09A42",
-				"disableScroll":true
-				
+				"disableScroll": true
+
 			}
 		},
-		
 		{
 			"path": "pages/renterManage/renterManage",
 			"style": {
@@ -82,9 +86,7 @@
 		{
 			"path": "pages/houseDetail/houseDetail",
 			"style": {
-				"navigationBarTextStyle": "black",
-				"navigationBarTitleText": "房号",
-				"navigationBarBackgroundColor": "#FFFFFF"
+				"navigationBarTitleText": "房号"
 			}
 		},
 		{
@@ -126,25 +128,26 @@
 			"style": {
 				"navigationBarTextStyle": "#fff",
 				"navigationBarTitleText": "账单",
-				"navigationBarBackgroundColor": "#F09A42"
+				"navigationBarBackgroundColor": "#F09A42",
+				"disableScroll": true
 			}
-		}
-	    ,{
-            "path" : "pages/aboutUs/aboutUs",
-            "style" : {
+		}, {
+			"path": "pages/aboutUs/aboutUs",
+			"style": {
 				"navigationBarTextStyle": "#fff",
 				"navigationBarTitleText": "关于收租鸟",
 				"navigationBarBackgroundColor": "#F09A42"
 			}
-        },{
-		    "path" : "pages/reportForm/reportForm",
-		    "style" : {
+		}, {
+			"path": "pages/reportForm/reportForm",
+			"style": {
 				"navigationBarTextStyle": "black",
 				"navigationBarTitleText": "报表",
 				"navigationBarBackgroundColor": "#FFFFFF"
 			}
 		}
-        
+
+	   
     ],
 	"permission": {
 		"scope.userLocation": {
@@ -159,8 +162,7 @@
 	},
 	"tabBar": {
 		"selectedColor": "#FFA044",
-		"list": [
-			{
+		"list": [{
 				"pagePath": "pages/home/home",
 				"text": "首页",
 				"iconPath": "static/home0.png",

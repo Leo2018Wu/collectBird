@@ -93,18 +93,15 @@ export default {
 		};
 	},
 	onLoad() {
-		this.checkLoginStatus().then(res => {
-			this.loginFlag = res;
-		});
-		console.log(this.$store.state.isloginStatus);
+	
 	},
 	onShow(option) {
-		if (this.isPopUpModal) {
+		// if (this.isPopUpModal) {
 			this.checkLoginStatus().then(res => {
 				this.loginFlag = res;
 			});
 			console.log(this.$store.state.isloginStatus);
-		}
+		// }
 		this.getMoneyInfo();
 	},
 	methods: {

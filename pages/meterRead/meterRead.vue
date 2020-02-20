@@ -52,7 +52,8 @@
 		},
 		computed: {
 			amount() {
-				return this.currentNum < this.prevNum ? '0.00' : (this.currentNum - this.prevNum) * this.electricityInfo.unitPrice +
+				let _this = this
+				return parseInt((this.currentNum - this.prevNum) * this.electricityInfo.unitPrice)  <= 0 ? '0.00' : (this.currentNum - this.prevNum) * this.electricityInfo.unitPrice+
 					'.00';
 			},
 			startDate() {
@@ -67,6 +68,7 @@
             format: true
         });
 			return {
+				// amount:'0.00',
 				date: currentDate,
 				prevNum: '0',
 				currentNum: '',
@@ -79,30 +81,34 @@
 		},
 		onLoad(option) {
 			let _this = this
+			this.electricityInfo = JSON.parse(option.electricityInfo)
 			this.billInfo = JSON.parse(option.billInfo);
-			console.log(this.billInfo)
-			this.billInfo.items.map(item => {
-				if (item.itemName == '电费') {
-					_this.electricityInfo = item
-				}
-			})
-			this.prevNum = this.electricityInfo.currentNum ? this.electricityInfo.currentNum : 0;
+			this.billInfo.items.push(this.electricityInfo)
+			// this.billInfo.items.map(item => {
+			// 	if (item.itemName == '电费') {
+			// 		_this.electricityInfo = item
+			// 	}
+			// })
+			this.prevNum = this.electricityInfo.prevNum ? this.electricityInfo.prevNum : 0;
 		},
 		methods: {
 			bindDateChange(e) {
 				console.log('nihaoa', e);
 				this.date = e.detail.value;
 			},
-			inputChangeHandle(value) {
-				console.log(value)
-				if (+value.detail.value < +this.prevNum) {
+			inputChangeHandle(e) {
+				console.log(e)
+				this.currentNum = e.detail.value
+				if (+e.detail.value < +this.prevNum) {
 					uni.showToast({
 						title: '本期读数不能小于上期读数!',
 						icon: 'none'
 					});
 					return;
 				} else {
-
+					// console.log(this.currentNum,this.prevNum)
+					// this.amount = this.currentNum <= this.prevNum ? '0.00' : (this.currentNum - this.prevNum) * this.electricityInfo.unitPrice +
+					// 	'.00';
 				}
 			},
 			getDate(type) {
@@ -134,7 +140,7 @@
 						});
 						_this.billInfo.items = [..._this.billInfo.items];
 						console.log('传参数', _this.billInfo);
-						_this.$request.post('/bill/update', _this.billInfo).then(res => {
+						_this.$request.post('/bill/updateItems', _this.billInfo).then(res => {
 							console.log('请求反回', res);
 							if (res.data.code == 200) {
 								uni.showToast({

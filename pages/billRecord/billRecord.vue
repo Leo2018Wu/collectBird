@@ -58,16 +58,10 @@
 		onLoad(options) {
 			this.roomId = options.roomId;
 			this.userInfo = JSON.parse(options.userInfo) 
-			console.log(this.userInfo)
 			this.communityInfo = JSON.parse(options.commInfo)
-			this.getBillRecord(this.userInfo.id)
 		},
 		onShow(){
-			this.$request.post('/roomUser/findById',{
-				tenantId:this.userInfo.id
-			}).then((res)=>{
-				this.userInfo = res.data.data
-			})
+			this.getBillRecord(this.userInfo.id)
 		},
 		methods: {
 			updateData(){

@@ -66,8 +66,11 @@
 			</view>
 			
 		</view>
-			
-		<view class="saveBtn" @click="save()">保存</view>
+		<view class="saveBtnBox">
+			<view class="bindNewLandlord" @click="bindNewLandlord">绑定业主</view>
+			<view class="saveBtn" @click="save()">保存</view>
+		</view>
+		
 	</view>
 </template>
 
@@ -153,6 +156,11 @@
 			}
 		},
 		methods: {
+			bindNewLandlord(){
+				uni.navigateTo({
+					url:"../addLandLord/addLandLord"
+				})
+			},
 			inputTip(e){
 				console.log(e)
 				if(e.detail.value.length >= 2){
@@ -386,14 +394,27 @@
 		padding: 0 40rpx;
 		background-color: #FFFFFF;
 	}
-	.saveBtn{
+	.saveBtnBox{
+		width: calc(100% - 180rpx);
+		margin-left: 90rpx;
+		height: 74rpx;
+		display: flex;
+		justify-content: space-between;
+	}
+	.saveBtnBox view{
 		width: 257rpx;
 		height: 74rpx;
 		border-radius: 37rpx;
-		color: #FFFFFF;
-		background:linear-gradient(-90deg,rgba(243,183,73,1) 0%,rgba(240,154,66,1) 100%);
 		text-align: center;
 		line-height: 74rpx;
-		margin: 136rpx auto 0 auto;
+		margin-top: 140rpx;
+	}
+	.saveBtn{
+		color: #FFFFFF;
+		background:linear-gradient(-90deg,rgba(243,183,73,1) 0%,rgba(240,154,66,1) 100%);
+	}
+	.bindNewLandlord{
+		border: 1rpx solid #FFA344;
+		color: #FFA344;
 	}
 </style>
