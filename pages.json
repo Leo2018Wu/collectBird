@@ -7,6 +7,12 @@
 				"enablePullDownRefresh": false,
 				"disableScroll": true
 			}
+		},{
+		    "path" : "pages/inviteRenter/inviteRenter",
+		    "style" : {
+				"navigationBarTitleText": "填写基本信息",
+				"disableScroll": true
+			}
 		},
 		{
 		    "path" : "pages/addLandLord/addLandLord",
@@ -146,8 +152,6 @@
 				"navigationBarBackgroundColor": "#FFFFFF"
 			}
 		}
-
-	   
     ],
 	"permission": {
 		"scope.userLocation": {

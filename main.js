@@ -4,6 +4,7 @@ import wxRequest from 'wechat-request';
 import * as filters from '@/filters/index'
 import store from './store'
 import validate from './util/validate.js'
+import debounce from './util/debounce.js'
 
 // wxRequest.defaults.baseURL = "https://funnyduck.raysler.com/rentbird";
 wxRequest.defaults.baseURL = "https://funnyduck.raysler.com/rentbird_test";//测试地址
@@ -14,6 +15,7 @@ Vue.prototype.$store = store;
 Vue.prototype.$validate = validate;
 Vue.config.productionTip = false;
 Vue.prototype.$request = wxRequest;
+Vue.prototype.$debounce = debounce;
 
 
 App.mpType = 'app'

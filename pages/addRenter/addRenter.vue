@@ -170,6 +170,7 @@
 				renterId: null,
 				chooseIndex: null,
 				isEdit: false,
+				isFillStatus:false,
 				currentSex: 0,
 				sexList: [{
 						value: 0,
@@ -315,6 +316,15 @@
 				this.getUserInfo(options.userId);
 			}
 			this.commInfo = JSON.parse(options.commInfo)
+			if(this.commInfo.renterId){
+				//分享信息填充操作
+				console.log('我是分享信息补充')
+				this.isFillStatus = true;
+				uni.setNavigationBarTitle({
+					title: '完善租客'
+				});
+				this.getUserInfo(this.commInfo.renterId);
+			}
 			this.roomId = options.roomId;
 			this.$nextTick(() => {
 				this.$refs.form1.setRules(this.rules1)
@@ -359,6 +369,11 @@
 					let rentIndex = parseInt(data.payRentCycle) - 1;
 					console.log(rentIndex)
 					this.chooseIndex = rentIndex;
+					this.radioChange({
+						target: {
+							value: data.tenantSex
+						}
+					});
 					this.renterId = data.id;
 					this.info1.name = data.tenantName;
 					this.info1.tel = data.tenantPhone;
@@ -379,11 +394,7 @@
 					this.rentCycleList[0] = data.payRentCycle;
 					this.rentCycleList[1] = data.depositNum;
 					// this.currentSex = data.tenantSex;
-					this.radioChange({
-						target: {
-							value: data.tenantSex
-						}
-					});
+					
 					this.chooseLi(data.rentMonthNum, true);
 					this.rentMonthNum = data.rentMonthNum;
 					this.remarks = data.remarks;
@@ -446,13 +457,9 @@
 					par.id = this.renterId;
 					par.tenantId = this.userId;
 				}
-				// if (!(_this.imgSideUrl && _this.imgOtherSideUrl)) {
-				// 	uni.showToast({
-				// 		title: '请先添加身份证照片',
-				// 		icon: 'none'
-				// 	});
-				// 	return;
-				// }
+				if(this.isFillStatus){
+					par.id = this.commInfo.renterId
+				}
 				_this.$refs.form1.validate(res1 => {
 					if (res1) {
 						console.log(res1);

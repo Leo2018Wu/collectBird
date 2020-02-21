@@ -134,7 +134,7 @@
 	.billBarName{
 		width: 100%;
 		padding: 20rpx 40rpx;
-		font-size: 30rpx;
+		font-size: 32rpx;
 		font-weight: bold;
 		color:#BBBBBB;
 		text-align: right;
@@ -155,7 +155,7 @@
 	.content{
 		background-color: #FFFFFF;
 		height: 128rpx;
-		font-size: 30rpx;
+		font-size: 32rpx;
 		margin-bottom: 14rpx;
 	}
 	.checkBg{
@@ -173,8 +173,9 @@
 	}
 	.checkDate{
 		color: #999999;
-		font-size: 24rpx;
+		font-size: 26rpx;
 		font-weight: bold;
+		margin-top: 8rpx;
 	}
 	.active{
 		color: #FFA344;

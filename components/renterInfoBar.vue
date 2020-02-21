@@ -14,6 +14,7 @@
 					{{userInfo.tenantPhone}}
 				</view>
 			</view>
+			<view v-if="showFillBtn" class="fillInfo" @click.stop="myClick">去完善</view>
 			<image class="renterArrow" src="../static/right_arrow.png" mode="aspectFit"></image>
 		</view>
 	</view>
@@ -36,6 +37,10 @@
 					userSex:"0",
 					phoneNumber:"1111111111"
 				}
+			},
+			showFillBtn:{
+				type:Boolean,
+				"default":false
 			}
 		},
 		onLoad() {
@@ -45,6 +50,9 @@
 			emit(){
 				console.log('sssssssssss',this.userInfo)
 				this.$emit('emitUserId',this.userInfo)
+			},
+			myClick(){
+				this.$emit('emitFillInfo')
 			}
 		}
 	}
@@ -55,7 +63,9 @@
 		display: flex;
 	}
 	.renterInfo{
-		width: calc(100% - 140rpx);
+		width: fit-content;
+		max-width: 300rpx;
+		margin-right: auto;
 	}
 	.renterAvatar{
 		width: 90rpx;
@@ -82,5 +92,19 @@
 	.infoBottom{
 		font-size: 30rpx;
 		color: #888888;
+	}
+	.fillInfo{
+		width:135rpx;
+		height:45rpx;
+		background:#EB5E61;
+		border-radius:23rpx;
+		text-align: center;
+		line-height: 45rpx;
+		color: #FFFFFF;
+		font-size: 28rpx;
+		margin-right: 28rpx;
+		align-self: center;
+		position: relative;
+		z-index: 99;
 	}
 </style>

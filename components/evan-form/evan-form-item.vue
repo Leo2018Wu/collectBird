@@ -5,7 +5,7 @@
       <view
         v-if="label"
         class="evan-form-item-container__label"
-        :class="{showAsteriskRect:hasRequiredAsterisk,isRequired:showRequiredAsterisk}"
+        :class="{showAsteriskRect:hasRequiredAsterisk,isRequired:showRequiredAsterisk,fontBold:noBold}"
         :style="mLabelStyle"
       >{{label}}</view>
       <view class="evan-form-item-container__main" :style="contentStyle">
@@ -33,7 +33,11 @@ export default {
     border: {
       type: Boolean,
       default: true
-    }
+    },
+	noBold:{
+		type:Boolean,
+		default:false
+	}
   },
   computed: {
     mLabelStyle() {
@@ -178,6 +182,9 @@ export default {
 	font-size: 34rpx;
     color: #333;
 	font-weight: bold;
+	&.fontBold{
+		font-weight: normal;
+	}
     // &.showAsteriskRect::before {
     // 	content: '';
     // 	color: #F56C6C;

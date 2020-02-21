@@ -36,19 +36,21 @@
 			租客信息
 		</view>
 		<!-- v-if="isShowAddBtn" -->
-		<view class="section3" v-for="(item,index) in roomInfo.tenants" :key="index" >
-			<renter-info-bar :userInfo = "item" v-on:emitUserId="getEmit"></renter-info-bar>
+		<view class="section3" v-for="(item,index) in roomInfo.tenants" :key="index">
+			<renter-info-bar :userInfo="item" v-on:emitFillInfo="fillInfo" v-on:emitUserId="getEmit" :showFillBtn="roomInfo.tenantStatus == 2"></renter-info-bar>
 		</view>
-		<view class="addRenterBox1"	v-if="isShowAddBtn">
-				<!-- <view class="invite">邀请入住</view> -->
-				<image class="noRenter" src="../../static/noRenter.png" mode="aspectFit"></image>
-				<view>暂无租客，点击添加租客</view>
-				<view  class="addRenter1" @click="addRenter">添加租客</view>
-			</view>
-			<!-- <view class="addRenterBox">
-				<view class="invite">邀请入住</view>
-				<view v-if="isShowAddBtn" class="addRenter" @click="addRenter">添加租客</view>
-			</view> -->
+		<view class="addRenterBox1" v-if="isShowAddBtn">
+			<image class="noRenter" src="../../static/noRenter.png" mode="aspectFit"></image>
+			<view>暂无租客，您可以选择</view>
+		</view>
+		<view class="addRenterBox" v-if="isShowAddBtn && roomInfo.tenantStatus == 0">
+			<view class="addRenter" @click="addRenter">添加租客</view>
+			<button class="invite" open-type="share">邀请入住</button>
+		</view>
+		<view class="addRenterBox" v-if="isShowAddBtn && roomInfo.tenantStatus == 1">
+			<view class="addRenter" @click="updateInviteStatus(0)">取消邀请</view>
+			<button class="invite" open-type="share">再次邀请</button>
+		</view>
 	</view>
 </template>
 
@@ -57,31 +59,30 @@
 	import facilityBar from '../../components/facilityBar.vue'
 	import renterInfoBar from '../../components/renterInfoBar.vue'
 	export default {
-		components:{
-			"icon-bar":iconBar,
-			"facility-bar":facilityBar,
+		components: {
+			"icon-bar": iconBar,
+			"facility-bar": facilityBar,
 			renterInfoBar
 		},
 		data() {
 			return {
-				houseId:null,
-				communityId:null,
-				isShowAddBtn:false,
-				roomId:'',
-				communityInfo:{},
-				roomInfo:{},
-				configList:[],
-				facBarList:['床','衣柜','书桌','空调','家居礼包'],
-				commonFacBarList:['空调','智能锁','燃气灶','热水器'],
+				houseId: null,
+				communityId: null,
+				isShowAddBtn: false,
+				roomId: '',
+				communityInfo: {},
+				roomInfo: {},
+				configList: [],
+				facBarList: ['床', '衣柜', '书桌', '空调', '家居礼包'],
+				commonFacBarList: ['空调', '智能锁', '燃气灶', '热水器'],
 			}
 		},
-		computed:{
-		},
+		computed: {},
 		onShow() {
 			this.getRoomInfo(this.roomId)
-			this.$request.post('/house/findById',{
-				id:this.houseId
-			}).then((res) =>{
+			this.$request.post('/house/findById', {
+				id: this.houseId
+			}).then((res) => {
 				console.log(res)
 				let data = res.data.data
 				this.communityInfo.houseNo = data.houseNo
@@ -94,118 +95,167 @@
 			console.log(option)
 			this.communityInfo = JSON.parse(option.communityInfo)
 			// this.getRoomInfo(option.id)
-			this.roomId =option.id 
+			this.roomId = option.id
 			this.houseId = option.houseId
 			this.communityId = option.communityId
+		},
+
+		onShareAppMessage(res) {
+			let _this = this
+			_this.updateInviteStatus(1)
+			var shareObject
+			// let par = {
+			// 	roomId:this.roomId,
+			// 	landLordId:this.$store.state.landladyInfo.id,
+			// 	landLordName:this.$store.state.landladyInfo.userName
+			// }
+			let data = this.$store.state.landladyInfo
+			shareObject = {
+				title: _this.$store.state.landladyInfo.userName + '邀请你填写入住信息',
+				imageUrl:'/static/share.jpg',
+				path: '/pages/inviteRenter/inviteRenter?roomId=' +this.roomId+'&landLordId='+data.id+'&landLordName='+data.userName+'&landLordAva='+data.userImg
+			}
+			return shareObject;
 		},
 		methods: {
 			// updateData(){
 			// 	this.getRoomInfo(this.roomId)
 			// },
-			toEditHouse(){
+			fillInfo(){
+				console.log('返回事件')
+				let commInfo = {
+					name: this.communityInfo.name,
+					houseNo: this.communityInfo.houseNo,
+					roomNo: this.communityInfo.roomNo,
+					renterId:this.roomInfo.tenants[0].id
+				}
 				uni.navigateTo({
-					url:'../addRoomNum/addRoomNum?communityName='+this.communityInfo.name+'&communityId='+this.communityId+'&houseId='+this.houseId
+					url:'../addRenter/addRenter?commInfo='+JSON.stringify(commInfo)+'&roomId='+this.roomInfo.id
+				})
+				
+			},
+			updateInviteStatus(status) {
+				console.log('我是分享函数')
+				let par = this.roomInfo;
+				par.tenantStatus = status;
+				console.log(par)
+				this.$request.post('room/update', par).then((res) => {
+					console.log(res)
 				})
 			},
-			getRoomInfo(id){
+			toEditHouse() {
+				uni.navigateTo({
+					url: '../addRoomNum/addRoomNum?communityName=' + this.communityInfo.name + '&communityId=' + this.communityId +
+						'&houseId=' + this.houseId
+				})
+			},
+			getRoomInfo(id) {
 				let _this = this;
-				_this.$request.post('room/findRoomById',{
+				_this.$request.post('room/findRoomById', {
 					id
-				}).then((res)=>{
+				}).then((res) => {
 					console.log(res)
 					// _this.commonFacBarList = res.data.data.houseConfigure.split(',')
 					_this.roomInfo = res.data.data
 					_this.communityInfo.roomPrice = res.data.data.roomPrice
-					if(_this.roomInfo.tenants && _this.roomInfo.tenants.length == 0){
-							this.isShowAddBtn = true;
-					}else{
+					if (_this.roomInfo.tenants && _this.roomInfo.tenants.length == 0) {
+						this.isShowAddBtn = true;
+					} else {
 						this.isShowAddBtn = false;
 					}
-					console.log(_this.roomInfo)
 				})
 			},
-			showBill(){
+			showBill() {
 				console.log('我点击了')
 				uni.navigateTo({
-					url:'../billDetail/billDetail?billId='+this.roomInfo.billId+'&tenantId='+this.roomInfo.tenants[0].id
+					url: '../billDetail/billDetail?billId=' + this.roomInfo.billId + '&tenantId=' + this.roomInfo.tenants[0].id
 				})
 			},
-			getEmit(e){
+			getEmit(e) {
 				console.log(e)
 				this.userInfo = e;
 				let communInfo = {
-					name:this.communityInfo.name,
-					houseNo:this.communityInfo.houseNo,
-					roomNo:this.communityInfo.roomNo
+					name: this.communityInfo.name,
+					houseNo: this.communityInfo.houseNo,
+					roomNo: this.communityInfo.roomNo
 				}
 				uni.navigateTo({
-					url:"../billRecord/billRecord?userInfo="+JSON.stringify(e)+'&commInfo='+JSON.stringify(communInfo)+'&roomId='+this.roomId
+					url: "../billRecord/billRecord?userInfo=" + JSON.stringify(e) + '&commInfo=' + JSON.stringify(communInfo) +
+						'&roomId=' + this.roomId
 				})
 			},
-			addRenter(){
+			addRenter() {
 				console.log('你打')
 				let communInfo = {
-					name:this.communityInfo.name,
-					houseNo:this.communityInfo.houseNo,
-					roomNo:this.communityInfo.roomNo
+					name: this.communityInfo.name,
+					houseNo: this.communityInfo.houseNo,
+					roomNo: this.communityInfo.roomNo
 				}
 				uni.navigateTo({
-					url:'../addRenter/addRenter?roomId='+this.roomId+'&commInfo='+JSON.stringify(communInfo)
+					url: '../addRenter/addRenter?roomId=' + this.roomId + '&commInfo=' + JSON.stringify(communInfo)
 				})
 			}
-			
+
 		}
 	}
 </script>
 
 <style scoped>
-	.section1{
+	.section1 {
 		padding: 23rpx 39rpx 26rpx 41rpx;
 	}
-	.sectionBorderBottom{
+
+	.sectionBorderBottom {
 		border-bottom: 3px solid #FAFAFA;
 	}
-	.houseName{
+
+	.houseName {
 		font-weight: bold;
 		font-size: 32rpx;
 		margin-bottom: 35rpx;
-	}	
-	
-	.houseDetail{
+	}
+
+	.houseDetail {
 		color: #999999;
 		font-size: 28rpx;
 		font-weight: 500;
 		padding-left: 19rpx;
 		position: relative;
 	}
-	.houseArrow{
+
+	.houseArrow {
 		position: absolute;
 		width: 30rpx;
 		height: 56rpx;
 		right: 0;
 		top: calc(50% - 28rpx);
 	}
-	.detailTop{
+
+	.detailTop {
 		display: flex;
 		align-items: center;
 		margin-bottom: 35rpx;
 	}
-	.houseDetail .houseNum{
+
+	.houseDetail .houseNum {
 		font-size: 32rpx;
 		font-weight: bold;
 		color: #333333;
 		margin-right: 17rpx;
 	}
-	.iconBar{
+
+	.iconBar {
 		margin-left: 17rpx;
 	}
-	.detailBottom{
+
+	.detailBottom {
 		color: #666666;
 		font-size: 32rpx;
 		display: flex;
 		align-items: baseline;
 	}
-	.showRecord{
+
+	.showRecord {
 		height: 45rpx;
 		width: 160rpx;
 		text-align: center;
@@ -218,62 +268,69 @@
 		position: relative;
 		z-index: 9;
 	}
-	.section2{
+
+	.section2 {
 		padding: 40rpx 40rpx 6rpx 40rpx;
 	}
-	.itemBar{
+
+	.itemBar {
 		margin-bottom: 35rpx;
 	}
-	.facilityBox{
+
+	.facilityBox {
 		display: flex;
 		flex-wrap: wrap;
 	}
-	.facilityItem{
+
+	.facilityItem {
 		width: calc(100% / 5);
 		margin-bottom: 54rpx;
 	}
-	.section3{
+
+	.section3 {
 		padding: 32rpx 0;
 		width: calc(100% - 80rpx);
 		margin-left: 40rpx;
-		border-bottom: 3rpx solid #FAFAFA; 
+		border-bottom: 3rpx solid #FAFAFA;
 	}
-	
-	.addRenterBox{
-		height: 128rpx;
-		width: 100%;
-		position: fixed;
-		bottom: 0;
-		left: 0;
+
+	.addRenterBox {
+		height: 68rpx;
+		width: fit-content;
+		margin: 300rpx auto 0 auto;
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		box-shadow:0px -5px 16px 0px rgba(0, 0, 0, 0.04);
 	}
-	.invite,.addRenter{
-		width: 235rpx;
-		height: 76rpx;
-		text-align: center;
-		line-height: 76rpx;
-		color: #FFFFFF;
+	.addRenter ,.invite,.inviteCancel,.inviteAgain{
+		width: 212rpx;
+		height: 100%;
 		border-radius: 18rpx;
-		font-size: 34rpx;
+		line-height: 68rpx;
+		text-align: center;
+		font-size: 32rpx;
 	}
-	.renterTitle{
+	.invite{
+		background-color: #FFA044;
+		color: #FFFFFF;
+	}
+	.addRenter {
+		border: 2rpx solid #FFA044;
+		color: #FFA044;
+		margin-right: 58rpx;
+	}
+
+
+	.renterTitle {
 		width: 100%;
 		padding: 30rpx 0 30rpx 40rpx;
 		border-bottom: 1rpx solid #FAFAFA;
 		font-weight: bold;
 		font-size: 32rpx;
 	}
-	.invite{
-		margin-right: 46rpx;
-		background:linear-gradient(-90deg,rgba(101,216,196,1) 0%,rgba(88,189,218,1) 100%);
-	}
-	.addRenter{
-		background:linear-gradient(-90deg,rgba(243,183,73,1) 0%,rgba(240,154,66,1) 100%);
-	}
-	.addRenterBox1{
+
+
+	.addRenterBox1 {
 		color: #BBBBBB;
 		font-size: 28rpx;
 		width: fit-content;
@@ -283,20 +340,12 @@
 		flex-direction: column;
 		align-items: center;
 	}
-	.noRenter{
+
+	.noRenter {
 		width: 214rpx;
 		height: 152rpx;
 		margin: 0 auto 48rpx auto;
 	}
-	.addRenter1{
-		width: 235rpx;
-		height: 68rpx;
-		border-radius: 18rpx;
-		border: 2rpx solid #FFA044;
-		color: #FFA044;
-		font-size: 32rpx;
-		line-height: 68rpx;
-		text-align: center;
-		margin: 48rpx auto 0 auto;
-	}
+
+
 </style>

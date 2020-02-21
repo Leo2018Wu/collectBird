@@ -65,6 +65,7 @@
 
 <script>
 export default {
+	name:'home',
 	data() {
 		return {
 			mouthIncome: '0', //本月净收入
@@ -102,7 +103,7 @@ export default {
 			});
 			console.log(this.$store.state.isloginStatus);
 		// }
-		this.getMoneyInfo();
+		// this.getMoneyInfo();
 	},
 	methods: {
 		checkLoginStatus() {
