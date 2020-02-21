@@ -41,7 +41,8 @@
 		</view>
 		<view class="addRenterBox1" v-if="isShowAddBtn">
 			<image class="noRenter" src="../../static/noRenter.png" mode="aspectFit"></image>
-			<view>暂无租客，您可以选择</view>
+			<view v-if="roomInfo.tenantStatus == 1">租客信息填写中，您可以选择</view>
+			<view v-else>暂无租客，您可以选择</view>
 		</view>
 		<view class="addRenterBox" v-if="isShowAddBtn && roomInfo.tenantStatus == 0">
 			<view class="addRenter" @click="addRenter">添加租客</view>

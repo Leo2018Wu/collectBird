@@ -49,7 +49,9 @@
 		methods:{
 			emit(){
 				console.log('sssssssssss',this.userInfo)
-				this.$emit('emitUserId',this.userInfo)
+				if(!this.showFillBtn){
+					this.$emit('emitUserId',this.userInfo)
+				}
 			},
 			myClick(){
 				this.$emit('emitFillInfo')
