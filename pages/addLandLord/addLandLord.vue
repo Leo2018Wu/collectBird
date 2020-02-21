@@ -74,6 +74,7 @@
 			<view class="section3 whiteBg"><textarea class="secTip textOverFlow" placeholder="备注" v-model="remarks"
 				 placeholder-class="textPlaceholder"></textarea></view>
 		</view>
+		<view class="sureBtn" @click="save">保存</view>
 	</view>
 </template>
 
@@ -142,6 +143,17 @@
 			})
 		},
 		methods: {
+			save(){
+				let _this = this;
+				_this.$refs.form1.validate(res1 => {
+					if(res1){
+						_this.$refs.form2.validate(res2 => {
+							if(res2){}
+						})
+					}
+				})
+				
+			},
 			bindDateChange(e) {
 				console.log(e)
 				let type = e.currentTarget.dataset.type;
@@ -222,5 +234,16 @@
 		padding: 32rpx 0 30rpx 0;
 		color: #999999;
 		font-size: 34rpx;
+	}
+	.sureBtn {
+		width: 257rpx;
+		height: 74rpx;
+		line-height: 74rpx;
+		text-align: center;
+		border-radius: 37rpx;
+		color: #FFFFFF;
+		background: linear-gradient(-90deg, rgba(243, 183, 73, 1) 0%, rgba(240, 154, 66, 1) 100%);
+		font-size: 32rpx;
+		margin: 124rpx auto 72rpx auto;
 	}
 </style>
