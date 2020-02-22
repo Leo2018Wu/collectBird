@@ -175,7 +175,7 @@
 		color: #999999;
 		font-size: 26rpx;
 		font-weight: bold;
-		margin-top: 8rpx;
+		margin-top: 6rpx;
 	}
 	.active{
 		color: #FFA344;
