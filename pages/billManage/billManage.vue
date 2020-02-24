@@ -40,30 +40,13 @@
 							</view>
 						</view>
 						<view class="itemBottom itemFlex">
-							<view class="bottomNo">{{ item.roomNo }}</view>
-							<view class="bottomName">{{item.tenantName}}</view>
+							<view v-if="para.billType == 0" class="bottomNo">{{ item.roomNo }}</view>
+							<view v-if="para.billType == 1" class="bottomNo">{{ item.communityName }}-{{item.houseNo}}</view>
+							<view v-if="para.billType == 0" class="bottomName">{{item.tenantName}}</view>
+							<view v-if="para.billType == 1" class="bottomName">{{item.ownerName}}</view>
 						</view>
-							<!-- <view class="topLeft">
-								<view class="myBillName">租金账单</view>
-								<view class="myBillDate">{{ item.payRentDate.substr(0, 10) }}</view>
-							</view>
-							<view class="topLeft">
-								<view class="topRight" :class="{ bule:  item.billStatus == 4 }">{{ item.totalAmount }}<span class="reminder"
-									 v-if="item.depositAmount">(含押金)</span></view>
-								<view class="myOverDueNum" v-if="currentIndex != 3">
-									<span v-if="currentIndex == 0">逾期{{ item.overdueDays }}天</span>
-									<span v-if="currentIndex == 1 && item.overdueDays < 0">{{ -item.overdueDays }}天后交租</span>
-									<span v-if="currentIndex == 1 && item.overdueDays == 0">当天交租</span>
-								</view>
-								<view class="myOverDueNum" v-if="currentIndex == 3 && item.billStatus != 4">
-									<span v-if="item.overdueDays > 0">逾期{{ item.overdueDays }}天</span>
-									<span v-if="item.overdueDays < 0">{{ -item.overdueDays }}天后交租</span>
-									<span v-if="item.overdueDays == 0">当天交租</span>
-								</view>
-							</view> -->
 					</view>
 				</view>
-
 			</mescroll-uni>
 		</view>
 	</view>
@@ -91,7 +74,8 @@
 				para: {
 					landlordId: '',
 					pageNum: 1,
-					billStatus: '3'
+					billStatus: '3',
+					billType:0,
 				},
 				countTotal: '',
 				// 下拉刷新的常用配置
@@ -131,8 +115,11 @@
 				return arr
 			}
 		},
-		onLoad() {
+		onShow() {
 			this.getMoney();
+		},
+		onLoad(options) {
+			this.para.billType = options.billType
 		},
 		methods: {
 			updateData() {
@@ -181,9 +168,16 @@
 			},
 			showBill(item) {
 				console.log(item);
-				uni.navigateTo({
-					url: '../billDetail/billDetail?billId=' + item.id + '&tenantId=' + item.tenantId
-				});
+				if(item.billType == 0){
+					uni.navigateTo({
+						url: '../billDetail/billDetail?billId=' + item.id + '&tenantId=' + item.tenantId+'&billType='+item.billType
+					});
+				}else if(item.billType == 1){
+					uni.navigateTo({
+						url: '../billDetail/billDetail?billId=' + item.id + '&ownerId=' + item.ownerId+'&billType='+item.billType
+					});
+				}
+				
 			},
 			init(e) {
 				this.mescroll = e;

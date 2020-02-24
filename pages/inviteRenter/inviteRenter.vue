@@ -2,7 +2,7 @@
 	<view class="inviteRenter">
 		<view class="headBg"></view>
 		<view  v-if="loadingEnd">
-			<view class="content" v-if="!isSubmitSuccess">
+			<view class="content" v-if="isSubmitSuccess == 1">
 				<view class="landLordInfoBox">
 					<image v-if="!avatar" class="avatar" src="../../static/defaultMale.png" mode="aspectFit"></image>
 					<image v-else class="avatar" :src="avatar" mode="aspectFit"></image>
@@ -61,9 +61,17 @@
 				</view>
 				<button class="submitBtn" open-type="getUserInfo" @getuserinfo="sumbit">提交</button>
 			</view>
-			<view class="content" v-else>
+			<view class="content" v-if="isSubmitSuccess >= 2">
 				<image class="success" src="../../static/submit_success.png" mode="aspectFit"></image>
 				<view class="sucTip">信息已提交，祝您入住愉快！</view>
+				<view class="bottomBox">
+					<image src="../../static/aboutUs.png" mode="aspectFit"></image>
+					<span class="logoTip">收租鸟，慧收租</span>
+				</view>
+			</view>
+			<view class="content" v-if="isSubmitSuccess == 0">
+				<image class="success inviteOver" src="../../static/inviteOver.png" mode="aspectFit"></image>
+				<view class="failTip ">抱歉，邀请已过期！</view>
 				<view class="bottomBox">
 					<image src="../../static/aboutUs.png" mode="aspectFit"></image>
 					<span class="logoTip">收租鸟，慧收租</span>
@@ -86,7 +94,7 @@
 		data() {
 			return {
 				loadingEnd: false,
-				isSubmitSuccess: false,
+				isSubmitSuccess: '',
 				returnData: {},
 				roomId: '',
 				landLordId: '',
@@ -178,9 +186,9 @@
 					id
 				}).then((res) => {
 					console.log(res)
-					if (res.data.data.tenantStatus >= '2') {
-						_this.isSubmitSuccess = true
-					}
+					// if (res.data.data.tenantStatus >= '2') {
+						_this.isSubmitSuccess = res.data.data.tenantStatus
+					// }
 					// setTimeout(() => {
 						_this.loadingEnd = true
 					// }, 200)
@@ -227,7 +235,7 @@
 									if (res) {
 										uni.hideLoading()
 										par.tenantImg = _this.renterAvatar
-										_this.$request.post('roomUser/inviTenant', par).then((data) => {
+										_this.$request.post('/roomUser/inviTenant', par).then((data) => {
 											if (data.data.code == '200') {
 												_this.isSubmitSuccess = true;
 												uni.showToast({
@@ -448,12 +456,21 @@
 		border-radius: 50%;
 		display: block;
 	}
-
+	
 	.sucTip {
 		width: 100%;
 		text-align: center;
 		color: #333333;
 		font-size: 34rpx;
+	}
+	.inviteOver{
+		border-radius: 0;
+	}
+	.failTip{
+		width: 100%;
+		text-align: center;
+		font-size: 34rpx;
+		color: #C3C2C2;
 	}
 
 	.bottomBox {

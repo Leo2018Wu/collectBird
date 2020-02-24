@@ -1,12 +1,16 @@
 <template>
 	<view class="addRoomNum">
-		<view class="communityName">{{communityName}}</view>
+		<view class="communityName">
+			<view>{{communityName}}</view>
+			<view v-if="inEdit && !houseInfo.owner" class="bind" @click="bindNewLandlord">绑定业主</view>
+			<view v-if="inEdit && houseInfo.owner" class="bind" @click="showNewLandLord">业主信息</view>
+		</view>
 		<view class="section1">
 			<choose-list v-if="listShow" v-on:close="hideList" :currentChooseIndex="chooseIndex" :list="list" v-on:emitClick = "returnEmit"></choose-list>
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form" :model="info">
 					<evan-form-item label="楼栋号" prop="houseNo">
 						<template v-slot:main>
-							<input class="form-input" type="number" maxlength="2" placeholder-class="form-input-placeholder" v-model="info.houseNo" @input="inputTip" placeholder="请输入楼栋号" />
+							<input class="form-input" type="number" maxlength="3" placeholder-class="form-input-placeholder" v-model="info.houseNo" @input="inputTip" placeholder="请输入楼栋号" />
 						</template>
 						<template v-slot:tip>
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -21,10 +25,7 @@
 						</template>
 					</evan-form-item>
 					<evan-form-item label="户型" prop="houseType" >
-						<!-- :style_Container="'height: 50px; font-size: 16px;'" -->
-						<!-- :initValue="''" -->
 						<template v-slot:main>
-							
 							<input  class="form-input" disabled="true" placeholder-class="form-input-placeholder" v-model="info.houseType" placeholder="请选择户型" @click="showList()"/>
 						</template>
 						<template v-slot:tip>
@@ -32,16 +33,6 @@
 						</template>
 					</evan-form-item>
 			</evan-form>
-			
-			<!-- <view class="inputContainer">
-				<view class="inputBarBox"><input-bar :placeholderContent="'请输入楼层'">楼层</input-bar></view>
-				<span class="inputSpan"></span>
-			</view>
-			<view class="inputContainer">
-				<view class="inputBarBox"><input-bar :placeholderContent="'请输入面积'">面积</input-bar></view>
-				<span class="inputSpan"></span>
-			</view> -->
-			
 			<view class="switchBox" @click="changeSwitch()">
 				<span>是否整租</span>
 				<switch :disabled="isHaveRenter" :checked="isWholeRent" @change="changeType" color="#F09A42" />
@@ -62,13 +53,17 @@
 			</view>
 			<view v-else  class="inputContainer" @click="goRoomDetail(item)" v-for="(item,index) in roomList" :key="index">
 				<view class="inputBarBox"><input-bar :disabled="true" >卧室{{item}}</input-bar></view>
-				<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
+				<view style="display: flex; align-items: center; color: #999999;fontSize:32rpx">
+					<span>编辑</span>
+					<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
+				</view>
+				
 			</view>
 			
 		</view>
+		<tip-modal v-if="isShowTipModal" :title="'删除房号'" :describition="'删除房号将删除房号关联的一切信息，是否确认删除?'" v-on:emitCancel="hideTipModal" v-on:emitSure="returnSure"></tip-modal>
 		<view class="saveBtnBox" v-if="inEdit">
-			<view v-if="inEdit && !houseInfo.owner" class="bindNewLandlord" @click="bindNewLandlord">绑定业主</view>
-			<view v-if="inEdit && houseInfo.owner" class="bindNewLandlord" @click="showNewLandLord">业主信息</view>
+			<view class="bindNewLandlord" @click="deleteHouse">删除</view>
 			<view class="saveBtn" @click="save()">保存</view>
 		</view>
 		<view v-if="!inEdit" class="saveBtn1" @click="save()">保存</view>
@@ -76,6 +71,7 @@
 </template>
 
 <script>
+	import tipModal from '../../components/tipModal.vue'
 	import chnToNumber from '../../util/index'
 	import chooseList from '../../components/chooseList.vue'
 	import { mapState, mapMutations } from "vuex";
@@ -89,10 +85,12 @@
 			facilityBar,
 			evanFormItem,
 			evanForm,
-			chooseList
+			chooseList,
+			tipModal
 		},
 		data() {
 			return {
+				isShowTipModal:false,
 				houseInfo:{},
 				isHaveRenter:false,//房号下是否有租客
 				chooseIndex:null,
@@ -159,6 +157,29 @@
 			}
 		},
 		methods: {
+			deleteHouse(){
+				this.showTipModal()
+			},
+			returnSure(){
+				this.$request.post('/house/delete',{
+					id:this.houseId
+				}).then((res)=>{
+					this.hideTipModal();
+					uni.showToast({
+						title:'房号删除成功',
+						duration:1500
+					})
+					setTimeout(()=>{
+						uni.navigateBack()
+					},2000)
+				})
+			},
+			showTipModal(){
+				this.isShowTipModal = true
+			},
+			hideTipModal(){
+				this.isShowTipModal = false
+			},
 			showNewLandLord(){
 				uni.navigateTo({
 					url:"../addLandLord/addLandLord?ownerId="+this.houseInfo.owner.id+'&houseId='+this.houseId
@@ -338,12 +359,29 @@
 		background-color: #FAFAFA;
 	}
 	.communityName{
-		padding: 32rpx 0 32rpx 40rpx;
+		height: 120rpx;
+		width: 100%;
+		padding: 0 40rpx;
 		color: #444444;
 		font-size: 34rpx;
 		font-weight: bold;
 		background-color: #FFFFFF;
-		margin-bottom: 17rpx;
+		margin-bottom:17rpx;
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+	}
+	.bind{
+		width:170rpx;
+		height:56rpx;
+		background:#FFA344;
+		text-align: center;
+		line-height: 56rpx;
+		font-size: 28rpx;
+		color: #FFFFFF;
+		border-radius:28rpx;
+		font-weight: normal;
+		margin-left: auto;
 	}
 	.form-input{
 		font-size: 32rpx;
@@ -363,7 +401,8 @@
 		border-bottom: 3rpx solid #EBEBEB80;
 	}
 	.inputBarBox{
-		width: 100%;
+		/* width: 100%; */
+		width: 80%;
 		height: 100%;
 	}
 	.inpArrow{

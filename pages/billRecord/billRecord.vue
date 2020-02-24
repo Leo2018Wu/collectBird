@@ -26,13 +26,14 @@
 
 					<view class="contentRight" >
 					<view class="billTitle">租金收入</view>
-					<view class="checkDate textOverFlow">到账日期：{{item.payRentDate.substr(0,10)}}</view>
+					<view class="checkDate textOverFlow">到账日期：{{item.arrivalDate.substr(0,10)}}</view>
 				</view>
 				<view>{{item.totalAmount}}</view>
 				</view>
 				
 			</view>
 		</view>
+		<view class="latestBill">生成最新账单</view>
 	</view>
 </template>
 
@@ -179,5 +180,16 @@
 	}
 	.active{
 		color: #FFA344;
+	}
+	.latestBill{
+		width:378rpx;
+		height:74rpx;
+		font-size: 34rpx;
+		line-height: 74rpx;
+		margin: 280rpx auto 0 auto;
+		background:linear-gradient(-90deg,rgba(243,183,73,1) 0%,rgba(240,154,66,1) 100%);
+		border-radius:37rpx;
+		color: #FFFFFF;
+		text-align: center;
 	}
 </style>

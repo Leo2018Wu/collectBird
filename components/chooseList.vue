@@ -5,9 +5,9 @@
 				<view class="title">
 					{{title}}
 				</view>
-				<view class="chooseLi" :class="{active: currentIndex == index}" v-for="(item,index) in list" :key="index" @click="chooseLi(item,index)">
+				<view class="chooseLi" :class="{active: currentChooseIndex == index}" v-for="(item,index) in list" :key="index" @click="chooseLi(item,index)">
 					{{item}}
-					<image v-if="currentIndex == index" src="../static/true-icon.png" mode="aspectFit"></image>
+					<image v-if="currentChooseIndex == index" src="../static/true-icon.png" mode="aspectFit"></image>
 				</view>
 			</view>
 	</view>
@@ -26,11 +26,11 @@
 			},
 			currentChooseIndex:null
 		},
-		computed:{
-			currentIndex(){
-				return this.currentChooseIndex
-			}
-		},
+		// computed:{
+		// 	currentIndex(){
+		// 		return this.currentChooseIndex
+		// 	}
+		// },
 		
 		data() {
 			return {

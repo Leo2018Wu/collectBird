@@ -11,7 +11,8 @@
 					<span>{{ billInfo.totalAmount ? billInfo.totalAmount : '0' }}</span>
 				</view>
 			</view>
-			<view class="houseAddr">{{ houseAddrInfo.communityName }}-{{ houseAddrInfo.houseNo }}-{{ houseAddrInfo.roomNo }}</view>
+			<view v-if="billType == 0" class="houseAddr">{{ houseAddrInfo.communityName }}-{{ houseAddrInfo.houseNo }}-{{ houseAddrInfo.roomNo }}</view>
+			<view v-else class="houseAddr">{{ ownerInfo.communityName }}-{{ ownerInfo.houseNo }}</view>
 		</view>
 		<view class="section1">
 			<view class="billStatus">
@@ -48,37 +49,28 @@
 					<span class="billDate">{{ !billInfo.depositAmount ? 0 : billInfo.depositAmount }}</span>
 				</view>
 			</view>
-			<view class="costDetail">费用明细</view>
-			<!-- <view class="electricBox" v-for="(item, index) in billInfo.items" :key="index">
-				<view class="elecRight">
-					<view class="unitPrice">
-						{{ item.itemName }}
-						<span>{{ item.unitPrice }}</span>
+			<view v-if="billType == 0">
+				<view class="costDetail">费用明细</view>
+				<view class="electricBox">
+					<view class="elecRight">
+						<view class="unitPrice">
+							{{ electricityInfo.itemName }}
+							<span>{{ electricityInfo.unitPrice }}元/度</span>
+						</view>
+						<view v-if="electricityInfo.itemType == 1" class="eleCostTotal">
+							{{ quantity }}<span>度</span>({{ electricityInfo.currentNum ? electricityInfo.currentNum : '0' }}~{{
+								electricityInfo.prevNum ? electricityInfo.prevNum : ''
+							}}）
+						</view>
+						<view v-if="electricityInfo.itemType == 1">抄表日期: {{ electricityInfo.noteDate ? electricityInfo.noteDate.substr(0,10) : '暂无抄表日期' }}</view>
 					</view>
-					<view v-if="item.itemType == 1" class="eleCostTotal">{{ item.quantity }}{{ '度' | addSpace }} ({{ item.currentNum?item.currentNum:"" }}-{{ item.prevNum ?item.prevNum:""}}）</view>
-					<view v-if="item.itemType == 1">抄表日期: {{ item.noteDate?item.noteDate:'' }}</view>
+					<view class="priceTotal">{{ electricityInfo.amount }}</view>
 				</view>
-				<view class="priceTotal">{{ item.amout }}</view>
-			</view> -->
-			<view class="electricBox">
-				<view class="elecRight">
-					<view class="unitPrice">
-						{{ electricityInfo.itemName }}
-						<span>{{ electricityInfo.unitPrice }}元/度</span>
+				<view class="waterBox" v-for="(item,index) in billInfo.items" :key="index">
+					<view class="waterOuter">
+						<span class="waterBar">{{item.itemName}}</span>
+						<span class="priceTotal">{{item.amount}}元</span>
 					</view>
-					<view v-if="electricityInfo.itemType == 1" class="eleCostTotal">
-						{{ quantity }}<span>度</span>({{ electricityInfo.currentNum ? electricityInfo.currentNum : '0' }}~{{
-							electricityInfo.prevNum ? electricityInfo.prevNum : ''
-						}}）
-					</view>
-					<view v-if="electricityInfo.itemType == 1">抄表日期: {{ electricityInfo.noteDate ? electricityInfo.noteDate.substr(0,10) : '暂无抄表日期' }}</view>
-				</view>
-				<view class="priceTotal">{{ electricityInfo.amount }}</view>
-			</view>
-			<view class="waterBox" v-for="(item,index) in billInfo.items" :key="index">
-				<view class="waterOuter">
-					<span class="waterBar">{{item.itemName}}</span>
-					<span class="priceTotal">{{item.amount}}元</span>
 				</view>
 			</view>
 		</view>
@@ -92,17 +84,23 @@
 		</view>
 		<view class="section2" v-else>
 			<!-- v-if="!billInfo.depositAmount" -->
-			<view class="sendBillBox" @click="openMeterRead">
-				<image class="sendIcon" src="../../static/eleWater.png" mode="aspectFit"></image>
-				<view>抄表</view>
-			</view>
-			<view class="sendBillBox">
-				<image class="sendIcon" src="../../static/sendBill.png" mode="aspectFit"></image>
-				<view>发送账单</view>
+			<view class="leftBtnBox">
+				<view class="sendBillBox" @click="deleteBill">
+					<image class="sendIcon" src="../../static/delete_btn.png" mode="aspectFit"></image>
+					<view>删除</view>
+				</view>
+				<view class="sendBillBox" @click="openMeterRead">
+					<image class="sendIcon" src="../../static/eleWater.png" mode="aspectFit"></image>
+					<view>抄表</view>
+				</view>
+				<view class="sendBillBox">
+					<image class="sendIcon" src="../../static/sendBill.png" mode="aspectFit"></image>
+					<view>发送账单</view>
+				</view>
 			</view>
 			<view class="sureBtn" @click="checkMoney">到账</view>
 		</view>
-
+		<tip-modal v-if="isShowTipModal" :title="'删除账单'" :describition="'是否确认删除账单?'" v-on:emitCancel="hideTipModal" v-on:emitSure="returnSure"></tip-modal>
 		<!-- 提示未抄表弹窗 -->
 		<view class="modal" v-show="isShowMeterRead" @click="cancle"></view>
 		<view class="modalBox" v-show="isShowMeterRead">
@@ -119,10 +117,17 @@
 </template>
 
 <script>
+	import tipModal from '../../components/tipModal.vue'
 	import dateForm from '../../util/index.js';
 	export default {
+		components:{
+			tipModal
+		},
 		data() {
 			return {
+				ownerInfo:{},
+				billType:'',
+				isShowTipModal:false,
 				init: false,
 				billId: null,
 				houseAddrInfo: {},
@@ -140,10 +145,49 @@
 		},
 		onLoad(option) {
 			console.log(this)
+			this.billType = option.billType;
 			this.billId = option.billId;
-			this.getAddr(option.tenantId);
+			if(option.tenantId){
+				this.getAddr(option.tenantId);
+			}
+			if(option.ownerId){
+				this.getOwnerInfo(option.ownerId)
+			}
 		},
 		methods: {
+			deleteBill(){
+				this.showTipModal()
+			},
+			hideTipModal(){
+				this.isShowTipModal = false;
+			},
+			showTipModal(){
+				this.isShowTipModal = true;
+			},
+			returnSure(){
+				this.$request.post('/bill/delete',{
+					id:this.billId
+				}).then((res)=>{
+					console.log(res)
+					if(res.data.code == 200){
+						this.isShowTipModal = false;
+						uni.showToast({
+							title:'删除成功',
+							duration:800
+						})
+						let pages = getCurrentPages();
+						if (pages.length > 1) {
+							let beforePage = pages[pages.length - 2];
+							if (beforePage.route == "pages/billManage/billManage") {
+								beforePage.$vm.updateData()
+							}
+						}
+						setTimeout(()=>{
+							uni.navigateBack();
+						},1500)
+					}
+				})
+			},
 			getBillDetail(id) {
 				let _this = this;
 				_this.$request
@@ -178,6 +222,13 @@
 						}
 						_this.init = true;
 					});
+			},
+			getOwnerInfo(id){
+				this.$request.post('/owner/findById',{
+					id
+				}).then((res)=>{
+					this.ownerInfo = res.data.data
+				})
 			},
 			getAddr(tenantId) {
 				let _this = this;
@@ -468,7 +519,7 @@
 		font-size: 34rpx;
 		text-align: center;
 		line-height: 92rpx;
-		margin-left: 82rpx;
+		/* margin-left: 82rpx; */
 	}
 
 	.sendBillBox {
@@ -477,10 +528,15 @@
 		text-align: center;
 		font-size: 28rpx;
 	}
-
-	.sendBillBox:first-of-type {
-		margin-right: 82rpx;
+	.leftBtnBox{
+		width: calc(100% - 258rpx);
+		display: flex;
+		justify-content: space-around;
 	}
+
+	/* .sendBillBox:first-of-type {
+		margin-right: 82rpx;
+	} */
 
 	.sendIcon {
 		width: 40rpx;

@@ -22,21 +22,9 @@
 		</view>
 		<view class="bannerBox">
 			<view class="bannerTop">
-				<view @click="toHouseList">
-					<view class="bannerItem"><image class="bannerImg" src="../../static/homeIcon1.png" mode=""></image></view>
-					<span class="bannerText">房源</span>
-				</view>
-				<view @click="goRenterMange">
-					<view class="bannerItem"><image class="bannerImg" src="../../static/homeIcon2.png" mode=""></image></view>
-					<span class="bannerText">租客</span>
-				</view>
-				<view @click="goBillManage">
-					<view class="bannerItem"><image class="bannerImg" src="../../static/homeIcon3.png" mode=""></image></view>
-					<span class="bannerText">账单</span>
-				</view>
-				<view @click="goReportForm">
-					<view class="bannerItem"><image class="bannerImg" src="../../static/statistical.png" mode=""></image></view>
-					<span class="bannerText">统计</span>
+				<view v-for="(item,index) in homeList" @click="switchPage(item.url)" :key="index">
+					<view class="bannerItem"><image class="bannerImg" :src="item.imgUrl" mode="aspectFit"></image></view>
+					<span class="bannerText">{{item.title}}</span>
 				</view>
 			</view>
 			<view class="banner">
@@ -87,6 +75,29 @@ export default {
 					url: '../../static/banner2.jpg'
 				}
 			],
+			homeList:[
+				{
+					title:'房源',
+					imgUrl:'../../static/homeIcon1.png',
+					url:'../houseList/houseList'
+				},{
+					title:'租客',
+					imgUrl:'../../static/homeIcon2.png',
+					url:'../renterManage/renterManage'
+				},{
+					title:'账单',
+					imgUrl:'../../static/homeIcon3.png',
+					url:'../billManage/billManage?billType='+0
+				},{
+					title:'统计',
+					imgUrl:'../../static/homeIcon4.png',
+					url:'../reportForm/reportForm'
+				},{
+					title:'房东账单',
+					imgUrl:'../../static/homeIcon5.png',
+					url:'../billManage/billManage?billType='+1
+				}
+			],
 			indicatorDots: true,
 			autoplay: true,
 			interval: 3000,
@@ -107,6 +118,11 @@ export default {
 		// this.getMoneyInfo();
 	},
 	methods: {
+		switchPage(url){
+			uni.navigateTo({
+				url
+			})
+		},
 		checkLoginStatus() {
 			let _this = this;
 			return new Promise((reslove, rej) => {
@@ -150,26 +166,6 @@ export default {
 					_this.billDuein = data.monthUnIncome;
 					_this.todayReceived = data.todaySumTotal;
 				});
-		},
-		toHouseList(e) {
-			uni.navigateTo({
-				url: '../houseList/houseList'
-			});
-		},
-		goRenterMange() {
-			uni.navigateTo({
-				url: '../renterManage/renterManage'
-			});
-		},
-		goBillManage() {
-			uni.navigateTo({
-				url: '../billManage/billManage'
-			});
-		},
-		goReportForm() {
-			uni.navigateTo({
-				url: '../reportForm/reportForm'
-			});
 		},
 		getUserInfo() {
 			let self = this;
@@ -309,18 +305,26 @@ export default {
 	height: 30%;
 	display: flex;
 	justify-content: space-between;
-	text-align: center;
-	padding: 60rpx 60rpx;
+	padding: 60rpx 20rpx 20rpx 20rpx;
+	flex-wrap: wrap;
+}
+.bannerTop view{
+	width: 25%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	/* margin-bottom: 40rpx; */
 }
 
 .bannerImg {
 	max-width: 88rpx;
 	max-height: 88rpx;
+	margin-bottom: 17rpx;
 }
 .bannerText {
 	color: #333333;
 	font-size: 28rpx;
-	font-family: PingFang-SC-Medium;
+	margin-bottom: 40rpx;
 	font-weight: 600;
 }
 
@@ -423,9 +427,6 @@ button::after {
 	height: 100%;
 }
 .banner {
-	position: absolute;
-	top: 260rpx;
-	left: 0rpx;
 	width: 100%;
 }
 .radius {

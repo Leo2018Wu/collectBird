@@ -5,7 +5,7 @@
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form1" :model="info1">
 				<evan-form-item label="姓名" prop="name">
 					<template v-slot:main>
-						<input class="form-input" placeholder-class="form-input-placeholder" v-model="info1.name" placeholder="租客姓名" />
+						<input class="form-input" :disabled="isEdit" placeholder-class="form-input-placeholder" v-model="info1.name" placeholder="租客姓名" />
 					</template>
 					<template v-slot:tip>
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -13,10 +13,10 @@
 				</evan-form-item>
 				<evan-form-item label="性别" prop="sex">
 					<template v-slot:main>
-						<radio-group class="sexRadio" name="sexRadio" @change="radioChange">
+						<radio-group class="sexRadio"  name="sexRadio" @change="radioChange" >
 							<label style="display: flex;justify-content: flex-end;">
 								<view v-for="(item, index) in sexList" :key="index">
-									<radio :value="item.value" :checked="index === currentSex" color="#FFA344" />
+									<radio :value="item.value" :disabled="isEdit" :checked="index === currentSex" color="#FFA344" />
 									<text>{{ item.name }}</text>
 								</view>
 							</label>
@@ -26,7 +26,7 @@
 				</evan-form-item>
 				<evan-form-item label="电话" prop="tel">
 					<template v-slot:main>
-						<input class="form-input" type="number" maxlength="11" placeholder-class="form-input-placeholder" v-model="info1.tel"
+						<input class="form-input" :disabled="isEdit" type="number" maxlength="11" placeholder-class="form-input-placeholder" v-model="info1.tel"
 						 placeholder="租客电话" @input="getPhone" />
 					</template>
 					<template v-slot:tip>
@@ -35,7 +35,7 @@
 				</evan-form-item>
 				<evan-form-item label="身份证号" prop="IDNum">
 					<template v-slot:main>
-						<input class="form-input" type="idcard" placeholder-class="form-input-placeholder" maxlength="18" v-model="info1.IDNum"
+						<input class="form-input" :disabled="isEdit" type="idcard" placeholder-class="form-input-placeholder" maxlength="18" v-model="info1.IDNum"
 						 placeholder="身份证号" @input="getID" />
 					</template>
 					<template v-slot:tip>
@@ -60,7 +60,7 @@
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form2" :model="info2">
 				<evan-form-item label="起租日期" prop="startDate">
 					<template v-slot:main>
-						<picker class="form-input" mode="date" :value="date" :start="startDate" @change="bindDateChange">{{ date }}</picker>
+						<picker class="form-input" :disabled="isEdit" mode="date" :value="date" :start="startDate" @change="bindDateChange">{{ date }}</picker>
 						<input v-show="false" class="form-input" placeholder-class="form-input-placeholder" v-model="info2.startDate"
 						 placeholder="请选择" />
 					</template>
@@ -70,7 +70,7 @@
 				</evan-form-item>
 				<evan-form-item label="租期" prop="keepDate" :border="false">
 					<template v-slot:main>
-						<picker class="form-input" mode="date" :value="pickerKeepDate" :start="startDate" @change="bindKeepDateChange">{{ pickerKeepDate }}</picker>
+						<picker class="form-input" :disabled="isEdit" mode="date" :value="pickerKeepDate" :start="startDate" @change="bindKeepDateChange">{{ pickerKeepDate }}</picker>
 						<input v-show="false" class="form-input" placeholder-class="form-input-placeholder" v-model="info2.keepDate" placeholder="请选择" />
 					</template>
 					<template v-slot:tip>
@@ -87,7 +87,7 @@
 					<template v-slot:main>
 						<choose-list v-if="listShow" :currentChooseIndex="chooseIndex" v-on:close="hideList" :list="list" :title="'选择收租周期'"
 						 v-on:emitClick="returnEmit"></choose-list>
-						<input class="form-input" disabled="true" placeholder-class="form-input-placeholder" v-model="info2.rentCycle"
+						<input class="form-input" :disabled="isEdit" placeholder-class="form-input-placeholder" v-model="info2.rentCycle"
 						 placeholder="请选择收租周期" @click="showList" />
 					</template>
 					<template v-slot:tip>
@@ -96,7 +96,7 @@
 				</evan-form-item>
 				<evan-form-item label="月租金" prop="rentUnitPrice">
 					<template v-slot:main>
-						<input class="form-input" type="number" placeholder-class="form-input-placeholder" v-model="info2.rentUnitPrice"
+						<input class="form-input" type="number" :disabled="isEdit" placeholder-class="form-input-placeholder" v-model="info2.rentUnitPrice"
 						 placeholder="请输入" @input="espInput" />
 					</template>
 					<template v-slot:tip>
@@ -105,7 +105,7 @@
 				</evan-form-item>
 				<evan-form-item label="押金" prop="deposit" :border="false">
 					<template v-slot:main>
-						<input class="form-input" placeholder-class="form-input-placeholder" v-model="info2.deposit" placeholder="请输入" />
+						<input class="form-input" :disabled="isEdit" placeholder-class="form-input-placeholder" v-model="info2.deposit" placeholder="请输入" />
 					</template>
 					<template v-slot:tip>
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -118,19 +118,19 @@
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form3" :model="info3">
 				<evan-form-item label="电费(1元/度)" prop="eleCost">
 					<template v-slot:main>
-						<input class="form-input inputColor" type="digit" maxlength="5" placeholder-class="form-input-placeholder" v-model="info3.eleCost"
+						<input class="form-input inputColor" :disabled="isEdit" type="digit" maxlength="5" placeholder-class="form-input-placeholder" v-model="info3.eleCost"
 						 placeholder="请输入初始刻度" />
 					</template>
 				</evan-form-item>
 				<evan-form-item label="水费(元/月)" prop="waterCost">
 					<template v-slot:main>
-						<input class="form-input inputColor" type="digit" placeholder-class="form-input-placeholder" v-model="info3.waterCost"
+						<input class="form-input inputColor" :disabled="isEdit" type="digit" placeholder-class="form-input-placeholder" v-model="info3.waterCost"
 						 placeholder="请输入水费" />
 					</template>
 				</evan-form-item>
 				<evan-form-item label="宽带(元/月)" prop="netCost" :border="false">
 					<template v-slot:main>
-						<input class="form-input inputColor" type="digit" placeholder-class="form-input-placeholder" v-model="info3.netCost"
+						<input class="form-input inputColor" :disabled="isEdit" type="digit" placeholder-class="form-input-placeholder" v-model="info3.netCost"
 						 placeholder="请输入宽带费" />
 					</template>
 				</evan-form-item>
@@ -143,13 +143,29 @@
 				</view> -->
 			</evan-form>
 		</view>
-		<view class="section4 whiteBg"><textarea class="secTip textOverFlow" placeholder="备注" v-model="remarks"
+		<view class="section4 whiteBg"><textarea class="secTip textOverFlow" :disabled="isEdit" placeholder="备注" v-model="remarks"
 			 placeholder-class="textPlaceholder"></textarea></view>
-		<view class="sureBtn" @click="save">保存</view>
+		<view v-if="!isEdit" class="sureBtn" @click="save">保存</view>
+		<view v-if="isEdit" class="delBtn" @click="deleteRenter">删除</view>
+		<tip-modal v-if="isShowTipModal" :title="'删除租客'" :describition="'删除租客将删除租客全部账单，是否确认删除?'" v-on:emitCancel="hideTipModal" v-on:emitSure="returnSure"></tip-modal>
+		<cover-view v-if="isShowSureModal" class="modalMask" @catchtouchmove='true'>
+			<cover-view class="modelContainer">
+				<cover-view class="modalTitle">信息确认</cover-view>
+				<cover-view class="modalContent">租金：{{info2.rentUnitPrice}}元/月</cover-view>
+				<cover-view class="modalContent">租金方式：{{info2.rentCycle}}</cover-view>
+				<cover-view class="modalContent">合约周期：{{date}}~{{info2.keepDate}}</cover-view>
+				<cover-view class="btnBox">
+					<cover-view class="btnDivide"></cover-view>
+					<cover-view class="modalCancel" @click="cancel()">取消</cover-view>
+					<cover-view class="modalSure" @click="sure()">确认</cover-view>
+				</cover-view>
+			</cover-view>
+		</cover-view>
 	</view>
 </template>
 
 <script>
+	import tipModal from '../../components/tipModal.vue'
 	import myUploadImg from '../../util/myUpload.js';
 	import chooseList from '../../components/chooseList.vue';
 	import chnToNumber from '../../util/index';
@@ -160,11 +176,14 @@
 		components: {
 			evanFormItem,
 			evanForm,
-			chooseList
+			chooseList,
+			tipModal
 		},
 		data() {
 			const currentDate = this.getDate();
 			return {
+				isShowTipModal:false,
+				isShowSureModal:false,
 				tenantImg:'',
 				remarks: '',
 				userId: null,
@@ -312,7 +331,7 @@
 				this.isEdit = true;
 				this.userId = options.userId
 				uni.setNavigationBarTitle({
-					title: '编辑租客'
+					title: '租客信息'
 				});
 				this.getUserInfo(options.userId);
 			}
@@ -343,6 +362,34 @@
 			}
 		},
 		methods: {
+			deleteRenter(){
+				this.showTipModal()
+			},
+			returnSure(){
+				this.$request.post('/roomUser/delete',{
+					id:this.userId
+				}).then((res)=>{
+					this.hideTipModal();
+					uni.showToast({
+						title:'租客删除成功',
+						duration:1500
+					})
+					setTimeout(()=>{
+						uni.navigateBack({
+							delta:2
+						})
+					},2000)
+				})
+			},
+			showTipModal(){
+				this.isShowTipModal = true
+			},
+			hideTipModal(){
+				this.isShowTipModal = false
+			},
+			cancel(){
+				this.isShowSureModal = false
+			},
 			getRoomInfo(id) {
 				this.$request.post('room/findRoomById', {
 					id
@@ -370,11 +417,12 @@
 					let rentIndex = parseInt(data.payRentCycle) - 1;
 					console.log(rentIndex)
 					this.chooseIndex = rentIndex;
-					this.radioChange({
-						target: {
-							value: data.tenantSex
-						}
-					});
+					// this.radioChange({
+					// 	target: {
+					// 		value: data.tenantSex
+					// 	}
+					// });
+					this.currentSex = parseInt(data.tenantSex);
 					this.tenantImg = data.tenantImg;
 					this.renterId = data.id;
 					this.info1.name = data.tenantName;
@@ -397,13 +445,15 @@
 					this.rentCycleList[1] = data.depositNum;
 					// this.currentSex = data.tenantSex;
 					
-					this.chooseLi(data.rentMonthNum, true);
+					this.chooseLi(data.rentMonthNum, true,true);
 					this.rentMonthNum = data.rentMonthNum;
 					this.remarks = data.remarks;
 				});
 			},
 			showList() {
-				this.listShow = true;
+				if(!this.isEdit){
+					this.listShow = true;
+				}
 			},
 			hideList() {
 				this.listShow = false;
@@ -417,7 +467,6 @@
 				this.listShow = false;
 			},
 			radioChange(evt) {
-				console.log(evt);
 				for (let i = 0; i < this.sexList.length; i++) {
 					if (this.sexList[i].value == evt.target.value) {
 						this.currentSex = this.sexList[i].value;
@@ -426,7 +475,7 @@
 				}
 				// this.currentSex = evt.target.value;
 			},
-			save() {
+			sure(){
 				let _this = this;
 				uni.showLoading({
 					title: '正在保存...'
@@ -463,6 +512,62 @@
 					par.tenantImg = this.tenantImg
 					par.id = this.commInfo.renterId
 				}
+				_this.$request.post(postUrl, par).then(responce => {
+					uni.hideLoading();
+					let tipContent = this.isEdit ? '编辑成功' : '添加成功';
+					uni.showToast({
+						title: tipContent
+					});
+					setTimeout(() => {
+						// let pages = getCurrentPages();
+						//    if (pages.length > 1) {
+						//        let beforePage = pages[pages.length - 2];
+						// 		console.log(beforePage)
+						//            beforePage.$vm.updateData()
+						uni.navigateBack({
+							delta: 1
+						});
+						// }
+					}, 1500);
+				});
+			},
+			save() {
+				let _this = this;
+				// uni.showLoading({
+				// 	title: '正在保存...'
+				// });
+				// let postUrl = this.isEdit ? '/roomUser/update' : '/roomUser/signTenant';
+				// let par = {
+				// 	roomId: _this.roomId,
+				// 	tenantName: _this.info1.name,
+				// 	landlordId: _this.$store.state.landladyInfo.id,
+				// 	landlordName: _this.$store.state.landladyInfo.userName,
+				// 	tenantPhone: _this.info1.tel,
+				// 	tenantIdNumber: _this.info1.IDNum,
+				// 	idCardImg1: _this.imgSideUrl,
+				// 	idCardImg2: _this.imgOtherSideUrl,
+				// 	eleUnitPrice: _this.eleUnitPrice ? _this.eleUnitPrice : 1,
+				// 	elePrevNum: _this.info3.eleCost,
+				// 	waterPrice: _this.info3.waterCost,
+				// 	netPrice: _this.info3.netCost,
+				// 	startDate: _this.info2.startDate ? _this.info2.startDate + ' 00:00:00' : _this.date + ' 00:00:00',
+				// 	rentMonthNum: _this.rentMonthNum,
+				// 	endDate:_this.info2.keepDate ? _this.info2.keepDate + ' 00:00:00' : _this.pickerKeepDate + ' 00:00:00',
+				// 	payRentCycle: _this.rentCycleList[0],
+				// 	rentPrice: _this.info2.rentUnitPrice,
+				// 	depositAmount: _this.info2.deposit,
+				// 	depositNum: _this.rentCycleList[1],
+				// 	tenantSex: _this.currentSex, //性别字段
+				// 	remarks: _this.remarks
+				// };
+				// if (this.isEdit) {
+				// 	par.id = this.renterId;
+				// 	par.tenantId = this.userId;
+				// }
+				// if(this.isFillStatus){
+				// 	par.tenantImg = this.tenantImg
+				// 	par.id = this.commInfo.renterId
+				// }
 				_this.$refs.form1.validate(res1 => {
 					if (res1) {
 						console.log(res1);
@@ -470,25 +575,25 @@
 							if (res2) {
 								_this.$refs.form3.validate(res3 => {
 									if (res3) {
-										console.log(par)
-										_this.$request.post(postUrl, par).then(responce => {
-											uni.hideLoading();
-											let tipContent = this.isEdit ? '编辑成功' : '添加成功';
-											uni.showToast({
-												title: tipContent
-											});
-											setTimeout(() => {
-												// let pages = getCurrentPages();
-												//    if (pages.length > 1) {
-												//        let beforePage = pages[pages.length - 2];
-												// 		console.log(beforePage)
-												//            beforePage.$vm.updateData()
-												uni.navigateBack({
-													delta: 1
-												});
-												// }
-											}, 1500);
-										});
+										_this.isShowSureModal = true;
+										// _this.$request.post(postUrl, par).then(responce => {
+										// 	uni.hideLoading();
+										// 	let tipContent = this.isEdit ? '编辑成功' : '添加成功';
+										// 	uni.showToast({
+										// 		title: tipContent
+										// 	});
+										// 	setTimeout(() => {
+										// 		// let pages = getCurrentPages();
+										// 		//    if (pages.length > 1) {
+										// 		//        let beforePage = pages[pages.length - 2];
+										// 		// 		console.log(beforePage)
+										// 		//            beforePage.$vm.updateData()
+										// 		uni.navigateBack({
+										// 			delta: 1
+										// 		});
+										// 		// }
+										// 	}, 1500);
+										// });
 									}
 								});
 							}
@@ -521,16 +626,17 @@
 				}
 			},
 			chooseImg(type) {
-				this.isChooseReverseImg = type
-				let returnUrl = myUploadImg.upload().then((res) => {
-					console.log(res)
-					if (this.isChooseReverseImg) {
-						this.imgOtherSideUrl = res;
-					} else {
-						this.imgSideUrl = res;
-					}
-				})
-
+				if(!this.isEdit){
+					this.isChooseReverseImg = type
+					let returnUrl = myUploadImg.upload().then((res) => {
+						console.log(res)
+						if (this.isChooseReverseImg) {
+							this.imgOtherSideUrl = res;
+						} else {
+							this.imgSideUrl = res;
+						}
+					})
+				}
 			},
 			espInput(e) {
 				console.log(this.rentCycleList)
@@ -564,13 +670,15 @@
 					})
 				})
 			},
-			chooseLi(index, temp) {
-				if (temp) {
-					this.currentLiIndex = index == 6 ? 0 : (index == 12 ? 1 : (index == 24 ? 2 : 3))
-				} else {
-					this.currentLiIndex = index
-					this.pickerKeepDate = this.getKeepDate(index)
-					this.info2.keepDate = this.getKeepDate(index)
+			chooseLi(index, temp,isPass) {
+				if(!this.isEdit || isPass){
+					if (temp) {
+						this.currentLiIndex = index == 6 ? 0 : (index == 12 ? 1 : (index == 24 ? 2 : 3))
+					} else {
+						this.currentLiIndex = index
+						this.pickerKeepDate = this.getKeepDate(index)
+						this.info2.keepDate = this.getKeepDate(index)
+					}
 				}
 			},
 			getKeepDate(index) {
@@ -801,6 +909,18 @@
 		font-size: 32rpx;
 		margin: 124rpx auto 72rpx auto;
 	}
+	.delBtn{
+		width: 257rpx;
+		height: 74rpx;
+		line-height: 74rpx;
+		text-align: center;
+		border-radius: 37rpx;
+		border: 1rpx solid #FFA044;
+		color: #FFFFFF;
+		font-size: 32rpx;
+		color: #FFA044;
+		margin: 124rpx auto 72rpx auto;
+	}
 
 	.sexRadio {
 		text-align: right;
@@ -811,4 +931,70 @@
 	.sexRadio text {
 		color: #444444;
 	}
+	
+	/* //确定弹窗 */
+	.modelContainer{
+		width: 620rpx;
+		/* height: fit-content; */
+		background-color: #FFFFFF;
+		border-radius: 25rpx;
+		margin: 280rpx 0 0 65rpx;
+		padding-top: 40rpx;
+		text-align: center;
+	}
+	.modalTitle{
+		font-size: 32rpx;
+		font-weight: bold;
+		margin-bottom: 40rpx;
+	}
+	.modalContent{
+		font-size: 28rpx;
+		text-align: left;
+		color: #999999;
+		width: calc(100% - 130rpx);
+		height: fit-content;
+		margin: 0 0 28rpx  65rpx;
+		white-space: normal;
+		line-height: 36rpx;
+	}
+	.btnBox{
+		border-top: 2rpx solid rgba(217,217,220,0.6);
+		width: 100%;
+		height: 90rpx;
+		position: relative;
+	}
+	.btnBox .modalCancel,.btnBox .modalSure{
+		width: 50%;
+		height: 100%;
+		font-size: 32rpx;
+		font-weight: 500;
+		display: inline-block;
+		line-height: 90rpx;
+	}
+	.btnBox .modalCancel{
+		color: #BABABA;
+	}
+	.btnBox .modalSure{
+		color: #FFA044;
+	}
+	.btnDivide{
+		width: 2rpx;
+		height: 100%;
+		background-color: rgba(217,217,220,0.6);
+		position: absolute;
+		right: 50%;
+		top: 0;
+	}
+	.modalMask{
+		width: 100%;
+		height: 100vh;
+		background:rgba(0,0,0,0.3);
+		position: fixed;
+		z-index: 99;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+	}
+	/* end */
 </style>

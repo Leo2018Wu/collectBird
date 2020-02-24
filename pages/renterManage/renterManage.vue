@@ -48,7 +48,8 @@
 			}
 		},
 		onLoad() {
-			console.log(this.$store)
+		},
+		onShow() {
 			let landordId = this.$store.state.landladyInfo.id
 			this.getRenterList(landordId)
 			this.getTopNum(landordId)
