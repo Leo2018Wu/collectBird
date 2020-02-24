@@ -1,65 +1,76 @@
 <template>
 	<view class="inviteRenter">
 		<view class="headBg"></view>
-		<view class="content">
-			<view class="landLordInfoBox">
-				<image v-if="!avatar" class="avatar" src="../../static/defaultMale.png" mode="aspectFit"></image>
-				<image v-else class="avatar" :src="avatar" mode="aspectFit"></image>
-				<image class="divide" src="../../static/reportFormDivide.png" mode="aspectFit"></image>
-				<view class="landLordInfo">
-					<view>我是<span>{{landLordName}}</span></view>
-					<view class="desc">邀请您填写入住基本信息</view>
-				</view>
-			</view>
-			<view class="form">
-				<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form" :model="info">
-					<evan-form-item label="姓名" prop="name" :noBold="true">
-						<template v-slot:main>
-							<input class="form-input" placeholder-class="form-input-placeholder" v-model="info.name" placeholder="请输入姓名" />
-						</template>
-					</evan-form-item>
-					<evan-form-item label="性别" prop="sex" :noBold="true">
-						<template v-slot:main>
-							<radio-group class="sexRadio" name="sexRadio" @change="radioChange">
-								<label style="display: flex;justify-content: flex-end;">
-									<view v-for="(item, index) in sexList" :key="index">
-										<radio :value="item.value" :checked="index === currentSex" color="#FFA344" />
-										<text>{{ item.name }}</text>
-									</view>
-								</label>
-							</radio-group>
-						</template>
-					</evan-form-item>
-					<evan-form-item label="电话" prop="tel" :noBold="true">
-						<template v-slot:main>
-							<input class="form-input" type="number" maxlength="11" placeholder-class="form-input-placeholder" v-model="info.tel"
-							 placeholder="租客电话" @input="getPhone" />
-						</template>
-					</evan-form-item>
-					<evan-form-item label="身份证号" prop="IDNum" :noBold="true">
-						<template v-slot:main>
-							<input class="form-input" type="idcard" placeholder-class="form-input-placeholder" maxlength="18" v-model="info.IDNum"
-							 placeholder="身份证号" @input="getID" />
-						</template>
-					</evan-form-item>
-				</evan-form>
-				<view class="idContainer">
-					<view class="idName">身份证照片</view>
-					<view class="idImgBox">
-						<view class="chooseIdImg0" @click="chooseImg(false)">
-							<image v-if="imgSideUrl" :src="imgSideUrl" mode="aspectFill"></image>
-							<image v-if="!imgSideUrl" src="../../static/idImg0.png" mode="aspectFit"></image>
-						</view>
-						<view class="chooseIdImg1" @click="chooseImg(true)">
-							<image v-if="imgOtherSideUrl" :src="imgOtherSideUrl" mode="aspectFill"></image>
-							<image v-if="!imgOtherSideUrl" src="../../static/idImg1.png" mode="aspectFit"></image>
-						</view>
+		<view  v-if="loadingEnd">
+			<view class="content" v-if="!isSubmitSuccess">
+				<view class="landLordInfoBox">
+					<image v-if="!avatar" class="avatar" src="../../static/defaultMale.png" mode="aspectFit"></image>
+					<image v-else class="avatar" :src="avatar" mode="aspectFit"></image>
+					<image class="divide" src="../../static/reportFormDivide.png" mode="aspectFit"></image>
+					<view class="landLordInfo">
+						<view>我是<span>{{landLordName}}</span></view>
+						<view class="desc">邀请您填写入住基本信息</view>
 					</view>
-
+				</view>
+				<view class="form">
+					<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form" :model="info">
+						<evan-form-item label="姓名" prop="name" :noBold="true">
+							<template v-slot:main>
+								<input class="form-input" placeholder-class="form-input-placeholder" v-model="info.name" placeholder="请输入姓名" />
+							</template>
+						</evan-form-item>
+						<evan-form-item label="性别" prop="sex" :noBold="true">
+							<template v-slot:main>
+								<radio-group class="sexRadio" name="sexRadio" @change="radioChange">
+									<label style="display: flex;justify-content: flex-end;">
+										<view v-for="(item, index) in sexList" :key="index">
+											<radio :value="item.value" :checked="index === currentSex" color="#FFA344" />
+											<text>{{ item.name }}</text>
+										</view>
+									</label>
+								</radio-group>
+							</template>
+						</evan-form-item>
+						<evan-form-item label="电话" prop="tel" :noBold="true">
+							<template v-slot:main>
+								<input class="form-input" type="number" maxlength="11" placeholder-class="form-input-placeholder" v-model="info.tel"
+								 placeholder="租客电话" @input="getPhone" />
+							</template>
+						</evan-form-item>
+						<evan-form-item label="身份证号" prop="IDNum" :noBold="true">
+							<template v-slot:main>
+								<input class="form-input" type="idcard" placeholder-class="form-input-placeholder" maxlength="18" v-model="info.IDNum"
+								 placeholder="身份证号" @input="getID" />
+							</template>
+						</evan-form-item>
+					</evan-form>
+					<view class="idContainer">
+						<view class="idName">身份证照片</view>
+						<view class="idImgBox">
+							<view class="chooseIdImg0" @click="chooseImg(false)">
+								<image v-if="imgSideUrl" :src="imgSideUrl" mode="aspectFill"></image>
+								<image v-if="!imgSideUrl" src="../../static/idImg0.png" mode="aspectFit"></image>
+							</view>
+							<view class="chooseIdImg1" @click="chooseImg(true)">
+								<image v-if="imgOtherSideUrl" :src="imgOtherSideUrl" mode="aspectFill"></image>
+								<image v-if="!imgOtherSideUrl" src="../../static/idImg1.png" mode="aspectFit"></image>
+							</view>
+						</view>
+			
+					</view>
+				</view>
+				<button class="submitBtn" open-type="getUserInfo" @getuserinfo="sumbit">提交</button>
+			</view>
+			<view class="content" v-else>
+				<image class="success" src="../../static/submit_success.png" mode="aspectFit"></image>
+				<view class="sucTip">信息已提交，祝您入住愉快！</view>
+				<view class="bottomBox">
+					<image src="../../static/aboutUs.png" mode="aspectFit"></image>
+					<span class="logoTip">收租鸟，慧收租</span>
 				</view>
 			</view>
 		</view>
-		<view class="submitBtn" @click="sumbit">提交</view>
+	
 	</view>
 </template>
 
@@ -74,11 +85,14 @@
 		},
 		data() {
 			return {
-				returnData:{},
-				roomId:'',
-				landLordId:'',
-				landLordName:'',
-				avatar:'',
+				loadingEnd: false,
+				isSubmitSuccess: false,
+				returnData: {},
+				roomId: '',
+				landLordId: '',
+				landLordName: '',
+				avatar: '',
+				renterAvatar: '',
 				imgOtherSideUrl: '',
 				imgSideUrl: '',
 				isChooseReverseImg: false,
@@ -138,16 +152,51 @@
 		},
 		onLoad(options) {
 			console.log(options)
+			let _this = this;
 			this.roomId = options.roomId;
 			this.landLordId = options.landLordId;
 			this.landLordName = options.landLordName;
 			this.avatar = options.landLordAva
+			this.getRoomInfo(this.roomId)
 			this.$nextTick(() => {
 				this.$refs.form.setRules(this.rules)
 			})
+			//判断用户是否授权过
+			uni.getSetting({
+				success(res) {
+					console.log(res);
+					if (res.authSetting['scope.userInfo']) {
+						_this.getUserInfo();
+					}
+				},
+			});
 		},
 		methods: {
-			
+			getRoomInfo(id) {
+				let _this = this;
+				_this.$request.post('room/findRoomById', {
+					id
+				}).then((res) => {
+					console.log(res)
+					if (res.data.data.tenantStatus >= '2') {
+						_this.isSubmitSuccess = true
+					}
+					// setTimeout(() => {
+						_this.loadingEnd = true
+					// }, 200)
+				})
+			},
+			getUserInfo() {
+				// 获取用户信息
+				let _this = this
+				
+				uni.getUserInfo({
+					provider: 'weixin',
+					success: function(infoRes) {
+						_this.renterAvatar = infoRes.userInfo.avatarUrl;
+					},
+				})
+			},
 			sumbit() {
 				let _this = this;
 				let par = {
@@ -159,41 +208,65 @@
 					"tenantPhone": this.info.tel,
 					"tenantIdNumber": this.info.IDNum,
 					"idCardImg1": this.imgSideUrl,
-					"idCardImg2": this.imgOtherSideUrl
+					"idCardImg2": this.imgOtherSideUrl,
 				}
-				this.$debounce.canDoFunction({
-				    key:"事件名",//基于此值判断是否可以操作，如两个方法传入了同样的key，则会混淆，建议传入调用此事件的方法名，简单好梳理
-				    time:3000,//如果传入time字段，则为定时器后，自动解除锁定状态，单位（毫秒）
-				    success:()=>{//成功中调用应该操作的方法，被锁定状态不会执行此代码块内的方法
-				        _this.$refs.form.validate(res => {
-				        	if(res){
-				        		_this.$request.post('roomUser/inviTenant',par).then((data)=>{
-									if(data.data.code == '200'){
-										uni.showToast({
-											title:'填写成功',
-											duration:1500
-										})
-									}else{
-										uni.showToast({
-											title:data.data.msg,
-											icon:'none',
-											duration:1500
+				uni.showLoading({
+					title:'正在提交...',
+					mask:true,
+				})
+				// 获取用户信息
+				uni.getUserInfo({
+					provider: 'weixin',
+					success: function(infoRes) {
+						_this.renterAvatar = infoRes.userInfo.avatarUrl;
+						_this.$debounce.canDoFunction({
+							key: "事件名", //基于此值判断是否可以操作，如两个方法传入了同样的key，则会混淆，建议传入调用此事件的方法名，简单好梳理
+							time: 3000, //如果传入time字段，则为定时器后，自动解除锁定状态，单位（毫秒）
+							success: () => { //成功中调用应该操作的方法，被锁定状态不会执行此代码块内的方法
+								_this.$refs.form.validate(res => {
+									if (res) {
+										uni.hideLoading()
+										par.tenantImg = _this.renterAvatar
+										_this.$request.post('roomUser/inviTenant', par).then((data) => {
+											if (data.data.code == '200') {
+												_this.isSubmitSuccess = true;
+												uni.showToast({
+													title: '填写成功',
+													duration: 1500
+												})
+											} else {
+												uni.showToast({
+													title: data.data.msg,
+													icon: 'none',
+													duration: 1500
+												})
+											}
+											// setTimeout(() => {
+											// 	uni.reLaunch({
+											// 		url: '../home/home'
+											// 	})
+											// }, 2100)
 										})
 									}
-									setTimeout(()=>{
-										uni.reLaunch({
-											url:'../home/home'
-										})
-									},2100)
-				        		})
-				        	}
-				        })
-				    },
-					complete:()=>{
-						
+								})
+							},
+							complete: () => {
+
+							}
+						})
+					},
+					fail: function() {
+						uni.showToast({
+							title: '拒绝授权会导致您提交信息失败',
+							icon: 'none',
+							duration: 1500
+						})
 					}
-				})
-			
+				});
+
+
+
+
 			},
 			getPhone(e) {
 				let _this = this
@@ -283,6 +356,7 @@
 		height: 98rpx;
 		margin-right: 26rpx;
 		position: relative;
+		border-radius: 50%;
 	}
 
 	.landLordInfoBox .divide {
@@ -365,5 +439,42 @@
 		color: #FFFFFF;
 		text-align: center;
 		line-height: 86rpx;
+	}
+
+	.success {
+		width: 140rpx;
+		height: 140rpx;
+		margin: 38rpx auto 64rpx auto;
+		border-radius: 50%;
+		display: block;
+	}
+
+	.sucTip {
+		width: 100%;
+		text-align: center;
+		color: #333333;
+		font-size: 34rpx;
+	}
+
+	.bottomBox {
+		width: 100%;
+		height: 68rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		position: absolute;
+		bottom: 30rpx;
+		left: 0;
+	}
+
+	.bottomBox image {
+		height: 100%;
+		width: 68rpx;
+	}
+
+	.logoTip {
+		margin-left: 20rpx;
+		color: #C2C2C2;
+		font-size: 32rpx;
 	}
 </style>

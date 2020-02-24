@@ -6,8 +6,8 @@ import store from './store'
 import validate from './util/validate.js'
 import debounce from './util/debounce.js'
 
-// wxRequest.defaults.baseURL = "https://funnyduck.raysler.com/rentbird";
-wxRequest.defaults.baseURL = "https://funnyduck.raysler.com/rentbird_test";//测试地址
+wxRequest.defaults.baseURL = "https://funnyduck.raysler.com/rentbird";
+// wxRequest.defaults.baseURL = "https://funnyduck.raysler.com/rentbird_test"; //测试地址
 // wxRequest.defaults.baseURL = "http://192.168.10.184:8889";
 wxRequest.defaults.headers.post['Content-Type'] = 'application/json';
 Vue.prototype.$baseUrl = "https://funnyduck.raysler.com/rentbird";
@@ -21,12 +21,11 @@ Vue.prototype.$debounce = debounce;
 App.mpType = 'app'
 
 Object.keys(filters).forEach(key => {
-  console.log(key)
-  Vue.filter(key, filters[key])
+	console.log(key)
+	Vue.filter(key, filters[key])
 })
-
 const app = new Vue({
-  store,
-  ...App
+	store,
+	...App
 })
 app.$mount()

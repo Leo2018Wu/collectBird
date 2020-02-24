@@ -260,7 +260,7 @@
 
 	.text {
 		color: rgba(51, 51, 51, 1);
-		border-bottom: 2rpx solid #EBEBEB80;
+		border-bottom: 1rpx solid #EBEBEB;
 	}
 
 	.button {

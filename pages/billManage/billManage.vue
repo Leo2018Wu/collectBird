@@ -5,12 +5,12 @@
 			<view class="houseTotalMsg">
 				<view class="leftMsg">
 					<view class="leftMsgTitle">未收金额</view>
-					<view class="leftMsgValue">{{ unIncome }}</view>
+					<view class="leftMsgValue">{{ unIncome | thousandsPoints}}</view>
 				</view>
 				<view class="line"></view>
 				<view class="rightMsg">
 					<view class="rightMsgTitle">已收金额</view>
-					<view class="rightMsgValue">{{ income }}</view>
+					<view class="rightMsgValue">{{ income | thousandsPoints}}</view>
 				</view>
 			</view>
 		</view>
@@ -23,7 +23,7 @@
 					<view class="myBillItem">
 						<view class="itemFlex itemTop">
 							<view class="myBillName">租金账单</view>
-							<view class="topRight">￥{{ item.totalAmount }}<span class="reminder"
+							<view class="topRight">￥{{ item.totalAmount | thousandsPoints}}<span class="reminder"
 								 v-if="item.depositAmount">(含押金)</span></view>
 						</view>
 						<view class="itemFlex itemMiddle">

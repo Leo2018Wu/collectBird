@@ -1,9 +1,12 @@
 <template>
 	<view>
 		<view class="section" @click="emit()">
-			<!-- <image v-if="userInfo.userImg" class="renterAvatar" :src="userInfo.userImg" mode="aspectFill"></image> -->
-			<image v-if="userInfo.tenantSex == 0" class="renterAvatar" src="../static/defaultMale.png" mode="aspectFill"></image>
-			<image v-else class="renterAvatar" src="../static/defaultFemale.png" mode="aspectFill"></image>
+			<image v-if="userInfo.tenantImg" class="renterAvatar" :src="userInfo.tenantImg" mode="aspectFill"></image>
+			<view  v-if="!userInfo.tenantImg">
+				<image v-if="userInfo.tenantSex == 1" class="renterAvatar" src="../static/defaultFemale.png" mode="aspectFill"></image>
+				<image v-else class="renterAvatar" src="../static/defaultMale.png" mode="aspectFill"></image>
+			</view>
+			
 			<view class="renterInfo">
 				<view class="infoTop">
 					<span>{{userInfo.tenantName}}</span>

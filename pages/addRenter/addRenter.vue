@@ -119,19 +119,19 @@
 				<evan-form-item label="电费(1元/度)" prop="eleCost">
 					<template v-slot:main>
 						<input class="form-input inputColor" type="digit" maxlength="5" placeholder-class="form-input-placeholder" v-model="info3.eleCost"
-						 placeholder="初始刻度" />
+						 placeholder="请输入初始刻度" />
 					</template>
 				</evan-form-item>
 				<evan-form-item label="水费(元/月)" prop="waterCost">
 					<template v-slot:main>
 						<input class="form-input inputColor" type="digit" placeholder-class="form-input-placeholder" v-model="info3.waterCost"
-						 placeholder="30元/月" />
+						 placeholder="请输入水费" />
 					</template>
 				</evan-form-item>
 				<evan-form-item label="宽带(元/月)" prop="netCost" :border="false">
 					<template v-slot:main>
 						<input class="form-input inputColor" type="digit" placeholder-class="form-input-placeholder" v-model="info3.netCost"
-						 placeholder="30元/月" />
+						 placeholder="请输入宽带费" />
 					</template>
 				</evan-form-item>
 				<!-- <view class="section4 whiteBg">
@@ -165,6 +165,7 @@
 		data() {
 			const currentDate = this.getDate();
 			return {
+				tenantImg:'',
 				remarks: '',
 				userId: null,
 				renterId: null,
@@ -374,6 +375,7 @@
 							value: data.tenantSex
 						}
 					});
+					this.tenantImg = data.tenantImg;
 					this.renterId = data.id;
 					this.info1.name = data.tenantName;
 					this.info1.tel = data.tenantPhone;
@@ -458,6 +460,7 @@
 					par.tenantId = this.userId;
 				}
 				if(this.isFillStatus){
+					par.tenantImg = this.tenantImg
 					par.id = this.commInfo.renterId
 				}
 				_this.$refs.form1.validate(res1 => {

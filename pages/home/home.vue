@@ -3,20 +3,20 @@
 		<view class="mouth">
 			<view class="mouthIncome">
 				<view class="mouthIncomeText">本月净收入 (元)</view>
-				<span class="mouthIncomeNum">{{ mouthIncome }}</span>
+				<span class="mouthIncomeNum">{{ mouthIncome | thousandsPoints }}</span>
 			</view>
 			<view class="payment">
 				<view class="">
 					<view class="paymentText">本月账单待收</view>
-					<span class="paymentNum">{{ billDuein }}</span>
+					<span class="paymentNum">{{ billDuein | thousandsPoints}}</span>
 				</view>
 				<view class="">
 					<view class="paymentText">本月账单已收</view>
-					<span class="paymentNum">{{ billReceived }}</span>
+					<span class="paymentNum">{{ billReceived | thousandsPoints}}</span>
 				</view>
 				<view class="">
 					<view class="paymentText">今日已收金额</view>
-					<span class="paymentNum">{{ todayReceived }}</span>
+					<span class="paymentNum">{{ todayReceived | thousandsPoints}}</span>
 				</view>
 			</view>
 		</view>
@@ -97,6 +97,7 @@ export default {
 	
 	},
 	onShow(option) {
+		console.log(this)
 		// if (this.isPopUpModal) {
 			this.checkLoginStatus().then(res => {
 				this.loginFlag = res;

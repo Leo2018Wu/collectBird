@@ -4,7 +4,7 @@
 			<view class="profitContainer">
 				<view class="profitBox">
 					<view class="profitBar">应收(元)</view>
-					<span>{{ billInfo.totalAmount ? billInfo.totalAmount : '0' }}</span>
+					<span>{{ billInfo.totalAmount}}</span>
 				</view>
 				<view v-if="billInfo.billStatus == 4" class="profitBox">
 					<view class="profitBar">实收(元)</view>
@@ -41,9 +41,9 @@
 			<view class="billDateBox">
 				<view class="billDateLi">
 					<span class="billDateTitle">租金</span>
-					<span>{{ billInfo.total }}</span>
+					<span>{{ !billInfo.total ? 0 : billInfo.total }}</span>
 				</view>
-				<view class="billDateLi">
+				<view class="billDateLi" v-if="billInfo.depositAmount">
 					<span class="billDateTitle">押金</span>
 					<span class="billDate">{{ !billInfo.depositAmount ? 0 : billInfo.depositAmount }}</span>
 				</view>
@@ -136,14 +136,11 @@
 			};
 		},
 		onShow() {
-			console.log('调用onshow');
 			this.getBillDetail(this.billId);
 		},
 		onLoad(option) {
-			console.log('调用onload');
-			console.log(option);
+			console.log(this)
 			this.billId = option.billId;
-			this.getBillDetail(option.billId);
 			this.getAddr(option.tenantId);
 		},
 		methods: {
@@ -322,10 +319,10 @@
 	.billDateLi:not(:last-of-type)::after {
 		content: '';
 		width: calc(100% - 48rpx);
-		height: 4rpx;
-		background-color: #ebebeb80;
+		height: 1rpx;
+		background-color: #ebebeb;
 		position: absolute;
-		bottom: -2rpx;
+		bottom: 0rpx;
 		left: 24rpx;
 	}
 
@@ -412,7 +409,7 @@
 		display: flex;
 		justify-content: flex-start;
 		align-items: center;
-		border-top: 3rpx solid #ebebeb80;
+		border-top: 1rpx solid #ebebeb;
 		height: 94rpx;
 	}
 

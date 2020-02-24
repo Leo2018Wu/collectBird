@@ -66,11 +66,12 @@
 			</view>
 			
 		</view>
-		<view class="saveBtnBox">
-			<view class="bindNewLandlord" @click="bindNewLandlord">绑定业主</view>
+		<view class="saveBtnBox" v-if="inEdit">
+			<view v-if="inEdit && !houseInfo.owner" class="bindNewLandlord" @click="bindNewLandlord">绑定业主</view>
+			<view v-if="inEdit && houseInfo.owner" class="bindNewLandlord" @click="showNewLandLord">业主信息</view>
 			<view class="saveBtn" @click="save()">保存</view>
 		</view>
-		
+		<view v-if="!inEdit" class="saveBtn1" @click="save()">保存</view>
 	</view>
 </template>
 
@@ -92,6 +93,7 @@
 		},
 		data() {
 			return {
+				houseInfo:{},
 				isHaveRenter:false,//房号下是否有租客
 				chooseIndex:null,
 				list: [
@@ -140,6 +142,7 @@
 				uni.setNavigationBarTitle({
 					title:'编辑房号'
 				})
+				this.getHouseInfo(this.houseId)
 			}
 		},
 		onLoad(options){
@@ -152,13 +155,18 @@
 			if(options.houseId){
 				this.inEdit = true;
 				this.houseId = options.houseId;
-				this.getHouseInfo(options.houseId)
+				
 			}
 		},
 		methods: {
+			showNewLandLord(){
+				uni.navigateTo({
+					url:"../addLandLord/addLandLord?ownerId="+this.houseInfo.owner.id+'&houseId='+this.houseId
+				})
+			},
 			bindNewLandlord(){
 				uni.navigateTo({
-					url:"../addLandLord/addLandLord"
+					url:"../addLandLord/addLandLord?houseId="+this.houseId
 				})
 			},
 			inputTip(e){
@@ -200,6 +208,7 @@
 				let _this = this;
 				this.$request.post('/house/findById',{id}).then(res=>{
 					console.log(res)
+					this.houseInfo = res.data.data
 					this.tempRoomList = res.data.data.roomList
 					this.info.houseNo = res.data.data.buildingNo;
 					this.info.roomNo = res.data.data.houseNo;
@@ -409,12 +418,22 @@
 		line-height: 74rpx;
 		margin-top: 140rpx;
 	}
-	.saveBtn{
+	.saveBtn,.saveBtn1{
 		color: #FFFFFF;
 		background:linear-gradient(-90deg,rgba(243,183,73,1) 0%,rgba(240,154,66,1) 100%);
 	}
 	.bindNewLandlord{
 		border: 1rpx solid #FFA344;
 		color: #FFA344;
+	}
+	.saveBtn1{
+		width: 257rpx;
+		height: 74rpx;
+		border-radius: 37rpx;
+		text-align: center;
+		line-height: 74rpx;
+		margin: 140rpx auto 0 auto; 
+		color: #FFFFFF;
+		background:linear-gradient(-90deg,rgba(243,183,73,1) 0%,rgba(240,154,66,1) 100%);
 	}
 </style>

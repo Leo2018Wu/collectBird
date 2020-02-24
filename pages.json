@@ -17,7 +17,7 @@
 		{
 		    "path" : "pages/addLandLord/addLandLord",
 		    "style" : {
-				"navigationBarTitleText": "房东信息"
+				"navigationBarTitleText": "添加业主信息"
 			}
 		},
 		{
