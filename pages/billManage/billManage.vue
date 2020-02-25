@@ -4,13 +4,13 @@
 			<view class="background"></view>
 			<view class="houseTotalMsg">
 				<view class="leftMsg">
-					<view class="leftMsgTitle">未收金额</view>
-					<view class="leftMsgValue">{{ unIncome | thousandsPoints}}</view>
+					<view class="leftMsgTitle">{{para.billType == 0 ? '未收金额' : '未付金额'}}</view>
+					<view class="leftMsgValue"><span v-if="para.billType == 1 && unIncome != 0">-</span>{{ unIncome | thousandsPoints}}</view>
 				</view>
 				<view class="line"></view>
 				<view class="rightMsg">
-					<view class="rightMsgTitle">已收金额</view>
-					<view class="rightMsgValue">{{ income | thousandsPoints}}</view>
+					<view class="rightMsgTitle">{{para.billType == 0 ? '已收金额' : '已付金额'}}</view>
+					<view class="rightMsgValue"><span v-if="para.billType == 1 && income != 0">-</span>{{ income | thousandsPoints}}</view>
 				</view>
 			</view>
 		</view>
@@ -19,12 +19,12 @@
 		</view>
 		<view class="billList">
 			<mescroll-uni :down="downOption" @down="downCallback" :up="upOption" @up="upCallback" :fixed="false" @init="init">
+				<!-- <mescroll-empty v-if="selectList.length==0"></mescroll-empty> -->
 				<view v-for="(item, idx) in selectList" :key="idx" @click="showBill(item)">
 					<view class="myBillItem">
 						<view class="itemFlex itemTop">
 							<view class="myBillName">租金账单</view>
-							<view class="topRight">￥{{ item.totalAmount | thousandsPoints}}<span class="reminder"
-								 v-if="item.depositAmount">(含押金)</span></view>
+							<view class="topRight">￥<span v-if="para.billType == 1 && item.totalAmount != 0">-</span>{{ item.totalAmount | thousandsPoints}}<span class="reminder" v-if="item.depositAmount">(含押金)</span></view>
 						</view>
 						<view class="itemFlex itemMiddle">
 							<view class="myBillDate">{{ item.payRentDate.substr(0, 10) }}</view>
@@ -53,11 +53,13 @@
 </template>
 
 <script>
+	import MescrollEmpty from '@/components/mescroll-uni/components/mescroll-empty.vue';
 	import MescrollUni from '../../components/mescroll-uni/mescroll-uni.vue';
 	export default {
 		name: 'billManage',
 		components: {
-			MescrollUni
+			MescrollUni,
+			MescrollEmpty
 		},
 		data() {
 			return {
@@ -65,7 +67,7 @@
 				// billStatus: '3', // 默认展示已逾期
 				billStatus: '0', // 默认展示已逾期
 				userId: '',
-				arr: ['已逾期', '未收款', '已收款', '全部'],
+				// arr: ['已逾期', '未收款', '已收款', '全部'],
 				currentIndex: 0,
 				// isActive: true, //判断是否选中
 				unIncome: 0,
@@ -75,7 +77,7 @@
 					landlordId: '',
 					pageNum: 1,
 					billStatus: '3',
-					billType:0,
+					billType: 0,
 				},
 				countTotal: '',
 				// 下拉刷新的常用配置
@@ -100,6 +102,10 @@
 			};
 		},
 		computed: {
+			arr() {
+				let list = this.para.billType == 0 ? ['已逾期', '未收款', '已收款', '全部'] : ['已逾期', '未付款', '已付款', '全部'];
+				return list
+			},
 			selectList() {
 				const overdueList = function(item) {
 					return item.overdueDays > 0
@@ -120,6 +126,11 @@
 		},
 		onLoad(options) {
 			this.para.billType = options.billType
+			if (options.billType == 1) {
+				uni.setNavigationBarTitle({
+					title: '房东账单'
+				})
+			}
 		},
 		methods: {
 			updateData() {
@@ -130,7 +141,8 @@
 				let _this = this;
 				_this.$request
 					.post('/bill/money', {
-						id: this.$store.state.landladyInfo.id
+						id: this.$store.state.landladyInfo.id,
+						billType: this.para.billType
 					})
 					.then(res => {
 						console.log(res);
@@ -168,16 +180,16 @@
 			},
 			showBill(item) {
 				console.log(item);
-				if(item.billType == 0){
+				if (item.billType == 0) {
 					uni.navigateTo({
-						url: '../billDetail/billDetail?billId=' + item.id + '&tenantId=' + item.tenantId+'&billType='+item.billType
+						url: '../billDetail/billDetail?billId=' + item.id + '&tenantId=' + item.tenantId + '&billType=' + item.billType
 					});
-				}else if(item.billType == 1){
+				} else if (item.billType == 1) {
 					uni.navigateTo({
-						url: '../billDetail/billDetail?billId=' + item.id + '&ownerId=' + item.ownerId+'&billType='+item.billType
+						url: '../billDetail/billDetail?billId=' + item.id + '&ownerId=' + item.ownerId + '&billType=' + item.billType
 					});
 				}
-				
+
 			},
 			init(e) {
 				this.mescroll = e;
@@ -258,46 +270,54 @@
 		width: calc(100% - 60rpx);
 		margin: 17rpx 0 17rpx 30rpx;
 		height: fit-content;
-		padding:24rpx 32rpx 20rpx 32rpx;
+		padding: 24rpx 32rpx 20rpx 32rpx;
 		background-color: #FFFFFF;
 		border-radius: 12rpx;
 		font-size: 28rpx;
 	}
-	.itemFlex{
+
+	.itemFlex {
 		width: 100%;
 		height: fit-content;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 	}
+
 	.itemTop {
 		color: #333333;
 		font-size: 34rpx;
 		align-items: baseline;
 	}
-	.itemMiddle{
+
+	.itemMiddle {
 		padding-bottom: 12rpx;
 		border-bottom: 1rpx solid #EBEBEB;
 	}
+
 	.myBillName {
 		color: #3333333;
 		font-size: 32rpx;
 		font-weight: bold;
 		margin-bottom: 10rpx;
 	}
-	.myBillDate{
+
+	.myBillDate {
 		font-size: 30rpx;
 		color: #999999;
 	}
-	.topLeft{
+
+	.topLeft {
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
 	}
-	.topLeft:last-of-type{
+
+	.topLeft:last-of-type {
 		align-items: flex-end;
 		margin-bottom: 10rpx;
 	}
+
 	.topRight {
 		font-size: 36rpx;
 		font-weight: bold;
@@ -310,7 +330,8 @@
 		color: #333333;
 		margin-top: 10rpx;
 	}
-	.bottomNo{
+
+	.bottomNo {
 		max-width: 450rpx;
 	}
 

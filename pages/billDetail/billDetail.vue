@@ -3,11 +3,11 @@
 		<view class="section0">
 			<view class="profitContainer">
 				<view class="profitBox">
-					<view class="profitBar">应收(元)</view>
+					<view class="profitBar">{{billType == 0 ? '应收' : '应付'}}(元)</view>
 					<span>{{ billInfo.totalAmount}}</span>
 				</view>
 				<view v-if="billInfo.billStatus == 4" class="profitBox">
-					<view class="profitBar">实收(元)</view>
+					<view class="profitBar">{{billType == 0 ? '实收' : '实付'}}(元)</view>
 					<span>{{ billInfo.totalAmount ? billInfo.totalAmount : '0' }}</span>
 				</view>
 			</view>
@@ -16,26 +16,27 @@
 		</view>
 		<view class="section1">
 			<view class="billStatus">
-				<image v-if="billInfo.billStatus == 4" class="billStatusBg" src="../../static/hasCheck.png" mode="aspectFit"></image>
+				<image v-if="billInfo.billStatus == 4 && billType == 0" class="billStatusBg" src="../../static/hasCheck.png" mode="aspectFit"></image>
+				<image v-if="billInfo.billStatus == 4 && billType == 1" class="billStatusBg" src="../../static/hasCheck1.png" mode="aspectFit"></image>
 				<span class="billTitle">账单状态</span>
-				<span v-if="billInfo.billStatus != 4" class="statusDes0">未到账</span>
-				<span v-if="billInfo.billStatus == 4" class="statusDes1">已到账</span>
+				<span v-if="billInfo.billStatus != 4" class="statusDes0">{{billType == 0 ? '未到账' : '未交租'}}</span>
+				<span v-if="billInfo.billStatus == 4" class="statusDes1">{{billType == 0 ? '已到账' : '已交租'}}</span>
 			</view>
 			<view class="billDateBox">
 				<view class="billDateLi">
-					<span class="billDateTitle">收租日期</span>
-					<span>{{startDate }}</span>
+					<span class="billDateTitle">{{billType == 0 ? '收租日期' : '交租日期'}}</span>
+					<span>{{payRentDate }}</span>
 				</view>
 				<view class="billDateLi">
 					<span class="billDateTitle">缴费周期</span>
 					<span class="billDate">{{ startDate }} ~ {{ endDate }}</span>
 				</view>
 				<view class="billDateLi" v-if="billInfo.billStatus == 4">
-					<span class="billDateTitle">到账日期</span>
-					<span>{{ payRentDate }}</span>
+					<span class="billDateTitle">{{billType == 0 ? '到账日期' : '付款日期'}}</span>
+					<span>{{ arrivalDate }}</span>
 				</view>
 				<view class="billDateLi" v-if="billInfo.billStatus == 4">
-					<span class="billDateTitle">收款方式</span>
+					<span class="billDateTitle">{{billType == 0 ? '收款方式' : '付款方式'}}</span>
 					<span class="billDate">现金</span>
 				</view>
 			</view>
@@ -51,7 +52,7 @@
 			</view>
 			<view v-if="billType == 0">
 				<view class="costDetail">费用明细</view>
-				<view class="electricBox">
+				<!-- 	<view class="electricBox">
 					<view class="elecRight">
 						<view class="unitPrice">
 							{{ electricityInfo.itemName }}
@@ -65,6 +66,13 @@
 						<view v-if="electricityInfo.itemType == 1">抄表日期: {{ electricityInfo.noteDate ? electricityInfo.noteDate.substr(0,10) : '暂无抄表日期' }}</view>
 					</view>
 					<view class="priceTotal">{{ electricityInfo.amount }}</view>
+				</view> -->
+				<view class="waterBox">
+					<view class="waterOuter eleOuter">
+						<span class="eleBar">{{electricityInfo.itemName}}</span>
+						<span class="eleInfo" @click="showSureModal">详情</span>
+						<span class="priceTotal">{{electricityInfo.amount}}元</span>
+					</view>
 				</view>
 				<view class="waterBox" v-for="(item,index) in billInfo.items" :key="index">
 					<view class="waterOuter">
@@ -76,31 +84,51 @@
 		</view>
 		<!-- <view class="remarks">暂无备注</view> -->
 		<view class="remarks">{{ billInfo.remarks ? billInfo.remarks : '无备注' }}</view>
-		<view class="section3" v-if="billInfo.billStatus == 4">
-			<view class="sendBillBox">
-				<image class="sendIcon" src="../../static/sendBill.png" mode="aspectFit"></image>
-				<view>发送账单</view>
-			</view>
-		</view>
-		<view class="section2" v-else>
-			<!-- v-if="!billInfo.depositAmount" -->
-			<view class="leftBtnBox">
-				<view class="sendBillBox" @click="deleteBill">
-					<image class="sendIcon" src="../../static/delete_btn.png" mode="aspectFit"></image>
-					<view>删除</view>
-				</view>
-				<view class="sendBillBox" @click="openMeterRead">
-					<image class="sendIcon" src="../../static/eleWater.png" mode="aspectFit"></image>
-					<view>抄表</view>
-				</view>
+		<view v-if="billType == 0">
+			<view class="section3" v-if="billInfo.billStatus == 4">
 				<view class="sendBillBox">
 					<image class="sendIcon" src="../../static/sendBill.png" mode="aspectFit"></image>
 					<view>发送账单</view>
 				</view>
 			</view>
-			<view class="sureBtn" @click="checkMoney">到账</view>
+			<view class="section2" v-else>
+				<!-- v-if="!billInfo.depositAmount" -->
+				<view class="leftBtnBox">
+					<view class="sendBillBox" @click="deleteBill">
+						<image class="sendIcon" src="../../static/delete_btn.png" mode="aspectFit"></image>
+						<view>删除</view>
+					</view>
+					<view class="sendBillBox" @click="openMeterRead">
+						<image class="sendIcon" src="../../static/eleWater.png" mode="aspectFit"></image>
+						<view>抄表</view>
+					</view>
+					<view class="sendBillBox">
+						<image class="sendIcon" src="../../static/sendBill.png" mode="aspectFit"></image>
+						<view>发送账单</view>
+					</view>
+				</view>
+				<view class="sureBtn" @click="checkMoney">到账</view>
+			</view>
 		</view>
-		<tip-modal v-if="isShowTipModal" :title="'删除账单'" :describition="'是否确认删除账单?'" v-on:emitCancel="hideTipModal" v-on:emitSure="returnSure"></tip-modal>
+		<view class="" v-if="billType == 1">
+			<view class="sureBtnNew" v-if="billInfo.billStatus != 4"  @click="checkMoney">交租</view>
+			<view class="sureBtnNew" v-if="billInfo.billStatus == 4">已交租</view>
+		</view>
+		<tip-modal v-if="isShowTipModal" :title="'删除账单'" :describition="'是否确认删除账单?'" v-on:emitCancel="hideTipModal"
+		 v-on:emitSure="returnSure"></tip-modal>
+		<cover-view v-if="isShowSureModal" class="modalMask" @click="gotIt()" @catchtouchmove='true'>
+			<cover-view class="modelContainer">
+				<cover-view class="modalSureTitle">电费详情</cover-view>
+				<cover-view class="modalContent">单价：{{ electricityInfo.unitPrice }}元/度</cover-view>
+				<cover-view class="modalContent">度数：{{ quantity }}<span>度</span>({{ electricityInfo.currentNum ? electricityInfo.currentNum : '0' }}~{{
+								electricityInfo.prevNum ? electricityInfo.prevNum : '0'
+							}}）</cover-view>
+				<cover-view class="modalContent">抄表日期： {{ electricityInfo.noteDate ? electricityInfo.noteDate.substr(0,10) : '暂无抄表日期' }}</cover-view>
+				<cover-view class="btnBox">
+					<cover-view class="modalSure" @click="gotIt()">知道了</cover-view>
+				</cover-view>
+			</cover-view>
+		</cover-view>
 		<!-- 提示未抄表弹窗 -->
 		<view class="modal" v-show="isShowMeterRead" @click="cancle"></view>
 		<view class="modalBox" v-show="isShowMeterRead">
@@ -120,14 +148,15 @@
 	import tipModal from '../../components/tipModal.vue'
 	import dateForm from '../../util/index.js';
 	export default {
-		components:{
+		components: {
 			tipModal
 		},
 		data() {
 			return {
-				ownerInfo:{},
-				billType:'',
-				isShowTipModal:false,
+				isShowSureModal: false,
+				ownerInfo: {},
+				billType: '',
+				isShowTipModal: false,
 				init: false,
 				billId: null,
 				houseAddrInfo: {},
@@ -147,33 +176,39 @@
 			console.log(this)
 			this.billType = option.billType;
 			this.billId = option.billId;
-			if(option.tenantId){
+			if (option.tenantId) {
 				this.getAddr(option.tenantId);
 			}
-			if(option.ownerId){
+			if (option.ownerId) {
 				this.getOwnerInfo(option.ownerId)
 			}
 		},
 		methods: {
-			deleteBill(){
+			showSureModal() {
+				this.isShowSureModal = true
+			},
+			gotIt() {
+				this.isShowSureModal = false
+			},
+			deleteBill() {
 				this.showTipModal()
 			},
-			hideTipModal(){
+			hideTipModal() {
 				this.isShowTipModal = false;
 			},
-			showTipModal(){
+			showTipModal() {
 				this.isShowTipModal = true;
 			},
-			returnSure(){
-				this.$request.post('/bill/delete',{
-					id:this.billId
-				}).then((res)=>{
+			returnSure() {
+				this.$request.post('/bill/delete', {
+					id: this.billId
+				}).then((res) => {
 					console.log(res)
-					if(res.data.code == 200){
+					if (res.data.code == 200) {
 						this.isShowTipModal = false;
 						uni.showToast({
-							title:'删除成功',
-							duration:800
+							title: '删除成功',
+							duration: 800
 						})
 						let pages = getCurrentPages();
 						if (pages.length > 1) {
@@ -182,9 +217,9 @@
 								beforePage.$vm.updateData()
 							}
 						}
-						setTimeout(()=>{
+						setTimeout(() => {
 							uni.navigateBack();
-						},1500)
+						}, 1500)
 					}
 				})
 			},
@@ -211,7 +246,7 @@
 						_this.endDate = dateForm.dateForm(_this.billInfo.endDate);
 						_this.payRentDate = dateForm.dateForm(_this.billInfo.payRentDate);
 						_this.billInfo.depositAmount = parseFloat(_this.billInfo.depositAmount).toFixed(2);
-						if(isNaN(_this.billInfo.depositAmount)){
+						if (isNaN(_this.billInfo.depositAmount)) {
 							_this.billInfo.depositAmount = 0
 						}
 						_this.billInfo.total = parseFloat(_this.billInfo.total).toFixed(2);
@@ -223,10 +258,10 @@
 						_this.init = true;
 					});
 			},
-			getOwnerInfo(id){
-				this.$request.post('/owner/findById',{
+			getOwnerInfo(id) {
+				this.$request.post('/owner/findById', {
 					id
-				}).then((res)=>{
+				}).then((res) => {
 					this.ownerInfo = res.data.data
 				})
 			},
@@ -244,6 +279,9 @@
 			checkMoney() {
 				console.log('你好')
 				let _this = this;
+				if(this.billType == 1){
+					this.ll()
+				}
 				if (_this.electricityInfo.itemName == '电费') {
 					if (_this.electricityInfo.currentNum == '' || _this.electricityInfo.currentNum == null || _this.electricityInfo.currentNum ==
 						'0') {
@@ -262,7 +300,8 @@
 					})
 				} else {
 					uni.navigateTo({
-						url: '../meterRead/meterRead?billInfo=' + JSON.stringify(this.billInfo) +'&electricityInfo='+JSON.stringify(this.electricityInfo)
+						url: '../meterRead/meterRead?billInfo=' + JSON.stringify(this.billInfo) + '&electricityInfo=' + JSON.stringify(
+							this.electricityInfo)
 					});
 				}
 			},
@@ -285,7 +324,7 @@
 						console.log(res);
 						if (res.data.code == '200') {
 							uni.showToast({
-								title: '到账成功'
+								title: _this.billType == 0 ? '到账成功' : '交租成功'
 							});
 						}
 						_this.getBillDetail(_this.billId);
@@ -456,12 +495,35 @@
 		border-radius: 5rpx;
 	}
 
+	.eleOuter {
+		border: none !important;
+	}
+
 	.waterOuter {
 		display: flex;
 		justify-content: flex-start;
 		align-items: center;
 		border-top: 1rpx solid #ebebeb;
 		height: 94rpx;
+	}
+
+	.eleInfo {
+		width: 96rpx;
+		height: 42rpx;
+		margin-left: 20rpx;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 1rpx solid #999999;
+		color: #999999;
+		font-size: 28rpx;
+		margin-right: auto;
+		border-radius: 5rpx;
+	}
+
+	.eleBar {
+		font-size: 30rpx;
+		color: #333333;
 	}
 
 	.waterBar {
@@ -521,6 +583,18 @@
 		line-height: 92rpx;
 		/* margin-left: 82rpx; */
 	}
+	.sureBtnNew{
+		width: 228rpx;
+		height: 76rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background:linear-gradient(-90deg,rgba(243,183,73,1) 0%,rgba(240,154,66,1) 100%);
+		border-radius:18rpx;
+		color: #FFFFFF;
+		font-size: 34rpx;
+		margin: 140rpx auto 0 auto;
+	}
 
 	.sendBillBox {
 		height: 82rpx;
@@ -528,7 +602,8 @@
 		text-align: center;
 		font-size: 28rpx;
 	}
-	.leftBtnBox{
+
+	.leftBtnBox {
 		width: calc(100% - 258rpx);
 		display: flex;
 		justify-content: space-around;
@@ -617,4 +692,64 @@
 		width: 49%;
 		text-align: center;
 	}
+
+	/* //确定弹窗 */
+	.modelContainer {
+		width: 620rpx;
+		/* height: fit-content; */
+		background-color: #FFFFFF;
+		border-radius: 25rpx;
+		margin: 280rpx 0 0 65rpx;
+		padding-top: 40rpx;
+		text-align: center;
+	}
+
+	.modalSureTitle {
+		font-size: 32rpx;
+		font-weight: bold;
+		margin-bottom: 40rpx;
+	}
+
+	.modalContent {
+		font-size: 28rpx;
+		text-align: left;
+		color: #999999;
+		width: calc(100% - 130rpx);
+		height: fit-content;
+		margin: 0 0 28rpx 65rpx;
+		white-space: normal;
+		line-height: 36rpx;
+	}
+
+	.btnBox {
+		border-top: 2rpx solid rgba(217, 217, 220, 0.6);
+		width: 100%;
+		height: 120rpx;
+	}
+
+	.btnBox .modalSure {
+		width: 220rpx;
+		height: 74rpx;
+		margin: 23rpx auto 0 auto;
+		line-height: 74rpx;
+		background: #FFA044;
+		box-shadow: 0px 8px 19px 2px rgba(242, 166, 69, 0.4);
+		border-radius: 37px;
+		color: #FFFFFF;
+		font-size: 34rpx;
+	}
+
+	.modalMask {
+		width: 100%;
+		height: 100vh;
+		background: rgba(0, 0, 0, 0.3);
+		position: fixed;
+		z-index: 99;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+	}
+
+	/* end */
 </style>

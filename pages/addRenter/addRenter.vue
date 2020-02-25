@@ -5,7 +5,7 @@
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form1" :model="info1">
 				<evan-form-item label="姓名" prop="name">
 					<template v-slot:main>
-						<input class="form-input" :disabled="isEdit" placeholder-class="form-input-placeholder" v-model="info1.name" placeholder="租客姓名" />
+						<input class="form-input" placeholder-class="form-input-placeholder" v-model="info1.name" placeholder="租客姓名" />
 					</template>
 					<template v-slot:tip>
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -16,7 +16,7 @@
 						<radio-group class="sexRadio"  name="sexRadio" @change="radioChange" >
 							<label style="display: flex;justify-content: flex-end;">
 								<view v-for="(item, index) in sexList" :key="index">
-									<radio :value="item.value" :disabled="isEdit" :checked="index === currentSex" color="#FFA344" />
+									<radio :value="item.value"  :checked="index === currentSex" color="#FFA344" />
 									<text>{{ item.name }}</text>
 								</view>
 							</label>
@@ -26,7 +26,7 @@
 				</evan-form-item>
 				<evan-form-item label="电话" prop="tel">
 					<template v-slot:main>
-						<input class="form-input" :disabled="isEdit" type="number" maxlength="11" placeholder-class="form-input-placeholder" v-model="info1.tel"
+						<input class="form-input"  type="number" maxlength="11" placeholder-class="form-input-placeholder" v-model="info1.tel"
 						 placeholder="租客电话" @input="getPhone" />
 					</template>
 					<template v-slot:tip>
@@ -35,7 +35,7 @@
 				</evan-form-item>
 				<evan-form-item label="身份证号" prop="IDNum">
 					<template v-slot:main>
-						<input class="form-input" :disabled="isEdit" type="idcard" placeholder-class="form-input-placeholder" maxlength="18" v-model="info1.IDNum"
+						<input class="form-input"  type="idcard" placeholder-class="form-input-placeholder" maxlength="18" v-model="info1.IDNum"
 						 placeholder="身份证号" @input="getID" />
 					</template>
 					<template v-slot:tip>
@@ -60,7 +60,7 @@
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form2" :model="info2">
 				<evan-form-item label="起租日期" prop="startDate">
 					<template v-slot:main>
-						<picker class="form-input" :disabled="isEdit" mode="date" :value="date" :start="startDate" @change="bindDateChange">{{ date }}</picker>
+						<picker class="form-input" :disabled="isEdit && !isChangeDateDue" mode="date" :value="date" :start="startDate" @change="bindDateChange">{{ date }}</picker>
 						<input v-show="false" class="form-input" placeholder-class="form-input-placeholder" v-model="info2.startDate"
 						 placeholder="请选择" />
 					</template>
@@ -70,7 +70,7 @@
 				</evan-form-item>
 				<evan-form-item label="租期" prop="keepDate" :border="false">
 					<template v-slot:main>
-						<picker class="form-input" :disabled="isEdit" mode="date" :value="pickerKeepDate" :start="startDate" @change="bindKeepDateChange">{{ pickerKeepDate }}</picker>
+						<picker class="form-input" :disabled="isEdit && !isChangeDateDue" mode="date" :value="pickerKeepDate" :start="startDate" @change="bindKeepDateChange">{{ pickerKeepDate }}</picker>
 						<input v-show="false" class="form-input" placeholder-class="form-input-placeholder" v-model="info2.keepDate" placeholder="请选择" />
 					</template>
 					<template v-slot:tip>
@@ -87,7 +87,7 @@
 					<template v-slot:main>
 						<choose-list v-if="listShow" :currentChooseIndex="chooseIndex" v-on:close="hideList" :list="list" :title="'选择收租周期'"
 						 v-on:emitClick="returnEmit"></choose-list>
-						<input class="form-input" :disabled="isEdit" placeholder-class="form-input-placeholder" v-model="info2.rentCycle"
+						<input class="form-input" disabled="true" placeholder-class="form-input-placeholder" v-model="info2.rentCycle"
 						 placeholder="请选择收租周期" @click="showList" />
 					</template>
 					<template v-slot:tip>
@@ -96,7 +96,7 @@
 				</evan-form-item>
 				<evan-form-item label="月租金" prop="rentUnitPrice">
 					<template v-slot:main>
-						<input class="form-input" type="number" :disabled="isEdit" placeholder-class="form-input-placeholder" v-model="info2.rentUnitPrice"
+						<input class="form-input" type="number" :disabled="isEdit && !isChangeDateDue" placeholder-class="form-input-placeholder" v-model="info2.rentUnitPrice"
 						 placeholder="请输入" @input="espInput" />
 					</template>
 					<template v-slot:tip>
@@ -105,7 +105,7 @@
 				</evan-form-item>
 				<evan-form-item label="押金" prop="deposit" :border="false">
 					<template v-slot:main>
-						<input class="form-input" :disabled="isEdit" placeholder-class="form-input-placeholder" v-model="info2.deposit" placeholder="请输入" />
+						<input class="form-input" :disabled="isEdit && !isChangeDateDue" placeholder-class="form-input-placeholder" v-model="info2.deposit" placeholder="请输入" />
 					</template>
 					<template v-slot:tip>
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -118,19 +118,19 @@
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form3" :model="info3">
 				<evan-form-item label="电费(1元/度)" prop="eleCost">
 					<template v-slot:main>
-						<input class="form-input inputColor" :disabled="isEdit" type="digit" maxlength="5" placeholder-class="form-input-placeholder" v-model="info3.eleCost"
+						<input class="form-input inputColor" type="digit" maxlength="5" placeholder-class="form-input-placeholder" v-model="info3.eleCost"
 						 placeholder="请输入初始刻度" />
 					</template>
 				</evan-form-item>
 				<evan-form-item label="水费(元/月)" prop="waterCost">
 					<template v-slot:main>
-						<input class="form-input inputColor" :disabled="isEdit" type="digit" placeholder-class="form-input-placeholder" v-model="info3.waterCost"
+						<input class="form-input inputColor"  type="digit" placeholder-class="form-input-placeholder" v-model="info3.waterCost"
 						 placeholder="请输入水费" />
 					</template>
 				</evan-form-item>
 				<evan-form-item label="宽带(元/月)" prop="netCost" :border="false">
 					<template v-slot:main>
-						<input class="form-input inputColor" :disabled="isEdit" type="digit" placeholder-class="form-input-placeholder" v-model="info3.netCost"
+						<input class="form-input inputColor" type="digit" placeholder-class="form-input-placeholder" v-model="info3.netCost"
 						 placeholder="请输入宽带费" />
 					</template>
 				</evan-form-item>
@@ -143,12 +143,17 @@
 				</view> -->
 			</evan-form>
 		</view>
-		<view class="section4 whiteBg"><textarea class="secTip textOverFlow" :disabled="isEdit" placeholder="备注" v-model="remarks"
+		<view class="section4 whiteBg"><textarea class="secTip textOverFlow"  placeholder="备注" v-model="remarks"
 			 placeholder-class="textPlaceholder"></textarea></view>
-		<view v-if="!isEdit" class="sureBtn" @click="save">保存</view>
-		<view v-if="isEdit" class="delBtn" @click="deleteRenter">删除</view>
+		<cover-view class="btnBoxMy twoButton textLeft" v-if="!listShow && isEdit">
+			<cover-view  class="delBtn" @click="deleteRenter">删除</cover-view>
+			<cover-view  class="sureBtn" @click="save">保存</cover-view>
+		</cover-view>
+		<cover-view class="btnBoxMy oneButton" v-if="!listShow && !isEdit">
+			<cover-view  class="sureBtn" @click="save">保存</cover-view>
+		</cover-view>
 		<tip-modal v-if="isShowTipModal" :title="'删除租客'" :describition="'删除租客将删除租客全部账单，是否确认删除?'" v-on:emitCancel="hideTipModal" v-on:emitSure="returnSure"></tip-modal>
-		<cover-view v-if="isShowSureModal" class="modalMask" @catchtouchmove='true'>
+		<cover-view v-if="isShowSureModal" class="modalMask" @click="cancel()" @catchtouchmove='true'>
 			<cover-view class="modelContainer">
 				<cover-view class="modalTitle">信息确认</cover-view>
 				<cover-view class="modalContent">租金：{{info2.rentUnitPrice}}元/月</cover-view>
@@ -182,6 +187,7 @@
 		data() {
 			const currentDate = this.getDate();
 			return {
+				isChangeDateDue:false,
 				isShowTipModal:false,
 				isShowSureModal:false,
 				tenantImg:'',
@@ -331,9 +337,10 @@
 				this.isEdit = true;
 				this.userId = options.userId
 				uni.setNavigationBarTitle({
-					title: '租客信息'
+					title: '编辑租客'
 				});
-				this.getUserInfo(options.userId);
+				this.getUserInfo(options.userId)
+				this.getBillRecord(options.userId);
 			}
 			this.commInfo = JSON.parse(options.commInfo)
 			if(this.commInfo.renterId){
@@ -362,6 +369,19 @@
 			}
 		},
 		methods: {
+			getBillRecord(id){
+				let _this = this;
+				_this.$request.post("/bill/findByTenantId",{
+					tenantId:id
+				}).then((res)=>{
+					if(res.data.data.length == 0){
+						//签约信息可编辑
+						_this.isChangeDateDue = true
+					}
+				}).catch(err=>{
+					
+				})
+			},
 			deleteRenter(){
 				this.showTipModal()
 			},
@@ -445,13 +465,13 @@
 					this.rentCycleList[1] = data.depositNum;
 					// this.currentSex = data.tenantSex;
 					
-					this.chooseLi(data.rentMonthNum, true,true);
+					this.chooseLi(data.rentMonthNum, true);
 					this.rentMonthNum = data.rentMonthNum;
 					this.remarks = data.remarks;
 				});
 			},
 			showList() {
-				if(!this.isEdit){
+				if(!(this.isEdit && !this.isChangeDateDue)){
 					this.listShow = true;
 				}
 			},
@@ -626,7 +646,6 @@
 				}
 			},
 			chooseImg(type) {
-				if(!this.isEdit){
 					this.isChooseReverseImg = type
 					let returnUrl = myUploadImg.upload().then((res) => {
 						console.log(res)
@@ -636,7 +655,6 @@
 							this.imgSideUrl = res;
 						}
 					})
-				}
 			},
 			espInput(e) {
 				console.log(this.rentCycleList)
@@ -671,15 +689,38 @@
 				})
 			},
 			chooseLi(index, temp,isPass) {
-				if(!this.isEdit || isPass){
-					if (temp) {
-						this.currentLiIndex = index == 6 ? 0 : (index == 12 ? 1 : (index == 24 ? 2 : 3))
-					} else {
+				if(!this.isEdit){
+					this.currentLiIndex = index
+					this.pickerKeepDate = this.getKeepDate(index)
+					this.info2.keepDate = this.getKeepDate(index)
+				}else{
+					if(this.isChangeDateDue){
 						this.currentLiIndex = index
 						this.pickerKeepDate = this.getKeepDate(index)
 						this.info2.keepDate = this.getKeepDate(index)
 					}
+					if(temp){
+						this.currentLiIndex = index == 6 ? 0 : (index == 12 ? 1 : (index == 24 ? 2 : 3))
+					}
 				}
+				// if(isPass){
+				// 	if (temp) {
+				// 		this.currentLiIndex = index == 6 ? 0 : (index == 12 ? 1 : (index == 24 ? 2 : 3))
+				// 	} else {
+				// 		this.currentLiIndex = index
+				// 		this.pickerKeepDate = this.getKeepDate(index)
+				// 		this.info2.keepDate = this.getKeepDate(index)
+				// 	}
+				// }
+				// if(!(this.isEdit && !isChangeDateDue)){
+				// 	if (temp) {
+				// 		this.currentLiIndex = index == 6 ? 0 : (index == 12 ? 1 : (index == 24 ? 2 : 3))
+				// 	} else {
+				// 		this.currentLiIndex = index
+				// 		this.pickerKeepDate = this.getKeepDate(index)
+				// 		this.info2.keepDate = this.getKeepDate(index)
+				// 	}
+				// }
 			},
 			getKeepDate(index) {
 				let keepDate;
@@ -774,6 +815,7 @@
 		min-height: 100vh;
 		height: 100%;
 		width: 100%;
+		padding-bottom: 140rpx;
 		background-color: #FAFAFA;
 	}
 
@@ -897,31 +939,52 @@
 		color: #999999;
 		font-size: 34rpx;
 	}
-
+	.btnBoxMy{
+		width: 100%;
+		/* padding: 0 85rpx; */
+		height: 128rpx;
+		line-height: 128rpx;
+		text-align: center;
+		background-color: #FFFFFF;
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		box-shadow:0px -5px 16px 0px rgba(0, 0, 0, 0.04);
+	}
+	.textLeft{
+		text-align: left;
+	}
+	
 	.sureBtn {
 		width: 257rpx;
-		height: 74rpx;
-		line-height: 74rpx;
+		height: 82rpx;
+		line-height: 82rpx;
 		text-align: center;
-		border-radius: 37rpx;
+		border-radius: 40rpx;
 		color: #FFFFFF;
-		background: linear-gradient(-90deg, rgba(243, 183, 73, 1) 0%, rgba(240, 154, 66, 1) 100%);
-		font-size: 32rpx;
-		margin: 124rpx auto 72rpx auto;
+		background: #FFA044;
+		font-size: 34rpx;
+		display: inline-block;
+		vertical-align: middle;
 	}
+	/* .oneButton .sureBtn{
+		margin: 23rpx auto 0 auto;
+	} */
 	.delBtn{
+		display: inline-block;
 		width: 257rpx;
-		height: 74rpx;
-		line-height: 74rpx;
+		height: 82rpx;
+		line-height: 82rpx;
 		text-align: center;
-		border-radius: 37rpx;
-		border: 1rpx solid #FFA044;
-		color: #FFFFFF;
-		font-size: 32rpx;
-		color: #FFA044;
-		margin: 124rpx auto 72rpx auto;
+		border-radius: 40rpx;
+		border: 1rpx solid #D2D2D2;
+		color: #656565;
+		font-size: 34rpx;
+		vertical-align: middle;
 	}
-
+	.twoButton .delBtn{
+		margin:0 66rpx 0 85rpx;
+	}
 	.sexRadio {
 		text-align: right;
 		/* color: #444444;

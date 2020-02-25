@@ -237,7 +237,7 @@
 										par.tenantImg = _this.renterAvatar
 										_this.$request.post('/roomUser/inviTenant', par).then((data) => {
 											if (data.data.code == '200') {
-												_this.isSubmitSuccess = true;
+												_this.isSubmitSuccess = 2;
 												uni.showToast({
 													title: '填写成功',
 													duration: 1500

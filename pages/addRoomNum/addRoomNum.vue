@@ -192,9 +192,9 @@
 			},
 			inputTip(e){
 				console.log(e)
-				if(e.detail.value.length >= 2){
+				if(e.detail.value.length >= 3){
 					uni.showToast({
-						title:'请输入不超过两位数楼栋号！',
+						title:'请输入不超过三位数楼栋号！',
 						icon:'none',
 						duration:1500
 					})

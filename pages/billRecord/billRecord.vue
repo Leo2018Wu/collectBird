@@ -6,6 +6,7 @@
 		<!-- <view class="addBar">
 			<add-bar :title="'新账单'"></add-bar>
 		</view> -->
+		<view class="noLatestBill" v-if="latestBill.length == 0">暂无最新账单</view>
 		<view class="section2" v-if="latestBill.length != 0">
 			<view class="billBarName">最新账单</view>
 			<view class="content" @click="showBillDetail(item.id)" v-for="(item,index) in latestBill" :key="index">
@@ -23,31 +24,35 @@
 			<view class="content" @click="showBillDetail(item.id)" v-for="(item,index) in returnBillRecord" :key="index">
 				<view class="inner">
 				<image v-if="item.billStatus  == 4 " class="checkBg" src="../../static/hasCheck.png" mode="aspectFit"></image>
-
 					<view class="contentRight" >
 					<view class="billTitle">租金收入</view>
 					<view class="checkDate textOverFlow">到账日期：{{item.arrivalDate.substr(0,10)}}</view>
 				</view>
 				<view>{{item.totalAmount}}</view>
 				</view>
-				
 			</view>
 		</view>
-		<view class="latestBill">生成最新账单</view>
+		<tip-modal v-if="isShowTipModal" :oneButton="true" :title="'提示'" :describition="'您有未确认账单，请先确认。'" v-on:emitCancel="hideTipModal"></tip-modal>
+		<view class="latestBillBox">
+			<view class="latestBill" @click="getLatestBill">生成最新账单</view>
+		</view>
 	</view>
 </template>
 
 <script>
+	import tipModal from '../../components/tipModal.vue'
 	import moment from 'moment'
 	import renterInfoBar from '../../components/renterInfoBar.vue'
 	import addBar from '../../components/addBar.vue'
 	export default {
 		components:{
 			renterInfoBar,
-			addBar
+			addBar,
+			tipModal
 		},
 		data() {
 			return {
+				isShowTipModal:false,
 				userInfo:{},
 				// isHaveLatestBill:false,
 				returnBillRecord:[],
@@ -63,8 +68,35 @@
 		},
 		onShow(){
 			this.getBillRecord(this.userInfo.id)
+			this.getRenterInfo(this.userInfo.id)
 		},
 		methods: {
+			hideTipModal(){
+				this.isShowTipModal = false
+			},
+			getLatestBill(){
+				if(this.latestBill.length != 0){
+					this.isShowTipModal = true
+				}else{
+					let par = this.returnBillRecord[0]
+					par.billStatus = 4
+					this.$request.post('/bill/createBill',par).then((res)=>{
+						if(res.data.code == 200){
+							this.getBillRecord(this.userInfo.id)
+							uni.showToast({
+								title:'最新账单已生成'
+							})
+						}
+					})
+				}
+			},
+			getRenterInfo(id){
+				this.$request.post('/roomUser/findById',{
+					tenantId:id
+				}).then((res)=>{
+					this.userInfo = res.data.data
+				})
+			},
 			updateData(){
 				
 			},
@@ -94,6 +126,10 @@
 				_this.$request.post("/bill/findByTenantId",{
 					tenantId:id
 				}).then((res)=>{
+					if(res.data.data.length == 0){
+						this.latestBill = [];
+						this.returnBillRecord = [];
+					}
 					res.data.data.forEach((item,index) => {
 						if(item.billStatus != 4){
 							arr1.push(item)
@@ -115,7 +151,9 @@
 <style scoped>
 	.billRecord{
 		width: 100%;
-		height: 100vh;
+		height: 100%;
+		min-height: 100vh;
+		padding-bottom: 140rpx;
 		background-color: #FAFAFA;
 	}
 	.section1{
@@ -151,7 +189,7 @@
 		padding: 26rpx 0;
 	}
 	.content:not(:last-child){
-				border-bottom: 3rpx solid #EBEBEB80;
+		border-bottom: 1rpx solid #EBEBEB;
 	}
 	.content{
 		background-color: #FFFFFF;
@@ -181,15 +219,33 @@
 	.active{
 		color: #FFA344;
 	}
+	.noLatestBill{
+		width: 100%;
+		color: #BBBBBB;
+		font-size: 32rpx;
+		font-weight: bold;
+		text-align: center;
+		margin: 50rpx 0;
+	}
 	.latestBill{
 		width:378rpx;
 		height:74rpx;
 		font-size: 34rpx;
 		line-height: 74rpx;
-		margin: 280rpx auto 0 auto;
 		background:linear-gradient(-90deg,rgba(243,183,73,1) 0%,rgba(240,154,66,1) 100%);
 		border-radius:37rpx;
 		color: #FFFFFF;
 		text-align: center;
+	}
+	.latestBillBox{
+		width: 100%;
+		height: 128rpx;
+		box-shadow:0px -5px 16px 0px rgba(0, 0, 0, 0.04);
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		position: fixed;
+		bottom: 0;
+		left: 0;
 	}
 </style>
