@@ -78,8 +78,12 @@
 				if(this.latestBill.length != 0){
 					this.isShowTipModal = true
 				}else{
-					let par = this.returnBillRecord[0]
-					par.billStatus = 4
+					// let par = this.returnBillRecord[0]
+					let par = {
+						landlordId:this.$store.state.landladyInfo.id,
+						billType:0,
+						tenantId:this.userInfo.id
+					}
 					this.$request.post('/bill/createBill',par).then((res)=>{
 						if(res.data.code == 200){
 							this.getBillRecord(this.userInfo.id)

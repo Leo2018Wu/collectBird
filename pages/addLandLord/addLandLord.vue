@@ -293,6 +293,9 @@
 											title: _this.isEdit ? '编辑业主成功' : '绑定业主成功',
 											duration: 1500
 										})
+										setTimeout(()=>{
+											uni.navigateBack()
+										},2000)
 									}
 								})
 							}
@@ -365,7 +368,7 @@
 
 	.section1,
 	.section2,
-	section3 {
+	.section3 {
 		padding: 0 40rpx;
 		font-size: 32rpx;
 		color: #333333;

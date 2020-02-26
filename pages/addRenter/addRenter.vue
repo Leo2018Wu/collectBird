@@ -13,10 +13,10 @@
 				</evan-form-item>
 				<evan-form-item label="性别" prop="sex">
 					<template v-slot:main>
-						<radio-group class="sexRadio"  name="sexRadio" @change="radioChange" >
+						<radio-group class="sexRadio" name="sexRadio" @change="radioChange">
 							<label style="display: flex;justify-content: flex-end;">
 								<view v-for="(item, index) in sexList" :key="index">
-									<radio :value="item.value"  :checked="index === currentSex" color="#FFA344" />
+									<radio :value="item.value" :checked="index === currentSex" color="#FFA344" />
 									<text>{{ item.name }}</text>
 								</view>
 							</label>
@@ -26,7 +26,7 @@
 				</evan-form-item>
 				<evan-form-item label="电话" prop="tel">
 					<template v-slot:main>
-						<input class="form-input"  type="number" maxlength="11" placeholder-class="form-input-placeholder" v-model="info1.tel"
+						<input class="form-input" type="number" maxlength="11" placeholder-class="form-input-placeholder" v-model="info1.tel"
 						 placeholder="租客电话" @input="getPhone" />
 					</template>
 					<template v-slot:tip>
@@ -35,7 +35,7 @@
 				</evan-form-item>
 				<evan-form-item label="身份证号" prop="IDNum">
 					<template v-slot:main>
-						<input class="form-input"  type="idcard" placeholder-class="form-input-placeholder" maxlength="18" v-model="info1.IDNum"
+						<input class="form-input" type="idcard" placeholder-class="form-input-placeholder" maxlength="18" v-model="info1.IDNum"
 						 placeholder="身份证号" @input="getID" />
 					</template>
 					<template v-slot:tip>
@@ -60,7 +60,8 @@
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form2" :model="info2">
 				<evan-form-item label="起租日期" prop="startDate">
 					<template v-slot:main>
-						<picker class="form-input" :disabled="isEdit && !isChangeDateDue" mode="date" :value="date" :start="startDate" @change="bindDateChange">{{ date }}</picker>
+						<picker class="form-input" :disabled="isEdit && !isChangeDateDue" mode="date" :value="date" :start="startDate"
+						 @change="bindDateChange">{{ date }}</picker>
 						<input v-show="false" class="form-input" placeholder-class="form-input-placeholder" v-model="info2.startDate"
 						 placeholder="请选择" />
 					</template>
@@ -70,8 +71,10 @@
 				</evan-form-item>
 				<evan-form-item label="租期" prop="keepDate" :border="false">
 					<template v-slot:main>
-						<picker class="form-input" :disabled="isEdit && !isChangeDateDue" mode="date" :value="pickerKeepDate" :start="startDate" @change="bindKeepDateChange">{{ pickerKeepDate }}</picker>
-						<input v-show="false" class="form-input" placeholder-class="form-input-placeholder" v-model="info2.keepDate" placeholder="请选择" />
+						<picker class="form-input" :disabled="isEdit && !isChangeDateDue" mode="date" :value="pickerKeepDate" :start="startDate"
+						 @change="bindKeepDateChange">{{ pickerKeepDate }}</picker>
+						<input v-show="false" class="form-input" placeholder-class="form-input-placeholder" v-model="info2.keepDate"
+						 placeholder="请选择" />
 					</template>
 					<template v-slot:tip>
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -96,8 +99,8 @@
 				</evan-form-item>
 				<evan-form-item label="月租金" prop="rentUnitPrice">
 					<template v-slot:main>
-						<input class="form-input" type="number" :disabled="isEdit && !isChangeDateDue" placeholder-class="form-input-placeholder" v-model="info2.rentUnitPrice"
-						 placeholder="请输入" @input="espInput" />
+						<input class="form-input" type="number" :disabled="isEdit && !isChangeDateDue" placeholder-class="form-input-placeholder"
+						 v-model="info2.rentUnitPrice" placeholder="请输入" @input="espInput" />
 					</template>
 					<template v-slot:tip>
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -105,7 +108,8 @@
 				</evan-form-item>
 				<evan-form-item label="押金" prop="deposit" :border="false">
 					<template v-slot:main>
-						<input class="form-input" :disabled="isEdit && !isChangeDateDue" placeholder-class="form-input-placeholder" v-model="info2.deposit" placeholder="请输入" />
+						<input class="form-input" :disabled="isEdit && !isChangeDateDue" placeholder-class="form-input-placeholder"
+						 v-model="info2.deposit" placeholder="请输入" />
 					</template>
 					<template v-slot:tip>
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -118,13 +122,13 @@
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form3" :model="info3">
 				<evan-form-item label="电费(1元/度)" prop="eleCost">
 					<template v-slot:main>
-						<input class="form-input inputColor" type="digit" maxlength="5" placeholder-class="form-input-placeholder" v-model="info3.eleCost"
-						 placeholder="请输入初始刻度" />
+						<input class="form-input inputColor" type="digit" maxlength="5" placeholder-class="form-input-placeholder"
+						 v-model="info3.eleCost" placeholder="请输入初始刻度" />
 					</template>
 				</evan-form-item>
 				<evan-form-item label="水费(元/月)" prop="waterCost">
 					<template v-slot:main>
-						<input class="form-input inputColor"  type="digit" placeholder-class="form-input-placeholder" v-model="info3.waterCost"
+						<input class="form-input inputColor" type="digit" placeholder-class="form-input-placeholder" v-model="info3.waterCost"
 						 placeholder="请输入水费" />
 					</template>
 				</evan-form-item>
@@ -134,25 +138,39 @@
 						 placeholder="请输入宽带费" />
 					</template>
 				</evan-form-item>
-				<!-- <view class="section4 whiteBg">
-					<evan-form-item prop="remarks" :border="false">
-						<template v-slot:main>
-							<textarea class="secTip textOverFlow" placeholder="备注" value v-model="info3.remarks" placeholder-class="textPlaceholder"></textarea>
-						</template>
-					</evan-form-item>
-				</view> -->
 			</evan-form>
 		</view>
-		<view class="section4 whiteBg"><textarea class="secTip textOverFlow"  placeholder="备注" v-model="remarks"
+		<view class="eleCommonBox whiteBg">
+			<view class="switchBox">
+				<span>公摊电费</span>
+				<switch :checked="isShowEleCommonModal" @change="changeType" color="#F09A42" />
+			</view>
+			<view class="eleCommonInfo" v-if="isShowEleCommonModal">
+				<evan-form-item label="电费(1元/度)" prop="commonEleNum">
+					<template v-slot:main>
+						<input class="form-input inputColor" type="digit" placeholder-class="form-input-placeholder" v-model="commonEleNum"
+						 placeholder="请输入初始刻度" />
+					</template>
+				</evan-form-item>
+				<view class="eleCommonBottom">
+					<span>公摊人数</span>
+					<view class="eleNumBox">
+						<number-box :valNum="tenantNum" v-on:emitVal='returnVal'></number-box>
+					</view>
+				</view>
+			</view>
+		</view>
+		<view class="section4 whiteBg"><textarea class="secTip textOverFlow" placeholder="备注" v-model="remarks"
 			 placeholder-class="textPlaceholder"></textarea></view>
 		<cover-view class="btnBoxMy twoButton textLeft" v-if="!listShow && isEdit">
-			<cover-view  class="delBtn" @click="deleteRenter">删除</cover-view>
-			<cover-view  class="sureBtn" @click="save">保存</cover-view>
+			<cover-view class="delBtn" @click="deleteRenter">删除</cover-view>
+			<cover-view class="sureBtn" @click="save">保存</cover-view>
 		</cover-view>
 		<cover-view class="btnBoxMy oneButton" v-if="!listShow && !isEdit">
-			<cover-view  class="sureBtn" @click="save">保存</cover-view>
+			<cover-view class="sureBtn" @click="save">保存</cover-view>
 		</cover-view>
-		<tip-modal v-if="isShowTipModal" :title="'删除租客'" :describition="'删除租客将删除租客全部账单，是否确认删除?'" v-on:emitCancel="hideTipModal" v-on:emitSure="returnSure"></tip-modal>
+		<tip-modal v-if="isShowTipModal" :title="'删除租客'" :describition="'删除租客将删除租客全部账单，是否确认删除?'" v-on:emitCancel="hideTipModal"
+		 v-on:emitSure="returnSure"></tip-modal>
 		<cover-view v-if="isShowSureModal" class="modalMask" @click="cancel()" @catchtouchmove='true'>
 			<cover-view class="modelContainer">
 				<cover-view class="modalTitle">信息确认</cover-view>
@@ -170,7 +188,8 @@
 </template>
 
 <script>
-	import tipModal from '../../components/tipModal.vue'
+	import numberBox from '../../components/numberBox.vue';
+	import tipModal from '../../components/tipModal.vue';
 	import myUploadImg from '../../util/myUpload.js';
 	import chooseList from '../../components/chooseList.vue';
 	import chnToNumber from '../../util/index';
@@ -182,21 +201,25 @@
 			evanFormItem,
 			evanForm,
 			chooseList,
-			tipModal
+			tipModal,
+			numberBox
 		},
 		data() {
 			const currentDate = this.getDate();
 			return {
-				isChangeDateDue:false,
-				isShowTipModal:false,
-				isShowSureModal:false,
-				tenantImg:'',
+				tenantNum: 2,
+				commonEleNum: '',
+				isShowEleCommonModal: false,
+				isChangeDateDue: false,
+				isShowTipModal: false,
+				isShowSureModal: false,
+				tenantImg: '',
 				remarks: '',
 				userId: null,
 				renterId: null,
 				chooseIndex: null,
 				isEdit: false,
-				isFillStatus:false,
+				isFillStatus: false,
 				currentSex: 0,
 				sexList: [{
 						value: 0,
@@ -214,7 +237,7 @@
 				uImgList: [],
 				listShow: false,
 				date: currentDate,
-				pickerKeepDate:'',
+				pickerKeepDate: '',
 				currentLiIndex: null,
 				rentCycleList: [],
 				keepDateList: ['半年', '1年', '2年', '其他'],
@@ -279,10 +302,6 @@
 					deposit: ''
 				},
 				rules2: {
-					// startDate:{
-					// 	required:true,
-					// 	message:'请输入起租日期'
-					// },
 					keepDate: {
 						required: true,
 						message: '请输入租期'
@@ -301,19 +320,11 @@
 					}
 				},
 				info3: {
-					// ele:'1元/度',
 					eleCost: '',
 					waterCost: '30',
 					netCost: '30',
-					// net: '30元/月',
-					// water: '30元/月',
-					// remarks: ''
 				},
 				rules3: {
-					// ele:{
-					// 	required:true,
-					// 	message:'请输入电费'
-					// },
 					eleCost: {
 						required: true,
 						message: '请输入初始刻度'
@@ -327,7 +338,7 @@
 						message: '请输入宽带费'
 					}
 				},
-				eleUnitPrice:1,
+				eleUnitPrice: 1,
 			}
 		},
 		onLoad(options) {
@@ -343,7 +354,7 @@
 				this.getBillRecord(options.userId);
 			}
 			this.commInfo = JSON.parse(options.commInfo)
-			if(this.commInfo.renterId){
+			if (this.commInfo.renterId) {
 				//分享信息填充操作
 				console.log('我是分享信息补充')
 				this.isFillStatus = true;
@@ -369,45 +380,53 @@
 			}
 		},
 		methods: {
-			getBillRecord(id){
+			returnVal(e) {
+				console.log('woshifanhuide')
+				this.tenantNum = e;
+			},
+			changeType(e) {
+				console.log(e)
+				this.isShowEleCommonModal = e.detail.value
+			},
+			getBillRecord(id) {
 				let _this = this;
-				_this.$request.post("/bill/findByTenantId",{
-					tenantId:id
-				}).then((res)=>{
-					if(res.data.data.length == 0){
+				_this.$request.post("/bill/findByTenantId", {
+					tenantId: id
+				}).then((res) => {
+					if (res.data.data.length == 0) {
 						//签约信息可编辑
 						_this.isChangeDateDue = true
 					}
-				}).catch(err=>{
-					
+				}).catch(err => {
+
 				})
 			},
-			deleteRenter(){
+			deleteRenter() {
 				this.showTipModal()
 			},
-			returnSure(){
-				this.$request.post('/roomUser/delete',{
-					id:this.userId
-				}).then((res)=>{
+			returnSure() {
+				this.$request.post('/roomUser/delete', {
+					id: this.userId
+				}).then((res) => {
 					this.hideTipModal();
 					uni.showToast({
-						title:'租客删除成功',
-						duration:1500
+						title: '租客删除成功',
+						duration: 1500
 					})
-					setTimeout(()=>{
+					setTimeout(() => {
 						uni.navigateBack({
-							delta:2
+							delta: 2
 						})
-					},2000)
+					}, 2000)
 				})
 			},
-			showTipModal(){
+			showTipModal() {
 				this.isShowTipModal = true
 			},
-			hideTipModal(){
+			hideTipModal() {
 				this.isShowTipModal = false
 			},
-			cancel(){
+			cancel() {
 				this.isShowSureModal = false
 			},
 			getRoomInfo(id) {
@@ -425,6 +444,7 @@
 					this.info2.deposit = data.roomPrice;
 					this.rentCycleList[0] = data.rentNum;
 					this.rentCycleList[1] = data.depositNum;
+					this.tenantNum = parseInt(data.tenantNum)+1;
 				})
 			},
 			getUserInfo(id) {
@@ -464,14 +484,16 @@
 					this.rentCycleList[0] = data.payRentCycle;
 					this.rentCycleList[1] = data.depositNum;
 					// this.currentSex = data.tenantSex;
-					
 					this.chooseLi(data.rentMonthNum, true);
 					this.rentMonthNum = data.rentMonthNum;
 					this.remarks = data.remarks;
+					this.isShowEleCommonModal = data.publicELeStatus == 1 ? true : false;
+					this.commonEleNum = data.publicELeNum;
+					this.tenantNum = data.tenantNum;
 				});
 			},
 			showList() {
-				if(!(this.isEdit && !this.isChangeDateDue)){
+				if (!(this.isEdit && !this.isChangeDateDue)) {
 					this.listShow = true;
 				}
 			},
@@ -495,7 +517,7 @@
 				}
 				// this.currentSex = evt.target.value;
 			},
-			sure(){
+			sure() {
 				let _this = this;
 				uni.showLoading({
 					title: '正在保存...'
@@ -516,7 +538,7 @@
 					netPrice: _this.info3.netCost,
 					startDate: _this.info2.startDate ? _this.info2.startDate + ' 00:00:00' : _this.date + ' 00:00:00',
 					rentMonthNum: _this.rentMonthNum,
-					endDate:_this.info2.keepDate ? _this.info2.keepDate + ' 00:00:00' : _this.pickerKeepDate + ' 00:00:00',
+					endDate: _this.info2.keepDate ? _this.info2.keepDate + ' 00:00:00' : _this.pickerKeepDate + ' 00:00:00',
 					payRentCycle: _this.rentCycleList[0],
 					rentPrice: _this.info2.rentUnitPrice,
 					depositAmount: _this.info2.deposit,
@@ -524,11 +546,25 @@
 					tenantSex: _this.currentSex, //性别字段
 					remarks: _this.remarks
 				};
+				if (this.isShowEleCommonModal &&!this.commonEleNum) {
+					uni.showToast({
+						title: '请输入公共电费初始刻度',
+						icon: 'none',
+						duration: 1500
+					})
+				}
+				if(this.isShowEleCommonModal){
+					par.publicELeNum = this.commonEleNum;
+					par.publicElePrice = 1;
+					par.tenantNum =this.tenantNum;
+				}
+				par.publicELeStatus = this.isShowEleCommonModal ? 1 : 0;
+
 				if (this.isEdit) {
 					par.id = this.renterId;
 					par.tenantId = this.userId;
 				}
-				if(this.isFillStatus){
+				if (this.isFillStatus) {
 					par.tenantImg = this.tenantImg
 					par.id = this.commInfo.renterId
 				}
@@ -646,15 +682,15 @@
 				}
 			},
 			chooseImg(type) {
-					this.isChooseReverseImg = type
-					let returnUrl = myUploadImg.upload().then((res) => {
-						console.log(res)
-						if (this.isChooseReverseImg) {
-							this.imgOtherSideUrl = res;
-						} else {
-							this.imgSideUrl = res;
-						}
-					})
+				this.isChooseReverseImg = type
+				let returnUrl = myUploadImg.upload().then((res) => {
+					console.log(res)
+					if (this.isChooseReverseImg) {
+						this.imgOtherSideUrl = res;
+					} else {
+						this.imgSideUrl = res;
+					}
+				})
 			},
 			espInput(e) {
 				console.log(this.rentCycleList)
@@ -688,18 +724,18 @@
 					})
 				})
 			},
-			chooseLi(index, temp,isPass) {
-				if(!this.isEdit){
+			chooseLi(index, temp, isPass) {
+				if (!this.isEdit) {
 					this.currentLiIndex = index
 					this.pickerKeepDate = this.getKeepDate(index)
 					this.info2.keepDate = this.getKeepDate(index)
-				}else{
-					if(this.isChangeDateDue){
+				} else {
+					if (this.isChangeDateDue) {
 						this.currentLiIndex = index
 						this.pickerKeepDate = this.getKeepDate(index)
 						this.info2.keepDate = this.getKeepDate(index)
 					}
-					if(temp){
+					if (temp) {
 						this.currentLiIndex = index == 6 ? 0 : (index == 12 ? 1 : (index == 24 ? 2 : 3))
 					}
 				}
@@ -753,7 +789,7 @@
 					default:
 						break;
 				}
-				if(index != 3){
+				if (index != 3) {
 					return this.getDate(keepDate);
 				}
 			},
@@ -776,34 +812,34 @@
 				this.date = e.detail.value;
 				this.info2.startDate = e.detail.value;
 			},
-			getRentMonth(date1,date2){
+			getRentMonth(date1, date2) {
 				//用-分成数组
 				date1 = date1.split("-");
 				date2 = date2.split("-");
 				//获取年,月数
 				var year1 = parseInt(date1[0]),
-				month1 = parseInt(date1[1]),
-				year2 = parseInt(date2[0]),
-				month2 = parseInt(date2[1]),
-				//通过年,月差计算月份差
-				months = (year2 - year1) * 12 + (month2 - month1);
-				this.chooseLi(months,true)
+					month1 = parseInt(date1[1]),
+					year2 = parseInt(date2[0]),
+					month2 = parseInt(date2[1]),
+					//通过年,月差计算月份差
+					months = (year2 - year1) * 12 + (month2 - month1);
+				this.chooseLi(months, true)
 				return months;
 			},
-			bindKeepDateChange(e){
+			bindKeepDateChange(e) {
 				let _this = this
-				let time1 = new Date((e.detail.value).replace(/\-/g,'/'))
-				let time2 = new Date((_this.date).replace(/\-/g,'/'))
-				if(Date.parse(time1) < Date.parse(time2)){
+				let time1 = new Date((e.detail.value).replace(/\-/g, '/'))
+				let time2 = new Date((_this.date).replace(/\-/g, '/'))
+				if (Date.parse(time1) < Date.parse(time2)) {
 					uni.showToast({
-						title:'选择租期时间必须必起租时间大',
-						icon:'none',
-						duration:1500
+						title: '选择租期时间必须必起租时间大',
+						icon: 'none',
+						duration: 1500
 					})
-				}else{
+				} else {
 					this.pickerKeepDate = e.detail.value;
 					this.info2.keepDate = e.detail.value;
-					this.rentMonthNum = this.getRentMonth(_this.date,_this.pickerKeepDate)
+					this.rentMonthNum = this.getRentMonth(_this.date, _this.pickerKeepDate)
 				}
 			}
 		}
@@ -846,9 +882,48 @@
 	.section3,
 	.section4 {
 		padding: 0 40rpx;
-		font-size: 30rpx;
-		color: #333333;
 		margin-bottom: 17rpx;
+	}
+
+	.eleCommonBox {
+		padding: 0 40rpx;
+		width: 100%;
+		margin-bottom: 17rpx;
+	}
+
+	.eleCommonInfo {
+		width: 100%;
+		border-top: 1rpx solid #EBEBEB;
+	}
+
+	.eleCommonBottom {
+		height: 112rpx;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		font-size: 34rpx;
+		color: #333;
+		font-weight: bold;
+	}
+
+	.eleNumBox {
+		width: 190rpx;
+		height: 50rpx;
+	}
+
+	.switchBox {
+		height: 112rpx;
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		color: #333333;
+		font-size: 34rpx;
+		font-weight: bold;
+	}
+
+	.switchBox switch {
+		margin-right: -26rpx;
 	}
 
 	.inpArrow {
@@ -939,7 +1014,8 @@
 		color: #999999;
 		font-size: 34rpx;
 	}
-	.btnBoxMy{
+
+	.btnBoxMy {
 		width: 100%;
 		/* padding: 0 85rpx; */
 		height: 128rpx;
@@ -949,12 +1025,13 @@
 		position: fixed;
 		bottom: 0;
 		left: 0;
-		box-shadow:0px -5px 16px 0px rgba(0, 0, 0, 0.04);
+		box-shadow: 0px -5px 16px 0px rgba(0, 0, 0, 0.04);
 	}
-	.textLeft{
+
+	.textLeft {
 		text-align: left;
 	}
-	
+
 	.sureBtn {
 		width: 257rpx;
 		height: 82rpx;
@@ -967,10 +1044,11 @@
 		display: inline-block;
 		vertical-align: middle;
 	}
+
 	/* .oneButton .sureBtn{
 		margin: 23rpx auto 0 auto;
 	} */
-	.delBtn{
+	.delBtn {
 		display: inline-block;
 		width: 257rpx;
 		height: 82rpx;
@@ -982,9 +1060,11 @@
 		font-size: 34rpx;
 		vertical-align: middle;
 	}
-	.twoButton .delBtn{
-		margin:0 66rpx 0 85rpx;
+
+	.twoButton .delBtn {
+		margin: 0 66rpx 0 85rpx;
 	}
+
 	.sexRadio {
 		text-align: right;
 		/* color: #444444;
@@ -994,9 +1074,9 @@
 	.sexRadio text {
 		color: #444444;
 	}
-	
+
 	/* //确定弹窗 */
-	.modelContainer{
+	.modelContainer {
 		width: 620rpx;
 		/* height: fit-content; */
 		background-color: #FFFFFF;
@@ -1005,28 +1085,33 @@
 		padding-top: 40rpx;
 		text-align: center;
 	}
-	.modalTitle{
+
+	.modalTitle {
 		font-size: 32rpx;
 		font-weight: bold;
 		margin-bottom: 40rpx;
 	}
-	.modalContent{
+
+	.modalContent {
 		font-size: 28rpx;
 		text-align: left;
 		color: #999999;
 		width: calc(100% - 130rpx);
 		height: fit-content;
-		margin: 0 0 28rpx  65rpx;
+		margin: 0 0 28rpx 65rpx;
 		white-space: normal;
 		line-height: 36rpx;
 	}
-	.btnBox{
-		border-top: 2rpx solid rgba(217,217,220,0.6);
+
+	.btnBox {
+		border-top: 2rpx solid rgba(217, 217, 220, 0.6);
 		width: 100%;
 		height: 90rpx;
 		position: relative;
 	}
-	.btnBox .modalCancel,.btnBox .modalSure{
+
+	.btnBox .modalCancel,
+	.btnBox .modalSure {
 		width: 50%;
 		height: 100%;
 		font-size: 32rpx;
@@ -1034,24 +1119,28 @@
 		display: inline-block;
 		line-height: 90rpx;
 	}
-	.btnBox .modalCancel{
+
+	.btnBox .modalCancel {
 		color: #BABABA;
 	}
-	.btnBox .modalSure{
+
+	.btnBox .modalSure {
 		color: #FFA044;
 	}
-	.btnDivide{
+
+	.btnDivide {
 		width: 2rpx;
 		height: 100%;
-		background-color: rgba(217,217,220,0.6);
+		background-color: rgba(217, 217, 220, 0.6);
 		position: absolute;
 		right: 50%;
 		top: 0;
 	}
-	.modalMask{
+
+	.modalMask {
 		width: 100%;
 		height: 100vh;
-		background:rgba(0,0,0,0.3);
+		background: rgba(0, 0, 0, 0.3);
 		position: fixed;
 		z-index: 99;
 		top: 0;
@@ -1059,5 +1148,6 @@
 		right: 0;
 		bottom: 0;
 	}
+
 	/* end */
 </style>

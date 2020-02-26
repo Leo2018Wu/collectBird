@@ -4,15 +4,15 @@
 			<view class="profitContainer">
 				<view class="profitBox">
 					<view class="profitBar">{{billType == 0 ? '应收' : '应付'}}(元)</view>
-					<span>{{ billInfo.totalAmount}}</span>
+					<span v-if="billType == 1 && unIncome != 0">-</span><span>{{ billInfo.totalAmount}}</span>
 				</view>
 				<view v-if="billInfo.billStatus == 4" class="profitBox">
 					<view class="profitBar">{{billType == 0 ? '实收' : '实付'}}(元)</view>
-					<span>{{ billInfo.totalAmount ? billInfo.totalAmount : '0' }}</span>
+					<span v-if="billType == 1 && unIncome != 0">-</span><span>{{ billInfo.totalAmount ? billInfo.totalAmount : '0' }}</span>
 				</view>
 			</view>
-			<view v-if="billType == 0" class="houseAddr">{{ houseAddrInfo.communityName }}-{{ houseAddrInfo.houseNo }}-{{ houseAddrInfo.roomNo }}</view>
-			<view v-else class="houseAddr">{{ ownerInfo.communityName }}-{{ ownerInfo.houseNo }}</view>
+			<view v-if="billType == 0" class="houseAddr">{{ houseAddrInfo.communityName }}-{{ houseAddrInfo.houseNo }}-{{ houseAddrInfo.roomNo }} <span @click="editBill">修改</span></view>
+			<view v-else class="houseAddr">{{ ownerInfo.communityName }}-{{ ownerInfo.houseNo }}  <span @click="editBill">修改</span></view>
 		</view>
 		<view class="section1">
 			<view class="billStatus">
@@ -43,11 +43,11 @@
 			<view class="billDateBox">
 				<view class="billDateLi">
 					<span class="billDateTitle">租金</span>
-					<span>{{ !billInfo.total ? 0 : billInfo.total }}</span>
+					<span v-if="billType == 1 && unIncome != 0">-</span><span>{{ !billInfo.total ? 0 : billInfo.total }}</span>
 				</view>
 				<view class="billDateLi" v-if="billInfo.depositAmount">
 					<span class="billDateTitle">押金</span>
-					<span class="billDate">{{ !billInfo.depositAmount ? 0 : billInfo.depositAmount }}</span>
+					<span v-if="billType == 1 && unIncome != 0">-</span><span class="billDate">{{ !billInfo.depositAmount ? 0 : billInfo.depositAmount }}</span>
 				</view>
 			</view>
 			<view v-if="billType == 0">
@@ -82,38 +82,39 @@
 				</view>
 			</view>
 		</view>
-		<!-- <view class="remarks">暂无备注</view> -->
 		<view class="remarks">{{ billInfo.remarks ? billInfo.remarks : '无备注' }}</view>
-		<view v-if="billType == 0">
-			<view class="section3" v-if="billInfo.billStatus == 4">
+		<!-- <view v-if="billType == 0"> -->
+		<view class="section3" v-if="billInfo.billStatus == 4">
+			<view class="sendBillBox">
+				<image class="sendIcon" src="../../static/sendBill.png" mode="aspectFit"></image>
+				<view>发送账单</view>
+			</view>
+		</view>
+		<view class="section2" v-else>
+			<!-- v-if="!billInfo.depositAmount" -->
+			<view class="leftBtnBox">
+				<view class="sendBillBox" @click="deleteBill">
+					<image class="sendIcon" src="../../static/delete_btn.png" mode="aspectFit"></image>
+					<view>删除</view>
+				</view>
+				<view v-if="billType == 0" class="sendBillBox" @click="openMeterRead">
+					<image class="sendIcon" src="../../static/eleWater.png" mode="aspectFit"></image>
+					<view>抄表</view>
+				</view>
 				<view class="sendBillBox">
 					<image class="sendIcon" src="../../static/sendBill.png" mode="aspectFit"></image>
 					<view>发送账单</view>
 				</view>
 			</view>
-			<view class="section2" v-else>
-				<!-- v-if="!billInfo.depositAmount" -->
-				<view class="leftBtnBox">
-					<view class="sendBillBox" @click="deleteBill">
-						<image class="sendIcon" src="../../static/delete_btn.png" mode="aspectFit"></image>
-						<view>删除</view>
-					</view>
-					<view class="sendBillBox" @click="openMeterRead">
-						<image class="sendIcon" src="../../static/eleWater.png" mode="aspectFit"></image>
-						<view>抄表</view>
-					</view>
-					<view class="sendBillBox">
-						<image class="sendIcon" src="../../static/sendBill.png" mode="aspectFit"></image>
-						<view>发送账单</view>
-					</view>
-				</view>
-				<view class="sureBtn" @click="checkMoney">到账</view>
+			<view class="" v-if="billType == 1">
+				<!-- class="sureBtnNew" -->
+				<view class="sureBtn" v-if="billInfo.billStatus != 4" @click="checkMoney">交租</view>
+				<view class="sureBtn" v-if="billInfo.billStatus == 4">已交租</view>
 			</view>
+			<view v-if="billType == 0" class="sureBtn" @click="checkMoney">到账</view>
 		</view>
-		<view class="" v-if="billType == 1">
-			<view class="sureBtnNew" v-if="billInfo.billStatus != 4"  @click="checkMoney">交租</view>
-			<view class="sureBtnNew" v-if="billInfo.billStatus == 4">已交租</view>
-		</view>
+		<!-- </view> -->
+
 		<tip-modal v-if="isShowTipModal" :title="'删除账单'" :describition="'是否确认删除账单?'" v-on:emitCancel="hideTipModal"
 		 v-on:emitSure="returnSure"></tip-modal>
 		<cover-view v-if="isShowSureModal" class="modalMask" @click="gotIt()" @catchtouchmove='true'>
@@ -155,7 +156,7 @@
 			return {
 				isShowSureModal: false,
 				ownerInfo: {},
-				billType: '',
+				billType: 0,
 				isShowTipModal: false,
 				init: false,
 				billId: null,
@@ -166,6 +167,7 @@
 				startDate: '',
 				endDate: '',
 				payRentDate: '',
+				arrivalDate:'',
 				quantity: ''
 			};
 		},
@@ -174,7 +176,9 @@
 		},
 		onLoad(option) {
 			console.log(this)
-			this.billType = option.billType;
+			if(option.billType){
+				this.billType = option.billType;
+			}
 			this.billId = option.billId;
 			if (option.tenantId) {
 				this.getAddr(option.tenantId);
@@ -184,6 +188,12 @@
 			}
 		},
 		methods: {
+			editBill(){
+				let titleContent = this.billType == 0 ? this.houseAddrInfo.communityName + '-' + this.houseAddrInfo.houseNo +'-'+this.houseAddrInfo.roomNo : this.ownerInfo.communityName +'-'+ this.ownerInfo.houseNo
+				uni.navigateTo({
+					url:'../editBill/editBill?billId='+this.billId+'&billType='+this.billType+'&titleContent='+titleContent
+				})
+			},
 			showSureModal() {
 				this.isShowSureModal = true
 			},
@@ -245,6 +255,9 @@
 						_this.startDate = dateForm.dateForm(_this.billInfo.startDate);
 						_this.endDate = dateForm.dateForm(_this.billInfo.endDate);
 						_this.payRentDate = dateForm.dateForm(_this.billInfo.payRentDate);
+						if(_this.billInfo.arrivalDate){
+							_this.arrivalDate =  dateForm.dateForm(_this.billInfo.arrivalDate);
+						}
 						_this.billInfo.depositAmount = parseFloat(_this.billInfo.depositAmount).toFixed(2);
 						if (isNaN(_this.billInfo.depositAmount)) {
 							_this.billInfo.depositAmount = 0
@@ -279,7 +292,7 @@
 			checkMoney() {
 				console.log('你好')
 				let _this = this;
-				if(this.billType == 1){
+				if (this.billType == 1) {
 					this.ll()
 				}
 				if (_this.electricityInfo.itemName == '电费') {
@@ -378,8 +391,22 @@
 	}
 
 	.houseAddr {
+		width: 100%;
+		height: 58rpx;
 		font-size: 30rpx;
 		margin-top: 10rpx;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+	.houseAddr span{
+		width:112rpx;
+		height:58rpx;
+		background:#E4892D;
+		border-radius:28rpx;
+		color: #FFFFFF;
+		text-align: center;
+		line-height: 58rpx;
 	}
 
 	.section1 {
@@ -583,14 +610,15 @@
 		line-height: 92rpx;
 		/* margin-left: 82rpx; */
 	}
-	.sureBtnNew{
+
+	.sureBtnNew {
 		width: 228rpx;
 		height: 76rpx;
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		background:linear-gradient(-90deg,rgba(243,183,73,1) 0%,rgba(240,154,66,1) 100%);
-		border-radius:18rpx;
+		background: linear-gradient(-90deg, rgba(243, 183, 73, 1) 0%, rgba(240, 154, 66, 1) 100%);
+		border-radius: 18rpx;
 		color: #FFFFFF;
 		font-size: 34rpx;
 		margin: 140rpx auto 0 auto;

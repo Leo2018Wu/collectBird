@@ -152,6 +152,12 @@
 				"navigationBarBackgroundColor": "#FFFFFF"
 			}
 		}
+        ,{
+            "path" : "pages/editBill/editBill",
+            "style" : {
+				"navigationBarTitleText": "账单修改"
+			}
+        }
     ],
 	"permission": {
 		"scope.userLocation": {
