@@ -36,10 +36,26 @@ const chnToNumber = function chnToNumber(chnStr) {
 	return resArr;
 }
 const dateForm = function dateForm(value) {
-		let data = value.split(' ')[0];
-		return data;
+	let data = value.split(' ')[0];
+	return data;
 }
+const getDate = function getDate(value) {
+	let date;
+	if (value) {
+		date = new Date(value);
+	} else {
+		date = new Date();
+	}
+	let year = date.getFullYear();
+	let month = date.getMonth() + 1;
+	let day = date.getDate();
+	month = month > 9 ? month : '0' + month;
+	day = day > 9 ? day : '0' + day;
+	return `${year}-${month}-${day}`;
+}
+
 module.exports = {
 	chnToNumber,
-	dateForm
+	dateForm,
+	getDate
 }

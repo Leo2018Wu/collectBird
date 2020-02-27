@@ -36,6 +36,14 @@
 					</block>
 				</swiper>
 			</view>
+			<view class="noticeBox">
+				<image class="leftImg" src="../../static/updateIcon.png" mode="aspectFit"></image>
+				<view class="noticeContent">
+					<view>账单支持删除</view>
+					<view>支持手动生成最新一期账单</view>
+				</view>
+				<image class="rightImg" src="../../static/right_arrow.png" mode="aspectFit"></image>
+			</view>
 		</view>
 		<!-- 授权弹窗 -->
 		<view class="isloginModal" v-if="loginFlag" @click="cancleLogin"></view>
@@ -432,4 +440,60 @@ button::after {
 .radius {
 	border-radius: 12rpx;
 }
+.noticeBox{
+	width: 100%;
+	height: 130rpx;
+	background-color: #FAFAFA;
+	margin-top: 60rpx;
+	padding:0 60rpx;
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+}
+.noticeBox .leftImg{
+	width: 73rpx;
+	height: 69rpx;
+	margin-right: 30rpx;
+}
+.noticeContent{
+	height: 70rpx;
+	width: 400rpx;
+	margin-right: auto;
+	color: #333333;
+	font-size: 28rpx;
+	padding-left: 30rpx;
+	position: relative;
+	/* animation: notice 2s linear; */
+	/* overflow-y: hidden; */
+}
+.noticeContent::before{
+	content: "";
+	width: 6rpx;
+	height: 6rpx;
+	background-color: #333333;
+	border-radius: 50%;
+	position: absolute;
+	top: 14rpx;
+	left: 0;
+}
+.noticeContent::after{
+	content: "";
+	width: 6rpx;
+	height: 6rpx;
+	background-color: #333333;
+	border-radius: 50%;
+	position: absolute;
+	bottom: 12rpx;
+	left: 0;
+}
+.noticeBox .rightImg{
+	width: 30rpx;
+	height: 28rpx;
+}
+/* @keyframes notice {
+		 0%  {transform: translateY(100%);}
+	    30%  {transform: translateY(0);}
+	    70%  {transform: translateY(0);}
+	   100%  {transform: translateY(-100%);}
+	} */
 </style>

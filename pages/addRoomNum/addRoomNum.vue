@@ -8,7 +8,7 @@
 		<view class="section1">
 			<choose-list v-if="listShow" v-on:close="hideList" :currentChooseIndex="chooseIndex" :list="list" v-on:emitClick = "returnEmit"></choose-list>
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form" :model="info">
-					<evan-form-item label="楼栋号" prop="houseNo">
+					<evan-form-item label="楼栋号" prop="houseNo" :fontBold="true">
 						<template v-slot:main>
 							<input class="form-input" type="number" maxlength="3" placeholder-class="form-input-placeholder" v-model="info.houseNo" @input="inputTip" placeholder="请输入楼栋号" />
 						</template>
@@ -16,7 +16,7 @@
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 						</template>
 					</evan-form-item>
-					<evan-form-item label="房号" prop="roomNo">
+					<evan-form-item label="房号" prop="roomNo" :fontBold="true">
 						<template v-slot:main>
 							<input class="form-input" type="number"  maxlength="4" placeholder-class="form-input-placeholder" v-model="info.roomNo" placeholder="请输入房号" />
 						</template>
@@ -24,7 +24,7 @@
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 						</template>
 					</evan-form-item>
-					<evan-form-item label="户型" prop="houseType" >
+					<evan-form-item label="户型" prop="houseType" :fontBold="true">
 						<template v-slot:main>
 							<input  class="form-input" disabled="true" placeholder-class="form-input-placeholder" v-model="info.houseType" placeholder="请选择户型" @click="showList()"/>
 						</template>

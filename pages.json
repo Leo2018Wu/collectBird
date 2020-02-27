@@ -21,16 +21,6 @@
 			}
 		},
 		{
-			"path": "pages/meterRead/meterRead",
-			"style": {
-				"navigationBarTextStyle": "#fff",
-				"navigationBarTitleText": "抄表",
-				"navigationBarBackgroundColor": "#F09A42",
-				"disableScroll": true
-
-			}
-		},
-		{
 			"path": "pages/renterManage/renterManage",
 			"style": {
 				"navigationBarTitleText": "租客管理"
@@ -156,6 +146,18 @@
             "path" : "pages/editBill/editBill",
             "style" : {
 				"navigationBarTitleText": "账单修改"
+			}
+        }
+        ,{
+            "path" : "pages/MeterReading/MeterReading",
+            "style" : {
+				"navigationBarTitleText": "抄表"
+			}
+        }
+        ,{
+            "path" : "pages/keepRenting/keepRenting",
+            "style" : {
+				"navigationBarTitleText": "续租"
 			}
         }
     ],

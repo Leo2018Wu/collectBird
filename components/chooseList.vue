@@ -1,15 +1,15 @@
 <template>
 	<view class="chooseContainer" @click="aa">
-		<view class="mask"></view>
-			<view class="list">
-				<view class="title">
+		<cover-view class="mask"></cover-view>
+			<cover-view class="list">
+				<cover-view class="title">
 					{{title}}
-				</view>
-				<view class="chooseLi" :class="{active: currentChooseIndex == index}" v-for="(item,index) in list" :key="index" @click="chooseLi(item,index)">
+				</cover-view>
+				<cover-view class="chooseLi" :class="{active: currentChooseIndex == index}" v-for="(item,index) in list" :key="index" @click="chooseLi(item,index)">
 					{{item}}
-					<image v-if="currentChooseIndex == index" src="../static/true-icon.png" mode="aspectFit"></image>
-				</view>
-			</view>
+					<cover-image v-if="currentChooseIndex == index" src="../static/true-icon.png" mode="aspectFit"></cover-image>
+				</cover-view>
+			</cover-view>
 	</view>
 </template>
 
@@ -74,7 +74,6 @@
 	.list{
 		text-align: center;
 		width: 600rpx;
-		height: fit-content;
 		background-color: #FFFFFF;
 		border-radius: 20rpx;
 		position: absolute;
@@ -90,8 +89,29 @@
 		line-height: 100rpx;
 		font-size: 32rpx;
 		font-weight: bold;
-		border-top-left-radius: 20rpx;
-		border-top-right-radius: 20rpx;
+		position: relative;
+		/* border-top-left-radius: 20rpx;
+		border-top-right-radius: 20rpx; */
+	}
+	.title::before{
+		content: '';
+		width: 20rpx;
+		height: 20rpx;
+		background-color: #F09A42;
+		position: absolute;
+		top: 0;
+		left: 0;
+		z-index: 999;
+	}
+	.title::after{
+		content: '';
+		width: 20rpx;
+		height: 20rpx;
+		background-color: #F09A42;
+		position: absolute;
+		top: 0;
+		right: 0;
+		z-index: 999;
 	}
 	.chooseLi{
 		font-size: 30rpx;
@@ -110,7 +130,7 @@
 		border-bottom-left-radius: 20rpx;
 		border-bottom-right-radius: 20rpx;
 	}
-	.chooseLi image{
+	.chooseLi cover-image{
 		width: 33rpx;
 		height: 23rpx;
 		position: absolute;

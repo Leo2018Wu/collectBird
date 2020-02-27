@@ -39,6 +39,10 @@
 		<view class="section3" v-for="(item,index) in roomInfo.tenants" :key="index">
 			<renter-info-bar :userInfo="item" v-on:emitFillInfo="fillInfo" v-on:emitUserId="getEmit" :showFillBtn="roomInfo.tenantStatus == 2"></renter-info-bar>
 		</view>
+		<view class="operationBox" v-if="!isShowAddBtn">
+			<view class="operationBtn keepRenting">退租</view>
+			<view class="operationBtn endRenting">续租</view>
+		</view>
 		<view class="addRenterBox1" v-if="isShowAddBtn">
 			<image class="noRenter" src="../../static/noRenter.png" mode="aspectFit"></image>
 			<view v-if="roomInfo.tenantStatus == 1">租客信息填写中，您可以选择</view>
@@ -348,5 +352,28 @@
 		margin: 0 auto 48rpx auto;
 	}
 
-
+	.operationBox{
+		margin-top: 28rpx;
+		width: 100%;
+		padding-right: 32rpx;
+		display: flex;
+		justify-content: flex-end;
+	}
+	.operationBtn{
+		width:112rpx;
+		height:56rpx;
+		text-align: center;
+		line-height: 56rpx;
+		border-radius:10rpx;
+		font-size: 30rpx;
+	}
+	.endRenting{
+		border:1rpx solid #FFA044;
+		color: #FFA044;
+	}
+	.keepRenting{
+		border:1rpx solid #999999;
+		color: #999999;
+		margin-right: 20rpx;
+	}
 </style>

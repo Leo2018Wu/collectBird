@@ -142,7 +142,7 @@
 		</view>
 		<view class="eleCommonBox whiteBg">
 			<view class="switchBox">
-				<span>公摊电费</span>
+				<span>均摊电费</span>
 				<switch :checked="isShowEleCommonModal" @change="changeType" color="#F09A42" />
 			</view>
 			<view class="eleCommonInfo" v-if="isShowEleCommonModal">
@@ -153,15 +153,19 @@
 					</template>
 				</evan-form-item>
 				<view class="eleCommonBottom">
-					<span>公摊人数</span>
+					<span>均摊人数</span>
 					<view class="eleNumBox">
 						<number-box :valNum="tenantNum" v-on:emitVal='returnVal'></number-box>
 					</view>
 				</view>
 			</view>
 		</view>
-		<view class="section4 whiteBg"><textarea class="secTip textOverFlow" placeholder="备注" v-model="remarks"
+		<view class="section3 whiteBg">
+			<view class="remarkTitle">备注</view>
+			<textarea class="secTip textOverFlow" v-model="remarks"
 			 placeholder-class="textPlaceholder"></textarea></view>
+		<!-- <view class="section4 whiteBg"><textarea class="secTip textOverFlow" placeholder="备注" v-model="remarks"
+			 placeholder-class="textPlaceholder"></textarea></view> -->
 		<cover-view class="btnBoxMy twoButton textLeft" v-if="!listShow && isEdit">
 			<cover-view class="delBtn" @click="deleteRenter">删除</cover-view>
 			<cover-view class="sureBtn" @click="save">保存</cover-view>
@@ -205,7 +209,7 @@
 			numberBox
 		},
 		data() {
-			const currentDate = this.getDate();
+			const currentDate = this.$getDate();
 			return {
 				tenantNum: 2,
 				commonEleNum: '',
@@ -546,13 +550,7 @@
 					tenantSex: _this.currentSex, //性别字段
 					remarks: _this.remarks
 				};
-				if (this.isShowEleCommonModal &&!this.commonEleNum) {
-					uni.showToast({
-						title: '请输入公共电费初始刻度',
-						icon: 'none',
-						duration: 1500
-					})
-				}
+				
 				if(this.isShowEleCommonModal){
 					par.publicELeNum = this.commonEleNum;
 					par.publicElePrice = 1;
@@ -631,6 +629,14 @@
 							if (res2) {
 								_this.$refs.form3.validate(res3 => {
 									if (res3) {
+										if (_this.isShowEleCommonModal && !_this.commonEleNum) {
+											uni.showToast({
+												title: '请输入公共电费初始刻度',
+												icon: 'none',
+												duration: 1500
+											})
+											return;
+										}
 										_this.isShowSureModal = true;
 										// _this.$request.post(postUrl, par).then(responce => {
 										// 	uni.hideLoading();
@@ -739,24 +745,6 @@
 						this.currentLiIndex = index == 6 ? 0 : (index == 12 ? 1 : (index == 24 ? 2 : 3))
 					}
 				}
-				// if(isPass){
-				// 	if (temp) {
-				// 		this.currentLiIndex = index == 6 ? 0 : (index == 12 ? 1 : (index == 24 ? 2 : 3))
-				// 	} else {
-				// 		this.currentLiIndex = index
-				// 		this.pickerKeepDate = this.getKeepDate(index)
-				// 		this.info2.keepDate = this.getKeepDate(index)
-				// 	}
-				// }
-				// if(!(this.isEdit && !isChangeDateDue)){
-				// 	if (temp) {
-				// 		this.currentLiIndex = index == 6 ? 0 : (index == 12 ? 1 : (index == 24 ? 2 : 3))
-				// 	} else {
-				// 		this.currentLiIndex = index
-				// 		this.pickerKeepDate = this.getKeepDate(index)
-				// 		this.info2.keepDate = this.getKeepDate(index)
-				// 	}
-				// }
 			},
 			getKeepDate(index) {
 				let keepDate;
@@ -790,22 +778,8 @@
 						break;
 				}
 				if (index != 3) {
-					return this.getDate(keepDate);
+					return this.$getDate(keepDate);
 				}
-			},
-			getDate(value) {
-				let date;
-				if (value) {
-					date = new Date(value);
-				} else {
-					date = new Date();
-				}
-				let year = date.getFullYear();
-				let month = date.getMonth() + 1;
-				let day = date.getDate();
-				month = month > 9 ? month : '0' + month;
-				day = day > 9 ? day : '0' + day;
-				return `${year}-${month}-${day}`;
 			},
 			bindDateChange(e) {
 				console.log('nihaoa', e);
@@ -874,7 +848,6 @@
 
 	.idName {
 		font-size: 34rpx;
-		font-weight: bold;
 	}
 
 	.section1,
@@ -919,7 +892,6 @@
 		align-items: center;
 		color: #333333;
 		font-size: 34rpx;
-		font-weight: bold;
 	}
 
 	.switchBox switch {
@@ -1003,9 +975,10 @@
 	.secTip {
 		width: 100%;
 		height: 180rpx;
-		padding: 32rpx 0 30rpx 0;
+		/* padding: 32rpx 0 30rpx 0; */
 		font-size: 34rpx;
 		color: #333333;
+		margin-top: 20rpx;
 		/* border-bottom: 2rpx solid #EBEBEB; */
 	}
 
@@ -1150,4 +1123,11 @@
 	}
 
 	/* end */
+	.remarkTitle{
+		margin-top: 17rpx;
+		padding: 28rpx 0;
+		font-size: 34rpx;
+		color: #999999;
+		border-bottom: 2rpx solid #EBEBEB;
+	}
 </style>

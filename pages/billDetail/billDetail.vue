@@ -69,19 +69,29 @@
 				</view> -->
 				<view class="waterBox">
 					<view class="waterOuter eleOuter">
-						<span class="eleBar">{{electricityInfo.itemName}}</span>
+						<span class="eleBar">电费</span>
 						<span class="eleInfo" @click="showSureModal">详情</span>
 						<span class="priceTotal">{{electricityInfo.amount}}元</span>
 					</view>
 				</view>
+				<!-- <view class="eleCommOuter" v-if="hasCommonEle"> -->
+					<view class="waterBox"  v-if="hasCommonEle">
+						<view class="waterOuter">
+							<span class="waterBar">均摊电费</span>
+							<span class="priceTotal">{{commEleCost.amount}}元</span>
+						</view>
+					</view>
+				<!-- </view> -->
 				<view class="waterBox" v-for="(item,index) in billInfo.items" :key="index">
 					<view class="waterOuter">
-						<span class="waterBar">{{item.itemName}}</span>
+						<span class="waterBar">{{item.itemName == 3 ? '水费' : '网费'}}</span>
 						<span class="priceTotal">{{item.amount}}元</span>
 					</view>
 				</view>
 			</view>
 		</view>
+		
+		
 		<view class="remarks">{{ billInfo.remarks ? billInfo.remarks : '无备注' }}</view>
 		<!-- <view v-if="billType == 0"> -->
 		<view class="section3" v-if="billInfo.billStatus == 4">
@@ -154,6 +164,8 @@
 		},
 		data() {
 			return {
+				hasCommonEle:false,
+				commEleCost:{},
 				isShowSureModal: false,
 				ownerInfo: {},
 				billType: 0,
@@ -245,9 +257,12 @@
 						console.log(_this.billInfo);
 						let tempArr = []
 						_this.billInfo.items.forEach((item, index) => {
-							if (item.itemName == '电费') {
+							if (item.itemName == '1') {
 								_this.electricityInfo = _this.billInfo.items[index];
-							} else {
+							} else if(item.itemName == '2'){
+								_this.hasCommonEle = true;
+								_this.commEleCost = _this.billInfo.items[index];
+							}else {
 								tempArr.push(item)
 							}
 						})
@@ -295,7 +310,7 @@
 				if (this.billType == 1) {
 					this.ll()
 				}
-				if (_this.electricityInfo.itemName == '电费') {
+				if (_this.electricityInfo.itemName == '1') {
 					if (_this.electricityInfo.currentNum == '' || _this.electricityInfo.currentNum == null || _this.electricityInfo.currentNum ==
 						'0') {
 						_this.isShowMeterRead = true;
@@ -313,8 +328,7 @@
 					})
 				} else {
 					uni.navigateTo({
-						url: '../meterRead/meterRead?billInfo=' + JSON.stringify(this.billInfo) + '&electricityInfo=' + JSON.stringify(
-							this.electricityInfo)
+						url: '../MeterReading/MeterReading?billId='+ this.billId
 					});
 				}
 			},
@@ -521,11 +535,10 @@
 		background-color: #ffffff;
 		border-radius: 5rpx;
 	}
-
 	.eleOuter {
-		border: none !important;
+		border-top: none !important;
 	}
-
+	
 	.waterOuter {
 		display: flex;
 		justify-content: flex-start;
@@ -533,7 +546,10 @@
 		border-top: 1rpx solid #ebebeb;
 		height: 94rpx;
 	}
-
+	.eleCommOuter{
+		padding: 0 17rpx;
+		background-color: #FAFAFA;
+	}
 	.eleInfo {
 		width: 96rpx;
 		height: 42rpx;

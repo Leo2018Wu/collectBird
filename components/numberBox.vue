@@ -89,7 +89,7 @@
 	.one::after,.three::before{
 		content: '';
 		width: 25rpx;
-		height: 1rpx;
+		height: 2rpx;
 		background-color: #999999;
 		position: absolute;
 		left: 50%;

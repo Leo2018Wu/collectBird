@@ -4,7 +4,7 @@
 		<view class="form-container whiteBg">
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form" :model="info">
 				<view class="section1 divideBottom">
-					<evan-form-item label="收租日期" prop="date" :noBold="true">
+					<evan-form-item label="收租日期" prop="date">
 						<template v-slot:main>
 							<picker class="form-input" disabled="true" mode="date" data-type="start" :value="date" :start="startDate" @change="bindDateChange">{{ date }}</picker>
 						</template>
@@ -12,7 +12,7 @@
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 						</template>
 					</evan-form-item>
-					<evan-form-item label="缴费周期" prop="rentCycle" :noBold="true" :border="fales">
+					<evan-form-item label="缴费周期" prop="rentCycle" :border="fales">
 						<template v-slot:main>
 							<view  class="form-input"><span>{{date}}</span>~<span>{{endCycleDate}}</span></view>
 						</template>
@@ -22,7 +22,7 @@
 					</evan-form-item>
 				</view>
 				<view class="section2" :class="{divideBottom : billType == 1}">
-					<evan-form-item label="月租金" prop="rentUnitPrice" :noBold="true" :border="billInfo.depositAmount">
+					<evan-form-item label="月租金" prop="rentUnitPrice" :border="billInfo.depositAmount">
 						<template v-slot:main>
 							<input class="form-input" type="digit" placeholder-class="form-input-placeholder" v-model="info.rentUnitPrice"
 							 placeholder="0.00" />
@@ -32,9 +32,9 @@
 						</template>
 					</evan-form-item>
 					<view v-if="billInfo.depositAmount">
-						<evan-form-item label="押金" prop="deposit" :noBold="true" :border="fales">
+						<evan-form-item label="押金" prop="deposit"  :border="fales">
 							<template v-slot:main>
-								<input class="form-input" type="digit" placeholder-class="form-input-placeholder" v-model="info.deposit"
+								<input class="form-input"  type="digit" placeholder-class="form-input-placeholder" v-model="info.deposit"
 								 placeholder="0.00" />
 							</template>
 							<template v-slot:tip>
@@ -47,9 +47,9 @@
 					<view class="billItems">费用明细</view>
 					<view class="section3 divideBottom">
 						<view v-for="(item,index) in billInfo.items" :key="index" ref="formItem">
-							<evan-form-item :label="item.itemName" prop="eleCost" :noBold="true">
+							<evan-form-item :label="item.itemName == 1 ? '电费' :(item.itemName == 2 ? '均摊电费' : (item.itemName == 3 ? '水费' : '网费')) " prop="eleCost" >
 								<template v-slot:main>
-									<input class="form-input" type="digit" placeholder-class="form-input-placeholder" v-model="item.amount" :data-type="item.itemName" @input="getValue" 
+									<input class="form-input" :disabled="item.itemName == '1' || item.itemName== '2'" @click="goMeterRead(item)" type="digit" placeholder-class="form-input-placeholder" v-model="item.amount" :data-type="item.itemName" @input="getValue" 
 									 placeholder="0.00" />
 								</template>
 								<template v-slot:tip>
@@ -60,8 +60,12 @@
 					</view>
 				</view>
 			</evan-form>
-			<view class="section4 whiteBg"><textarea class="secTip textOverFlow" placeholder="备注" v-model="remarks"
+			<view class="section4 whiteBg">
+				<view class="remarkTitle">备注</view>
+				<textarea class="secTip textOverFlow" v-model="remarks"
 				 placeholder-class="textPlaceholder"></textarea></view>
+		<!-- 	<view class="section4 whiteBg"><textarea class="secTip textOverFlow" placeholder="备注" v-model="remarks"
+				 placeholder-class="textPlaceholder"></textarea></view> -->
 		</view>
 		<view class="saveBtn" @click="save">保存</view>
 	</view>
@@ -77,7 +81,7 @@
 			evanForm,
 		},
 		data() {
-			const currentDate = this.getDate();
+			const currentDate = this.$getDate();
 			return {
 				titleContent:'',
 				billType:'',
@@ -86,6 +90,7 @@
 				eleCost:'',
 				netCost:'',
 				waterCost:'',
+				commeleCost:'',
 				date: currentDate,
 				// endCycleDate:'2020-09-09',
 				remarks:'',
@@ -111,15 +116,17 @@
 				let tempDate = moment(this.date)
 							.add(_this.billInfo.rentMonthNum, 'month')
 							.subtract(1, 'days');
-				return  this.getDate(tempDate)
+				return  this.$getDate(tempDate)
 			}
+		},
+		onShow(){
+			this.getBillInfo(this.billId)
 		},
 		onLoad(options) {
 			console.log(options)
 			this.titleContent = options.titleContent;
 			this.billType = options.billType;
 			this.billId = options.billId;
-			this.getBillInfo(options.billId)
 			this.$nextTick(() => {
 				this.$refs.form.setRules(this.rules)
 				console.log(this.$refs.form)
@@ -130,12 +137,17 @@
 			getValue(e){
 				console.log(e)
 				let type = e.currentTarget.dataset.type
-				if(type == '电费'){
-					this.eleCost = e.detail.value
-				}else if(type == '水费'){
+				if(type == '3'){
 					this.waterCost = e.detail.value
-				}else{
+				}else if(type == '4'){
 					this.netCost = e.detail.value
+				}
+			},
+			goMeterRead(item){
+				if(item.itemName == '1' || item.itemName == '2'){
+					uni.navigateTo({
+						url:'../MeterReading/MeterReading?billId='+this.billId
+					})
 				}
 			},
 			save(){
@@ -151,13 +163,16 @@
 							_this.billInfo.depositAmount = _this.billType == 0 ? _this.info.deposit : (Number(_this.info.deposit) < 0 ? -Number(_this.info.deposit) : Number(_this.info.deposit)) 
 						}
 						_this.billInfo.items.forEach((item,index)=>{
-							if(item.itemName == '电费'){
+							console.log(item)
+							if(item.itemName == '1'){
 								console.log(_this.eleCost)
 								_this.billInfo.items[index].amount = _this.eleCost
-							}else if(item.itemName == '水费'){
+							}else if(item.itemName == '3'){
 								_this.billInfo.items[index].amount = _this.waterCost
-							}else{
+							}else if(item.itemName == '4'){
 								_this.billInfo.items[index].amount = _this.netCost
+							}else{
+								_this.billInfo.items[index].amount = _this.commeleCost
 							}
 						})
 						if(_this.billType == 1){
@@ -193,12 +208,14 @@
 						_this.info.deposit = _this.billType == 0 ? _this.billInfo.depositAmount : '-'+_this.billInfo.depositAmount;
 						_this.remarks = _this.billInfo.remarks;
 						_this.billInfo.items.forEach((item,index)=>{
-							if(item.itemName == '电费'){
+							if(item.itemName == '1'){
 								_this.eleCost = item.amount
-							}else if(item.itemName == '水费'){
+							}else if(item.itemName == '3'){
 								_this.waterCost = item.amount
-							}else{
+							}else if(item.itemName == '4'){
 								_this.netCost = item.amount
+							}else{
+								_this.commeleCost = item.amount
 							}
 						})
 					});
@@ -206,20 +223,6 @@
 			bindDateChange(e){
 				console.log(e)
 				this.date = e.detail.value
-			},
-			getDate(value) {
-				let date;
-				if (value) {
-					date = new Date(value);
-				} else {
-					date = new Date();
-				}
-				let year = date.getFullYear();
-				let month = date.getMonth() + 1;
-				let day = date.getDate();
-				month = month > 9 ? month : '0' + month;
-				day = day > 9 ? day : '0' + day;
-				return `${year}-${month}-${day}`;
 			},
 		}
 	}
@@ -233,9 +236,7 @@
 		background-color: #FAFAFA;
 	}
 
-	.whiteBg {
-		background: #FFFFFF;
-	}
+	
 
 	.billTitle {
 		width: 100%;
@@ -245,6 +246,9 @@
 		font-size: 32rpx;
 		font-weight: bold;
 		padding-left: 40rpx;
+	}
+	.whiteBg {
+		background: #FFFFFF;
 	}
 	.divideBottom{
 		border-bottom: 14rpx solid #FAFAFA;
@@ -280,9 +284,10 @@
 	.secTip{
 		width: 100%;
 		min-height: 94rpx;
-		padding: 20rpx 0;
+		/* padding: 20rpx 0; */
 		font-size: 32rpx;
 		color: #333333;
+		margin-top: 20rpx;
 	}
 	.textPlaceholder {
 		padding: 20rpx 0;
@@ -302,5 +307,11 @@
 	}
 	textarea{
 		height: 94rpx;
+	}
+	.remarkTitle{
+		padding: 28rpx 0;
+		font-size: 34rpx;
+		color: #999999;
+		border-bottom: 2rpx solid #EBEBEB;
 	}
 </style>

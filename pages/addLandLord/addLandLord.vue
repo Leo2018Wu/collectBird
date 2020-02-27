@@ -2,7 +2,7 @@
 	<view class="addLandLord">
 		<view class="section1 whiteBg">
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form1" :model="info1">
-				<evan-form-item label="姓名" prop="name">
+				<evan-form-item label="姓名" prop="name" :fontBold="true">
 					<template v-slot:main>
 						<input class="form-input" placeholder-class="form-input-placeholder" v-model="info1.name" placeholder="房东姓名" />
 					</template>
@@ -10,7 +10,7 @@
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 					</template>
 				</evan-form-item>
-				<evan-form-item label="电话" prop="tel">
+				<evan-form-item label="电话" prop="tel" :border="false" :fontBold="true">
 					<template v-slot:main>
 						<input class="form-input" type="number" maxlength="11" placeholder-class="form-input-placeholder" @input="getPhone"
 						 v-model="info1.tel" placeholder="房东电话" />
@@ -23,7 +23,7 @@
 		</view>
 		<view class="section2 whiteBg">
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form2" :model="info2">
-				<evan-form-item label="起租日期" prop="startDate">
+				<evan-form-item label="起租日期" prop="startDate" :fontBold="true">
 					<template v-slot:main>
 						<picker class="form-input" mode="date" data-type="start" :value="date" :start="startDate" @change="bindDateChange">{{ date }}</picker>
 					</template>
@@ -31,7 +31,7 @@
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 					</template>
 				</evan-form-item>
-				<evan-form-item label="到租日期" prop="startDate">
+				<evan-form-item label="到租日期" prop="startDate" :fontBold="true">
 					<template v-slot:main>
 						<picker class="form-input" mode="date" data-type="end" :value="endDate" :start="startDate" @change="bindDateChange">{{ endDate }}</picker>
 					</template>
@@ -39,7 +39,7 @@
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 					</template>
 				</evan-form-item>
-				<evan-form-item label="收租周期" prop="rentCycle">
+				<evan-form-item label="收租周期" prop="rentCycle" :fontBold="true">
 					<template v-slot:main>
 						<choose-list v-if="listShow" :currentChooseIndex="chooseIndex" v-on:close="hideList" :list="list" :title="'选择收租周期'"
 						 v-on:emitClick="returnEmit"></choose-list>
@@ -50,7 +50,7 @@
 						<image class="inpArrow" src="../../static/triangle.png" mode="aspectFit"></image>
 					</template>
 				</evan-form-item>
-				<evan-form-item label="月租金" prop="rentUnitPrice">
+				<evan-form-item label="月租金" prop="rentUnitPrice" :fontBold="true">
 					<template v-slot:main>
 						<input class="form-input" type="digit" placeholder-class="form-input-placeholder" v-model="info2.rentUnitPrice"
 						 placeholder="0.00" />
@@ -59,7 +59,7 @@
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 					</template>
 				</evan-form-item>
-				<evan-form-item label="押金" prop="deposit">
+				<evan-form-item label="押金" prop="deposit" :border="false" :fontBold="true">
 					<template v-slot:main>
 						<input class="form-input" type="digit" placeholder-class="form-input-placeholder" v-model="info2.deposit"
 						 placeholder="0.00" />
@@ -69,9 +69,11 @@
 					</template>
 				</evan-form-item>
 			</evan-form>
-			<view class="section3 whiteBg"><textarea class="secTip textOverFlow" placeholder="备注" v-model="remarks"
-				 placeholder-class="textPlaceholder"></textarea></view>
 		</view>
+		<view class="section3 whiteBg">
+			<view class="remarkTitle">备注</view>
+			<textarea class="secTip textOverFlow" v-model="remarks"
+			 placeholder-class="textPlaceholder"></textarea></view>
 		<view class="sureBtn" @click="save">保存</view>
 	</view>
 </template>
@@ -88,7 +90,7 @@
 			chooseList
 		},
 		data() {
-			const currentDate = this.getDate();
+			const currentDate = this.$getDate();
 			return {
 				ownerId:null,
 				remarks: '',
@@ -212,7 +214,7 @@
 				myDate = moment(this.date)
 					.add(12, 'month')
 					.subtract(1, 'days');
-				this.endDate = this.getDate(myDate)
+				this.endDate = this.$getDate(myDate)
 			},
 			getRentCycleList() {
 				let _this = this;
@@ -325,20 +327,6 @@
 				}
 
 			},
-			getDate(value) {
-				let date;
-				if (value) {
-					date = new Date(value);
-				} else {
-					date = new Date();
-				}
-				let year = date.getFullYear();
-				let month = date.getMonth() + 1;
-				let day = date.getDate();
-				month = month > 9 ? month : '0' + month;
-				day = day > 9 ? day : '0' + day;
-				return `${year}-${month}-${day}`;
-			},
 		}
 	}
 </script>
@@ -378,7 +366,7 @@
 	.secTip {
 		width: 100%;
 		height: 180rpx;
-		padding: 32rpx 0 30rpx 0;
+		padding-bottom:20rpx;
 		font-size: 34rpx;
 		color: #333333;
 		margin-top: 17rpx;
@@ -400,5 +388,12 @@
 		background: linear-gradient(-90deg, rgba(243, 183, 73, 1) 0%, rgba(240, 154, 66, 1) 100%);
 		font-size: 32rpx;
 		margin: 124rpx auto 72rpx auto;
+	}
+	.remarkTitle{
+		margin-top: 17rpx;
+		padding: 28rpx 0;
+		font-size: 34rpx;
+		color: #999999;
+		border-bottom: 2rpx solid #EBEBEB;
 	}
 </style>

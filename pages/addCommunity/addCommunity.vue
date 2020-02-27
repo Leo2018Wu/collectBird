@@ -3,7 +3,7 @@
 		<tip-modal v-if="isShowTipModal" v-on:emitCancel="returnCancel" v-on:emitSure="returnSure"></tip-modal>
 		<view class="content">
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form" :model="info">
-				<evan-form-item label="小区名" prop="name">
+				<evan-form-item label="小区名" prop="name" :fontBold="true">
 					<template v-slot:main>
 						<view @click="chooseLocation(false)" class="form-input form-input-placeholder">{{myName}}</view>
 						<!-- <input @click="chooseLocation(false)" class="form-input" placeholder-class="form-input-placeholder" v-model="info.name" placeholder="请输入小区名" /> -->
@@ -12,7 +12,7 @@
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 					</template>
 				</evan-form-item>
-				<evan-form-item label="详细地址" prop="addr">
+				<evan-form-item label="详细地址" prop="addr" :fontBold="true">
 					<template v-slot:main>
 						<view @click="chooseLocation(true)" class="form-input form-input-placeholder">{{myAddr}}</view>
 						<!-- <input @click="chooseLocation(true)" class="form-input" placeholder-class="form-input-placeholder" :value="info.addr"  placeholder="请填写" /> -->
