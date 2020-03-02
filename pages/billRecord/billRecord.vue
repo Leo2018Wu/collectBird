@@ -95,7 +95,7 @@
 				}
 			},
 			getRenterInfo(id){
-				this.$request.post('/roomUser/findById',{
+				this.$request.post('/roomUser/findByTenantId',{
 					tenantId:id
 				}).then((res)=>{
 					this.userInfo = res.data.data

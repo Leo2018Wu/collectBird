@@ -20,7 +20,7 @@
 				<view class="renters">租客<span>{{item.count}}</span></view>
 			</view>
 			<view class="renterListBox" :class="{active:isShow && currentIndex == index}">
-				<view class="renterLi" v-for="(p,idx) in item.tenantList" :key="idx" @click="goRenter(p,item.communityName)">
+				<view class="renterLi" v-for="(p,idx) in item.tenantList" :key="idx" @click="goRenter(p,item.communityName,p.id)">
 					<image class="renterImg" v-if="p.tenantSex == 0" src="../../static/defaultMale.png" mode="aspectFill"></image>
 					<image class="renterImg" v-else src="../../static/defaultFemale.png" mode="aspectFill"></image>
 					<view class="renterInfoBox">
@@ -64,7 +64,7 @@
 					this.inRentTenantNum = res.data.data.inRentTenantNum;
 				})
 			},
-			goRenter(item, name) {
+			goRenter(item, name,tenantId) {
 				console.log(item)
 				let communityInfo = {}
 				communityInfo.name = name
@@ -76,7 +76,7 @@
 				communityInfo.roomPrice = item.map.roomPrice
 				let id = item.map.roomId
 				uni.navigateTo({
-					url: '../renter/renter?id=' + id + '&communityInfo=' + JSON.stringify(communityInfo) + '&houseId=' + item.map.houseId
+					url: '../renter/renter?id=' + id + '&communityInfo=' + JSON.stringify(communityInfo) + '&houseId=' + item.map.houseId+'&tenantId='+tenantId
 				})
 			},
 			getRenterList(id) {

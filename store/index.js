@@ -9,6 +9,7 @@ const store = new Vuex.Store({
 		sessionKey: null, //用户登录sessionKey 
 		isloginStatus: false, //是否授权登录状态
 		landladyInfo: {},	// 登录信息
+		tenantId:null,
 		tempRoomInfo: {},
 		chooseLocationInfo: {}
 	},
@@ -36,6 +37,9 @@ const store = new Vuex.Store({
 		},
 		sessionKey(state, data) {
 			state.sessionKey = data
+		},
+		tempRenterId(state,data){
+			state.tenantId = data
 		}
 	}
 })

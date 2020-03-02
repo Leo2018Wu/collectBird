@@ -240,13 +240,6 @@
 				_this.$request.post('report/reportQuery',par).then((res)=>{
 					console.log(res.data)
 					let data = res.data.data
-					let aa = _this.chartData.series
-					_this.chartData.series[0].data = 120;
-					_this.chartData.series[1].data = 160;
-					_this.chartData.series[2].data = 46;
-					_this.chartData.series[3].data = 25;
-					_this.chartData.series[4].data = 122;
-					_this.chartData.series[5].data = 52;
 					_this.showRing("canvasRing", _this.chartData, _this,data.totalAmount);
 					_this.itemProfitList[0].price = Number(data.total).toFixed(0);
 					_this.itemProfitList[1].price = Number(data.depositAmount).toFixed(0);

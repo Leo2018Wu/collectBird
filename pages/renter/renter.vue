@@ -14,7 +14,7 @@
 				</view>
 				<view class="detailBottom">
 					<span class="housePrice">{{communityInfo.roomPrice}}元/月</span>
-					<span class="showRecord" v-if="roomInfo.unPayBill == 1" @click.stop="showBill()">查看账单</span>
+					<span class="showRecord" v-if="roomInfo.unPayBill >= 1" @click.stop="showBill()">查看账单</span>
 				</view>
 			</view>
 		</view>
@@ -39,9 +39,9 @@
 		<view class="section3" v-for="(item,index) in roomInfo.tenants" :key="index">
 			<renter-info-bar :userInfo="item" v-on:emitFillInfo="fillInfo" v-on:emitUserId="getEmit" :showFillBtn="roomInfo.tenantStatus == 2"></renter-info-bar>
 		</view>
-		<view class="operationBox" v-if="!isShowAddBtn">
-			<view class="operationBtn keepRenting">退租</view>
-			<view class="operationBtn endRenting">续租</view>
+		<view class="operationBox" v-if="!isShowAddBtn &&  roomInfo.tenantStatus >= 3">
+			<view class="operationBtn keepRenting" @click="endRenting">退租</view>
+			<view class="operationBtn endRenting" @click="keepRenting">续租</view>
 		</view>
 		<view class="addRenterBox1" v-if="isShowAddBtn">
 			<image class="noRenter" src="../../static/noRenter.png" mode="aspectFit"></image>
@@ -56,10 +56,12 @@
 			<view class="addRenter" @click="updateInviteStatus(0)">取消邀请</view>
 			<button class="invite" open-type="share">再次邀请</button>
 		</view>
+		<tip-modal v-if="isShowTipModal" :oneButton="true" :title="'提示'" :describition="'有未确认账单，不能退租。'" v-on:emitCancel="returnEmit"></tip-modal>
 	</view>
 </template>
 
 <script>
+	import tipModal from '../../components/tipModal.vue'
 	import iconBar from '../../components/iconBar.vue'
 	import facilityBar from '../../components/facilityBar.vue'
 	import renterInfoBar from '../../components/renterInfoBar.vue'
@@ -67,10 +69,14 @@
 		components: {
 			"icon-bar": iconBar,
 			"facility-bar": facilityBar,
-			renterInfoBar
+			renterInfoBar,
+			tipModal
 		},
 		data() {
 			return {
+				isWholeRent:false,
+				tenantId:null,
+				isShowTipModal:false,
 				houseId: null,
 				communityId: null,
 				isShowAddBtn: false,
@@ -84,12 +90,18 @@
 		},
 		computed: {},
 		onShow() {
+			console.log(this.$store.state)
+			if(this.$store.state.tenantId != null){
+				this.tenantId = this.$store.state.tenantId
+				this.$store.commit('tempRenterId', null);
+			}
 			this.getRoomInfo(this.roomId)
 			this.$request.post('/house/findById', {
 				id: this.houseId
 			}).then((res) => {
 				console.log(res)
 				let data = res.data.data
+				this.isWholeRent = data.rentType == '0' ? 1 : 0;
 				this.communityInfo.houseNo = data.houseNo
 				this.communityInfo.bedroomNum = data.bedroomNum
 				this.communityInfo.livingroomNum = data.livingroomNum
@@ -97,9 +109,12 @@
 			})
 		},
 		onLoad(option) {
-			console.log(option)
+			console.log(this)
 			this.communityInfo = JSON.parse(option.communityInfo)
 			// this.getRoomInfo(option.id)
+			if(option.tenantId){
+				this.tenantId = option.tenantId
+			}
 			this.roomId = option.id
 			this.houseId = option.houseId
 			this.communityId = option.communityId
@@ -126,6 +141,24 @@
 			// updateData(){
 			// 	this.getRoomInfo(this.roomId)
 			// },
+			keepRenting(){
+				uni.navigateTo({
+					url:'../keepRenting/keepRenting?id='+this.roomInfo.tenants[0].id
+				})
+			},
+			returnEmit(){
+				this.isShowTipModal = false;
+			},
+			endRenting(){
+				if(this.roomInfo.unPayBill >= 1){
+					this.isShowTipModal = true;
+				}else{
+					let houseAddr = this.communityInfo.name +'-'+ this.communityInfo.houseNo+'-' + this.communityInfo.roomNo
+					uni.navigateTo({
+						url:'../endRenting/endRenting?tenantId=' + this.roomInfo.tenants[0].id+'&houseAddr='+houseAddr 
+					})
+				}
+			},
 			fillInfo(){
 				console.log('返回事件')
 				let commInfo = {
@@ -149,16 +182,28 @@
 				})
 			},
 			toEditHouse() {
+				
+				let houseInfo = {
+					communityName : this.communityInfo.name,
+					communityId : this.communityId,
+					houseId : this.houseId
+				}
 				uni.navigateTo({
-					url: '../addRoomNum/addRoomNum?communityName=' + this.communityInfo.name + '&communityId=' + this.communityId +
-						'&houseId=' + this.houseId
+					url: `../roomDetail/roomDetail?isWholeRent=${this.isWholeRent}` + `&roomNo=` + `${this.communityInfo.roomNo}` + '&houseInfo=' +
+						`${JSON.stringify(houseInfo)}`,
 				})
 			},
 			getRoomInfo(id) {
 				let _this = this;
-				_this.$request.post('room/findRoomById', {
+				let par = {
 					id
-				}).then((res) => {
+				}
+				console.log(this.tenantId)
+				// if(this.tenantId != null){
+					console.log('nihao')
+					par.tenantId = this.tenantId == 'null' ? '' : this.tenantId
+				// }
+				_this.$request.post('room/findRoomById',par).then((res) => {
 					console.log(res)
 					// _this.commonFacBarList = res.data.data.houseConfigure.split(',')
 					_this.roomInfo = res.data.data
@@ -171,10 +216,17 @@
 				})
 			},
 			showBill() {
-				console.log('我点击了')
-				uni.navigateTo({
-					url: '../billDetail/billDetail?billId=' + this.roomInfo.billId + '&tenantId=' + this.roomInfo.tenants[0].id
-				})
+				console.log('我点击了',this.roomInfo)
+				if(this.roomInfo.billStatus == 5){
+					let houseAddr = this.communityInfo.name +'-'+ this.communityInfo.houseNo+'-' + this.communityInfo.roomNo
+					uni.navigateTo({
+						url:'../endRenting/endRenting?billId=' + this.roomInfo.billId+'&houseAddr='+houseAddr 
+					})
+				}else{
+					uni.navigateTo({
+						url: '../billDetail/billDetail?billId=' + this.roomInfo.billId + '&tenantId=' + this.roomInfo.tenants[0].id
+					})
+				}
 			},
 			getEmit(e) {
 				console.log(e)
@@ -184,10 +236,12 @@
 					houseNo: this.communityInfo.houseNo,
 					roomNo: this.communityInfo.roomNo
 				}
-				uni.navigateTo({
-					url: "../billRecord/billRecord?userInfo=" + JSON.stringify(e) + '&commInfo=' + JSON.stringify(communInfo) +
-						'&roomId=' + this.roomId
-				})
+				if(this.roomInfo.billStatus != 5){
+					uni.navigateTo({
+						url: "../billRecord/billRecord?userInfo=" + JSON.stringify(e) + '&commInfo=' + JSON.stringify(communInfo) +
+							'&roomId=' + this.roomId
+					})
+				}
 			},
 			addRenter() {
 				console.log('你打')

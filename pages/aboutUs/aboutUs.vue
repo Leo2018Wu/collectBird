@@ -14,8 +14,8 @@
 			<view class="modalTitle">通过微信联系我们</view>
 			<view class="wechatName">{{wechat}}</view>
 			<view class="button" @click="copy">复制微信号</view>
-
 		</view>
+		<view class="copyRight">©2020 Raysler Info All Rights Reserved</view>
 	</view>
 </template>
 
@@ -159,5 +159,13 @@
 		font-size: 30rpx;
 		margin: 40rpx auto 140rpx auto;
 		width: fit-content;
+	}
+	.copyRight{
+		font-size: 22rpx;
+		color: #AEAEAE;
+		width: 100%;
+		text-align: center;
+		position: absolute;
+		bottom: 60rpx;
 	}
 </style>

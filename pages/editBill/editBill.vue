@@ -12,9 +12,10 @@
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 						</template>
 					</evan-form-item>
-					<evan-form-item label="缴费周期" prop="rentCycle" :border="fales">
+					<evan-form-item :label="billInfo.billStatus == 5 ? '清算日期':'缴费周期'" prop="rentCycle" :border="fales">
 						<template v-slot:main>
-							<view  class="form-input"><span>{{date}}</span>~<span>{{endCycleDate}}</span></view>
+							<view  class="form-input" v-if="billInfo.billStatus == 5">{{nowDate}}</span></view>
+							<view  v-else class="form-input"><span>{{date}}</span>~<span>{{endCycleDate}}</span></view>
 						</template>
 						<template v-slot:tip>
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -22,17 +23,19 @@
 					</evan-form-item>
 				</view>
 				<view class="section2" :class="{divideBottom : billType == 1}">
-					<evan-form-item label="月租金" prop="rentUnitPrice" :border="billInfo.depositAmount">
-						<template v-slot:main>
-							<input class="form-input" type="digit" placeholder-class="form-input-placeholder" v-model="info.rentUnitPrice"
-							 placeholder="0.00" />
-						</template>
-						<template v-slot:tip>
-							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
-						</template>
-					</evan-form-item>
-					<view v-if="billInfo.depositAmount">
-						<evan-form-item label="押金" prop="deposit"  :border="fales">
+					<view class="" v-if="billInfo.billStatus != 5">
+						<evan-form-item label="月租金" prop="rentUnitPrice" :border="billInfo.depositAmount">
+							<template v-slot:main>
+								<input class="form-input" type="digit" placeholder-class="form-input-placeholder" v-model="info.rentUnitPrice"
+								 placeholder="0.00" />
+							</template>
+							<template v-slot:tip>
+								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
+							</template>
+						</evan-form-item>
+					</view>
+					<view v-if="billInfo.depositAmount != 0">
+						<evan-form-item :label="billInfo.billStatus == 5 ? '应退押金' : '押金'" prop="deposit"  :border="fales">
 							<template v-slot:main>
 								<input class="form-input"  type="digit" placeholder-class="form-input-placeholder" v-model="info.deposit"
 								 placeholder="0.00" />
@@ -46,8 +49,8 @@
 				<view v-if="billType == 0">
 					<view class="billItems">费用明细</view>
 					<view class="section3 divideBottom">
-						<view v-for="(item,index) in billInfo.items" :key="index" ref="formItem">
-							<evan-form-item :label="item.itemName == 1 ? '电费' :(item.itemName == 2 ? '均摊电费' : (item.itemName == 3 ? '水费' : '网费')) " prop="eleCost" >
+						<view v-for="(item,index) in billInfo.items" :key="index" ref="formItem" :border="!item.itemName == 4">
+							<evan-form-item :label="item.itemName == 1 ? '电费(元/度)' :(item.itemName == 2 ? '均摊电费(元/度)' : (item.itemName == 3 ? '水费(元/月)' : '网费(元/月')) " prop="eleCost" >
 								<template v-slot:main>
 									<input class="form-input" :disabled="item.itemName == '1' || item.itemName== '2'" @click="goMeterRead(item)" type="digit" placeholder-class="form-input-placeholder" v-model="item.amount" :data-type="item.itemName" @input="getValue" 
 									 placeholder="0.00" />
@@ -67,7 +70,10 @@
 		<!-- 	<view class="section4 whiteBg"><textarea class="secTip textOverFlow" placeholder="备注" v-model="remarks"
 				 placeholder-class="textPlaceholder"></textarea></view> -->
 		</view>
-		<view class="saveBtn" @click="save">保存</view>
+		<cover-view class="btnxxx">
+			<cover-view class="saveBtn" @click="save">保存</cover-view>
+		</cover-view>
+		
 	</view>
 </template>
 
@@ -91,8 +97,9 @@
 				netCost:'',
 				waterCost:'',
 				commeleCost:'',
+				nowDate:currentDate,
 				date: currentDate,
-				// endCycleDate:'2020-09-09',
+				endCycleDate:'2020-09-09',
 				remarks:'',
 				info:{
 					rentUnitPrice:'',
@@ -100,7 +107,7 @@
 				},
 				rules:{
 					rentUnitPrice:{
-						required:true,
+						required:false,
 						message:'请输入月租金'
 					},
 					deposit:{
@@ -111,13 +118,13 @@
 			}
 		},
 		computed:{
-			endCycleDate(){
-				let _this = this
-				let tempDate = moment(this.date)
-							.add(_this.billInfo.rentMonthNum, 'month')
-							.subtract(1, 'days');
-				return  this.$getDate(tempDate)
-			}
+			// endCycleDate(){
+			// 	let _this = this
+			// 	let tempDate = moment(this.date)
+			// 				.add(_this.billInfo.rentMonthNum, 'month')
+			// 				// .subtract(1, 'days');
+			// 	return  this.$getDate(tempDate)
+			// }
 		},
 		onShow(){
 			this.getBillInfo(this.billId)
@@ -201,9 +208,15 @@
 					.then(res => {
 						console.log(res)
 						_this.billInfo = res.data.data;
-						_this.date =_this.billInfo.payRentDate.substr(0,10);
-						_this.startCycleDate = _this.billInfo.startDate.substr(0,10);
-						_this.endCycleDate = _this.billInfo.endDate.substr(0,10);
+						if(_this.billInfo.payRentDate){
+							_this.date =_this.billInfo.payRentDate.substr(0,10);
+						}
+						if(_this.billInfo.startDate){
+							_this.startCycleDate = _this.billInfo.startDate.substr(0,10);
+						}
+						if(_this.billInfo.endDate){
+							_this.endCycleDate = _this.billInfo.endDate.substr(0,10);
+						}
 						_this.info.rentUnitPrice = _this.billType == 0 ?  _this.billInfo.total : '-'+_this.billInfo.total;
 						_this.info.deposit = _this.billType == 0 ? _this.billInfo.depositAmount : '-'+_this.billInfo.depositAmount;
 						_this.remarks = _this.billInfo.remarks;
@@ -234,9 +247,8 @@
 		height: 100%;
 		width: 100%;
 		background-color: #FAFAFA;
+		padding-bottom: 140rpx;
 	}
-
-	
 
 	.billTitle {
 		width: 100%;
@@ -258,6 +270,7 @@
 		width: calc(100% - 34rpx);
 		margin-left: 17rpx;
 		color: #333333;
+		border-radius: 5rpx;
 	}
 	.section1,.section2,.section3,.section4{
 		padding: 0 24rpx;
@@ -284,10 +297,10 @@
 	.secTip{
 		width: 100%;
 		min-height: 94rpx;
-		/* padding: 20rpx 0; */
 		font-size: 32rpx;
 		color: #333333;
 		margin-top: 20rpx;
+		padding-bottom: 30rpx;
 	}
 	.textPlaceholder {
 		padding: 20rpx 0;
@@ -297,9 +310,8 @@
 	.saveBtn{
 		width:257rpx;
 		height:74rpx;
-		background:linear-gradient(-90deg,rgba(243,183,73,1) 0%,rgba(240,154,66,1) 100%);
+		background:#FFA044;
 		border-radius:37rpx;
-		margin: 128rpx auto 0 auto;
 		font-size: 32rpx;
 		color: #FFFFFF;
 		text-align: center;
@@ -312,6 +324,21 @@
 		padding: 28rpx 0;
 		font-size: 34rpx;
 		color: #999999;
-		border-bottom: 2rpx solid #EBEBEB;
+		border-bottom: 1rpx solid #EBEBEB;
+	}
+	.evanForm{
+		border-radius: 5rpx;
+	}
+	.btnxxx{
+		height: 128rpx;
+		width: 100%;
+		background-color: #ffffff;
+		display: flex;
+		justify-content: space-around;
+		align-items: center;
+		box-shadow: 0px -5px 16px 0px rgba(0, 0, 0, 0.04);
+		position: fixed;
+		bottom: 0;
+		left: 0;
 	}
 </style>

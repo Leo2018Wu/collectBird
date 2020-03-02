@@ -7,6 +7,7 @@
 				</cover-view>
 				<cover-view class="chooseLi" :class="{active: currentChooseIndex == index}" v-for="(item,index) in list" :key="index" @click="chooseLi(item,index)">
 					{{item}}
+					<cover-view v-if="index < list.length-1" class="divide"></cover-view>
 					<cover-image v-if="currentChooseIndex == index" src="../static/true-icon.png" mode="aspectFit"></cover-image>
 				</cover-view>
 			</cover-view>
@@ -103,7 +104,7 @@
 		left: 0;
 		z-index: 999;
 	}
-	.title::after{
+/* 	.title::after{
 		content: '';
 		width: 20rpx;
 		height: 20rpx;
@@ -112,21 +113,28 @@
 		top: 0;
 		right: 0;
 		z-index: 999;
-	}
+	} */
 	.chooseLi{
 		font-size: 30rpx;
 		height: 97rpx;
-		border-bottom: 1rpx solid #F6F6F6;
+		/* border-bottom: 1rpx solid #F6F6F6; */
 		line-height: 98rpx;
 		color: #888888;
 		position: relative;
+	}
+	.divide{
+		width: 100%;
+		height: 2rpx;
+		background-color: #F6F6F6;
+		position: absolute;
+		bottom: 0;
+		left: 0;
 	}
 	.active{
 		background-color: #FBFBFB;
 		color: #F09A42;
 	}
 	.chooseLi:last-of-type{
-		border-bottom: none;
 		border-bottom-left-radius: 20rpx;
 		border-bottom-right-radius: 20rpx;
 	}

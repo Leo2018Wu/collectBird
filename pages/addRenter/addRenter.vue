@@ -3,7 +3,7 @@
 		<view class="housTitle whiteBg">{{ commInfo.name }}-{{ commInfo.houseNo }}-卧室{{ commInfo.roomNo }}</view>
 		<view class="section1 whiteBg">
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form1" :model="info1">
-				<evan-form-item label="姓名" prop="name">
+				<evan-form-item label="姓名" prop="name" :fontBold="true">
 					<template v-slot:main>
 						<input class="form-input" placeholder-class="form-input-placeholder" v-model="info1.name" placeholder="租客姓名" />
 					</template>
@@ -11,7 +11,7 @@
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 					</template>
 				</evan-form-item>
-				<evan-form-item label="性别" prop="sex">
+				<evan-form-item label="性别" prop="sex" :fontBold="true">
 					<template v-slot:main>
 						<radio-group class="sexRadio" name="sexRadio" @change="radioChange">
 							<label style="display: flex;justify-content: flex-end;">
@@ -24,7 +24,7 @@
 						<!-- <input class="form-input" placeholder-class="form-input-placeholder" v-model="info1.name" placeholder="租客姓名" /> -->
 					</template>
 				</evan-form-item>
-				<evan-form-item label="电话" prop="tel">
+				<evan-form-item label="电话" prop="tel" :fontBold="true">
 					<template v-slot:main>
 						<input class="form-input" type="number" maxlength="11" placeholder-class="form-input-placeholder" v-model="info1.tel"
 						 placeholder="租客电话" @input="getPhone" />
@@ -33,7 +33,7 @@
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 					</template>
 				</evan-form-item>
-				<evan-form-item label="身份证号" prop="IDNum">
+				<evan-form-item label="身份证号" prop="IDNum" :fontBold="true">
 					<template v-slot:main>
 						<input class="form-input" type="idcard" placeholder-class="form-input-placeholder" maxlength="18" v-model="info1.IDNum"
 						 placeholder="身份证号" @input="getID" />
@@ -58,7 +58,7 @@
 		<view class="section2 whiteBg">
 			<view class="section2Name">签约资料</view>
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form2" :model="info2">
-				<evan-form-item label="起租日期" prop="startDate">
+				<evan-form-item label="起租日期" prop="startDate" :fontBold="true">
 					<template v-slot:main>
 						<picker class="form-input" :disabled="isEdit && !isChangeDateDue" mode="date" :value="date" :start="startDate"
 						 @change="bindDateChange">{{ date }}</picker>
@@ -69,7 +69,7 @@
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 					</template>
 				</evan-form-item>
-				<evan-form-item label="租期" prop="keepDate" :border="false">
+				<evan-form-item label="租期" prop="keepDate" :border="false" :fontBold="true">
 					<template v-slot:main>
 						<picker class="form-input" :disabled="isEdit && !isChangeDateDue" mode="date" :value="pickerKeepDate" :start="startDate"
 						 @change="bindKeepDateChange">{{ pickerKeepDate }}</picker>
@@ -86,7 +86,7 @@
 						{{ item }}
 					</view>
 				</view>
-				<evan-form-item label="收租周期" prop="rentCycle">
+				<evan-form-item label="收租周期" prop="rentCycle" :fontBold="true">
 					<template v-slot:main>
 						<choose-list v-if="listShow" :currentChooseIndex="chooseIndex" v-on:close="hideList" :list="list" :title="'选择收租周期'"
 						 v-on:emitClick="returnEmit"></choose-list>
@@ -97,7 +97,7 @@
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 					</template>
 				</evan-form-item>
-				<evan-form-item label="月租金" prop="rentUnitPrice">
+				<evan-form-item label="月租金" prop="rentUnitPrice" :fontBold="true">
 					<template v-slot:main>
 						<input class="form-input" type="number" :disabled="isEdit && !isChangeDateDue" placeholder-class="form-input-placeholder"
 						 v-model="info2.rentUnitPrice" placeholder="请输入" @input="espInput" />
@@ -106,7 +106,7 @@
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 					</template>
 				</evan-form-item>
-				<evan-form-item label="押金" prop="deposit" :border="false">
+				<evan-form-item label="押金" prop="deposit" :border="false" :fontBold="true">
 					<template v-slot:main>
 						<input class="form-input" :disabled="isEdit && !isChangeDateDue" placeholder-class="form-input-placeholder"
 						 v-model="info2.deposit" placeholder="请输入" />
@@ -120,19 +120,19 @@
 		<view class="section3 whiteBg">
 			<view class="section2Name">基本费用</view>
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form3" :model="info3">
-				<evan-form-item label="电费(1元/度)" prop="eleCost">
+				<evan-form-item label="电费(1元/度)" prop="eleCost" :fontBold="true">
 					<template v-slot:main>
 						<input class="form-input inputColor" type="digit" maxlength="5" placeholder-class="form-input-placeholder"
 						 v-model="info3.eleCost" placeholder="请输入初始刻度" />
 					</template>
 				</evan-form-item>
-				<evan-form-item label="水费(元/月)" prop="waterCost">
+				<evan-form-item label="水费(元/月)" prop="waterCost" :fontBold="true">
 					<template v-slot:main>
 						<input class="form-input inputColor" type="digit" placeholder-class="form-input-placeholder" v-model="info3.waterCost"
 						 placeholder="请输入水费" />
 					</template>
 				</evan-form-item>
-				<evan-form-item label="宽带(元/月)" prop="netCost" :border="false">
+				<evan-form-item label="宽带(元/月)" prop="netCost" :border="false" :fontBold="true">
 					<template v-slot:main>
 						<input class="form-input inputColor" type="digit" placeholder-class="form-input-placeholder" v-model="info3.netCost"
 						 placeholder="请输入宽带费" />
@@ -162,8 +162,8 @@
 		</view>
 		<view class="section3 whiteBg">
 			<view class="remarkTitle">备注</view>
-			<textarea class="secTip textOverFlow" v-model="remarks"
-			 placeholder-class="textPlaceholder"></textarea></view>
+			<textarea class="secTip textOverFlow" v-model="remarks" placeholder-class="textPlaceholder"></textarea>
+		</view>
 		<!-- <view class="section4 whiteBg"><textarea class="secTip textOverFlow" placeholder="备注" v-model="remarks"
 			 placeholder-class="textPlaceholder"></textarea></view> -->
 		<cover-view class="btnBoxMy twoButton textLeft" v-if="!listShow && isEdit">
@@ -211,6 +211,7 @@
 		data() {
 			const currentDate = this.$getDate();
 			return {
+				historyData:'',
 				tenantNum: 2,
 				commonEleNum: '',
 				isShowEleCommonModal: false,
@@ -448,11 +449,11 @@
 					this.info2.deposit = data.roomPrice;
 					this.rentCycleList[0] = data.rentNum;
 					this.rentCycleList[1] = data.depositNum;
-					this.tenantNum = parseInt(data.tenantNum)+1;
+					this.tenantNum = parseInt(data.tenantNum) + 1;
 				})
 			},
 			getUserInfo(id) {
-				this.$request.post('roomUser/findById', {
+				this.$request.post('roomUser/findByTenantId', {
 					tenantId: id
 				}).then((res) => {
 					console.log('用户信息', res)
@@ -494,6 +495,7 @@
 					this.isShowEleCommonModal = data.publicELeStatus == 1 ? true : false;
 					this.commonEleNum = data.publicELeNum;
 					this.tenantNum = data.tenantNum;
+					this.historyData = data.historyData;
 				});
 			},
 			showList() {
@@ -548,25 +550,30 @@
 					depositAmount: _this.info2.deposit,
 					depositNum: _this.rentCycleList[1],
 					tenantSex: _this.currentSex, //性别字段
-					remarks: _this.remarks
+					remarks: _this.remarks,
+					historyStatus:0,
 				};
-				
-				if(this.isShowEleCommonModal){
+
+				if (this.isShowEleCommonModal) {
 					par.publicELeNum = this.commonEleNum;
 					par.publicElePrice = 1;
-					par.tenantNum =this.tenantNum;
+					par.tenantNum = this.tenantNum;
 				}
 				par.publicELeStatus = this.isShowEleCommonModal ? 1 : 0;
 
 				if (this.isEdit) {
 					par.id = this.renterId;
 					par.tenantId = this.userId;
+					par.historyData = this.historyData
 				}
 				if (this.isFillStatus) {
 					par.tenantImg = this.tenantImg
 					par.id = this.commInfo.renterId
 				}
 				_this.$request.post(postUrl, par).then(responce => {
+					console.log(responce)
+					_this.$store.commit('tempRenterId', responce.data.data.id);
+					console.log(_this.$store)
 					uni.hideLoading();
 					let tipContent = this.isEdit ? '编辑成功' : '添加成功';
 					uni.showToast({
@@ -579,7 +586,7 @@
 						// 		console.log(beforePage)
 						//            beforePage.$vm.updateData()
 						uni.navigateBack({
-							delta: 1
+							delta: _this.isEdit ? 2 : 1
 						});
 						// }
 					}, 1500);
@@ -753,19 +760,19 @@
 					case 0:
 						keepDate = moment(this.date)
 							.add(6, 'month')
-							.subtract(1, 'days');
+							// .subtract(1, 'days');
 						_this.rentMonthNum = 6;
 						break;
 					case 1:
 						keepDate = moment(this.date)
 							.add(12, 'month')
-							.subtract(1, 'days');
+							// .subtract(1, 'days');
 						_this.rentMonthNum = 12;
 						break;
 					case 2:
 						keepDate = moment(this.date)
 							.add(24, 'month')
-							.subtract(1, 'days');
+							// .subtract(1, 'days');
 						_this.rentMonthNum = 24;
 						break;
 					case 3:
@@ -779,6 +786,8 @@
 				}
 				if (index != 3) {
 					return this.$getDate(keepDate);
+				}else{
+					return this.info2.keepDate
 				}
 			},
 			bindDateChange(e) {
@@ -848,6 +857,7 @@
 
 	.idName {
 		font-size: 34rpx;
+		font-weight: bold;
 	}
 
 	.section1,
@@ -876,7 +886,6 @@
 		align-items: center;
 		font-size: 34rpx;
 		color: #333;
-		font-weight: bold;
 	}
 
 	.eleNumBox {
@@ -892,6 +901,7 @@
 		align-items: center;
 		color: #333333;
 		font-size: 34rpx;
+		font-weight: bold;
 	}
 
 	.switchBox switch {
@@ -1123,7 +1133,7 @@
 	}
 
 	/* end */
-	.remarkTitle{
+	.remarkTitle {
 		margin-top: 17rpx;
 		padding: 28rpx 0;
 		font-size: 34rpx;

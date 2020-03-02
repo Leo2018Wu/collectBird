@@ -11,8 +11,9 @@
 					<span v-if="billType == 1 && unIncome != 0">-</span><span>{{ billInfo.totalAmount ? billInfo.totalAmount : '0' }}</span>
 				</view>
 			</view>
-			<view v-if="billType == 0" class="houseAddr">{{ houseAddrInfo.communityName }}-{{ houseAddrInfo.houseNo }}-{{ houseAddrInfo.roomNo }} <span @click="editBill">修改</span></view>
-			<view v-else class="houseAddr">{{ ownerInfo.communityName }}-{{ ownerInfo.houseNo }}  <span @click="editBill">修改</span></view>
+			<view v-if="billType == 0" class="houseAddr">{{ houseAddrInfo.communityName }}-{{ houseAddrInfo.houseNo }}-{{ houseAddrInfo.roomNo }}
+				<span @click="editBill">修改</span></view>
+			<view v-else class="houseAddr">{{ ownerInfo.communityName }}-{{ ownerInfo.houseNo }} <span @click="editBill">修改</span></view>
 		</view>
 		<view class="section1">
 			<view class="billStatus">
@@ -45,43 +46,27 @@
 					<span class="billDateTitle">租金</span>
 					<span v-if="billType == 1 && unIncome != 0">-</span><span>{{ !billInfo.total ? 0 : billInfo.total }}</span>
 				</view>
-				<view class="billDateLi" v-if="billInfo.depositAmount">
+				<view class="billDateLi" v-if="billInfo.depositAmount != 0">
 					<span class="billDateTitle">押金</span>
 					<span v-if="billType == 1 && unIncome != 0">-</span><span class="billDate">{{ !billInfo.depositAmount ? 0 : billInfo.depositAmount }}</span>
 				</view>
 			</view>
 			<view v-if="billType == 0">
 				<view class="costDetail">费用明细</view>
-				<!-- 	<view class="electricBox">
-					<view class="elecRight">
-						<view class="unitPrice">
-							{{ electricityInfo.itemName }}
-							<span>{{ electricityInfo.unitPrice }}元/度</span>
-						</view>
-						<view v-if="electricityInfo.itemType == 1" class="eleCostTotal">
-							{{ quantity }}<span>度</span>({{ electricityInfo.currentNum ? electricityInfo.currentNum : '0' }}~{{
-								electricityInfo.prevNum ? electricityInfo.prevNum : ''
-							}}）
-						</view>
-						<view v-if="electricityInfo.itemType == 1">抄表日期: {{ electricityInfo.noteDate ? electricityInfo.noteDate.substr(0,10) : '暂无抄表日期' }}</view>
-					</view>
-					<view class="priceTotal">{{ electricityInfo.amount }}</view>
-				</view> -->
 				<view class="waterBox">
 					<view class="waterOuter eleOuter">
-						<span class="eleBar">电费</span>
+						<span class="eleBar">个人电费</span>
 						<span class="eleInfo" @click="showSureModal">详情</span>
 						<span class="priceTotal">{{electricityInfo.amount}}元</span>
 					</view>
 				</view>
-				<!-- <view class="eleCommOuter" v-if="hasCommonEle"> -->
-					<view class="waterBox"  v-if="hasCommonEle">
-						<view class="waterOuter">
-							<span class="waterBar">均摊电费</span>
-							<span class="priceTotal">{{commEleCost.amount}}元</span>
-						</view>
+				<view class="waterBox" v-if="hasCommonEle">
+					<view class="waterOuter">
+						<span class="eleBar">均摊电费</span>
+						<span class="eleInfo" @click="showSureModal1">详情</span>
+						<span class="priceTotal">{{commEleCost.amount}}元</span>
 					</view>
-				<!-- </view> -->
+				</view>
 				<view class="waterBox" v-for="(item,index) in billInfo.items" :key="index">
 					<view class="waterOuter">
 						<span class="waterBar">{{item.itemName == 3 ? '水费' : '网费'}}</span>
@@ -90,9 +75,11 @@
 				</view>
 			</view>
 		</view>
+
 		
-		
-		<view class="remarks">{{ billInfo.remarks ? billInfo.remarks : '无备注' }}</view>
+		<view class="remarks">
+			<view class="remarksDivide">备注</view>
+		{{ billInfo.remarks ? billInfo.remarks  : ''}}</view>
 		<!-- <view v-if="billType == 0"> -->
 		<view class="section3" v-if="billInfo.billStatus == 4">
 			<view class="sendBillBox">
@@ -101,7 +88,6 @@
 			</view>
 		</view>
 		<view class="section2" v-else>
-			<!-- v-if="!billInfo.depositAmount" -->
 			<view class="leftBtnBox">
 				<view class="sendBillBox" @click="deleteBill">
 					<image class="sendIcon" src="../../static/delete_btn.png" mode="aspectFit"></image>
@@ -117,13 +103,11 @@
 				</view>
 			</view>
 			<view class="" v-if="billType == 1">
-				<!-- class="sureBtnNew" -->
 				<view class="sureBtn" v-if="billInfo.billStatus != 4" @click="checkMoney">交租</view>
 				<view class="sureBtn" v-if="billInfo.billStatus == 4">已交租</view>
 			</view>
 			<view v-if="billType == 0" class="sureBtn" @click="checkMoney">到账</view>
 		</view>
-		<!-- </view> -->
 
 		<tip-modal v-if="isShowTipModal" :title="'删除账单'" :describition="'是否确认删除账单?'" v-on:emitCancel="hideTipModal"
 		 v-on:emitSure="returnSure"></tip-modal>
@@ -135,6 +119,21 @@
 								electricityInfo.prevNum ? electricityInfo.prevNum : '0'
 							}}）</cover-view>
 				<cover-view class="modalContent">抄表日期： {{ electricityInfo.noteDate ? electricityInfo.noteDate.substr(0,10) : '暂无抄表日期' }}</cover-view>
+				<cover-view class="btnBox">
+					<cover-view class="modalSure" @click="gotIt()">知道了</cover-view>
+				</cover-view>
+			</cover-view>
+		</cover-view>
+
+		<cover-view v-if="isShowSureModal1" class="modalMask" @click="gotIt()" @catchtouchmove='true'>
+			<cover-view class="modelContainer">
+				<cover-view class="modalSureTitle">均摊电费详情</cover-view>
+				<cover-view class="modalContent">单价：{{ commEleCost.unitPrice }}元/度</cover-view>
+				<cover-view class="modalContent">度数：{{ commonQuantity }}<span>度</span>({{ commEleCost.currentNum ? commEleCost.currentNum : '0' }}~{{
+								commEleCost.prevNum ? commEleCost.prevNum : '0'
+							}}）</cover-view>
+				<cover-view class="modalContent">均摊人数： {{ billInfo.tenantNum }}</cover-view>
+				<cover-view class="modalContent">抄表日期： {{ commEleCost.noteDate ? commEleCost.noteDate.substr(0,10) : '暂无抄表日期' }}</cover-view>
 				<cover-view class="btnBox">
 					<cover-view class="modalSure" @click="gotIt()">知道了</cover-view>
 				</cover-view>
@@ -164,8 +163,10 @@
 		},
 		data() {
 			return {
-				hasCommonEle:false,
-				commEleCost:{},
+				commonQuantity: '',
+				isShowSureModal1: false,
+				hasCommonEle: false,
+				commEleCost: {},
 				isShowSureModal: false,
 				ownerInfo: {},
 				billType: 0,
@@ -179,7 +180,7 @@
 				startDate: '',
 				endDate: '',
 				payRentDate: '',
-				arrivalDate:'',
+				arrivalDate: '',
 				quantity: ''
 			};
 		},
@@ -188,7 +189,7 @@
 		},
 		onLoad(option) {
 			console.log(this)
-			if(option.billType){
+			if (option.billType) {
 				this.billType = option.billType;
 			}
 			this.billId = option.billId;
@@ -200,17 +201,23 @@
 			}
 		},
 		methods: {
-			editBill(){
-				let titleContent = this.billType == 0 ? this.houseAddrInfo.communityName + '-' + this.houseAddrInfo.houseNo +'-'+this.houseAddrInfo.roomNo : this.ownerInfo.communityName +'-'+ this.ownerInfo.houseNo
+			editBill() {
+				let titleContent = this.billType == 0 ? this.houseAddrInfo.communityName + '-' + this.houseAddrInfo.houseNo + '-' +
+					this.houseAddrInfo.roomNo : this.ownerInfo.communityName + '-' + this.ownerInfo.houseNo
 				uni.navigateTo({
-					url:'../editBill/editBill?billId='+this.billId+'&billType='+this.billType+'&titleContent='+titleContent
+					url: '../editBill/editBill?billId=' + this.billId + '&billType=' + this.billType + '&titleContent=' +
+						titleContent
 				})
+			},
+			showSureModal1() {
+				this.isShowSureModal1 = true
 			},
 			showSureModal() {
 				this.isShowSureModal = true
 			},
 			gotIt() {
-				this.isShowSureModal = false
+				this.isShowSureModal = false;
+				this.isShowSureModal1 = false;
 			},
 			deleteBill() {
 				this.showTipModal()
@@ -259,10 +266,10 @@
 						_this.billInfo.items.forEach((item, index) => {
 							if (item.itemName == '1') {
 								_this.electricityInfo = _this.billInfo.items[index];
-							} else if(item.itemName == '2'){
+							} else if (item.itemName == '2') {
 								_this.hasCommonEle = true;
 								_this.commEleCost = _this.billInfo.items[index];
-							}else {
+							} else {
 								tempArr.push(item)
 							}
 						})
@@ -270,8 +277,8 @@
 						_this.startDate = dateForm.dateForm(_this.billInfo.startDate);
 						_this.endDate = dateForm.dateForm(_this.billInfo.endDate);
 						_this.payRentDate = dateForm.dateForm(_this.billInfo.payRentDate);
-						if(_this.billInfo.arrivalDate){
-							_this.arrivalDate =  dateForm.dateForm(_this.billInfo.arrivalDate);
+						if (_this.billInfo.arrivalDate) {
+							_this.arrivalDate = dateForm.dateForm(_this.billInfo.arrivalDate);
 						}
 						_this.billInfo.depositAmount = parseFloat(_this.billInfo.depositAmount).toFixed(2);
 						if (isNaN(_this.billInfo.depositAmount)) {
@@ -282,6 +289,12 @@
 							_this.quantity = (+_this.electricityInfo.currentNum) - (+_this.electricityInfo.prevNum)
 						} else {
 							_this.quantity = ''
+						}
+						if (Number(_this.commEleCost.currentNum) > Number(_this.commEleCost.prevNum)) {
+							_this.commonQuantity = (+_this.commEleCost.currentNum) - (+_this.commEleCost.prevNum) ? (+_this.commEleCost.currentNum) -
+								(+_this.commEleCost.prevNum) : 0
+						} else {
+							_this.commonQuantity = ''
 						}
 						_this.init = true;
 					});
@@ -328,7 +341,7 @@
 					})
 				} else {
 					uni.navigateTo({
-						url: '../MeterReading/MeterReading?billId='+ this.billId
+						url: '../MeterReading/MeterReading?billId=' + this.billId
 					});
 				}
 			},
@@ -344,6 +357,9 @@
 				let _this = this;
 				let par = this.billInfo
 				par.items.push(this.electricityInfo)
+				if(JSON.stringify(this.commEleCos) != "{}"){
+					par.items.push(this.commEleCost)
+				}
 				par.billStatus = 4
 				_this.$request
 					.post('/bill/update', par)
@@ -413,11 +429,12 @@
 		justify-content: space-between;
 		align-items: center;
 	}
-	.houseAddr span{
-		width:112rpx;
-		height:58rpx;
-		background:#E4892D;
-		border-radius:28rpx;
+
+	.houseAddr span {
+		width: 112rpx;
+		height: 58rpx;
+		background: #E4892D;
+		border-radius: 28rpx;
 		color: #FFFFFF;
 		text-align: center;
 		line-height: 58rpx;
@@ -535,10 +552,11 @@
 		background-color: #ffffff;
 		border-radius: 5rpx;
 	}
+
 	.eleOuter {
 		border-top: none !important;
 	}
-	
+
 	.waterOuter {
 		display: flex;
 		justify-content: flex-start;
@@ -546,10 +564,12 @@
 		border-top: 1rpx solid #ebebeb;
 		height: 94rpx;
 	}
-	.eleCommOuter{
+
+	.eleCommOuter {
 		padding: 0 17rpx;
 		background-color: #FAFAFA;
 	}
+
 	.eleInfo {
 		width: 96rpx;
 		height: 42rpx;
@@ -578,9 +598,10 @@
 	.remarks {
 		width: calc(100% - 34rpx);
 		margin: 14rpx 0 0 17rpx;
-		height: 93rpx;
-		line-height: 93rpx;
-		padding-left: 26rpx;
+		/* min-height: 93rpx; */
+		height: fit-content;
+		/* line-height: 93rpx; */
+		padding:0 0 28rpx 30rpx;
 		color: #999999;
 		font-size: 30rpx;
 		background-color: #ffffff;
@@ -796,4 +817,12 @@
 	}
 
 	/* end */
+	.remarksDivide{
+		padding: 28rpx 0;
+		font-size: 34rpx;
+		color: #999999;
+		border-bottom: 2rpx solid #EBEBEB;
+		margin-bottom: 28rpx;
+	}
+	
 </style>

@@ -213,7 +213,7 @@
 				let myDate
 				myDate = moment(this.date)
 					.add(12, 'month')
-					.subtract(1, 'days');
+					// .subtract(1, 'days');
 				this.endDate = this.$getDate(myDate)
 			},
 			getRentCycleList() {

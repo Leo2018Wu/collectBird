@@ -23,7 +23,7 @@
 			
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form" :model="info">
 				<view class="section1">
-					<evan-form-item label="租金" prop="rentPrice">
+					<evan-form-item label="租金" prop="rentPrice" :fontBold="true">
 						<template v-slot:main>
 							<input class="form-input" type="number" placeholder-class="form-input-placeholder" v-model="info.rentPrice" placeholder="元/月" />
 						</template>
@@ -31,7 +31,7 @@
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 						</template>
 					</evan-form-item>
-					<evan-form-item label="收租周期" prop="rentCycle">
+					<evan-form-item label="收租周期" prop="rentCycle" :fontBold="true">
 							<template v-slot:main>
 								<input  class="form-input" disabled="true" @click="showList()" placeholder-class="form-input-placeholder" v-model="info.rentCycle"  placeholder="请选择收租周期"  />
 							</template>
@@ -42,7 +42,7 @@
 					</evan-form-item>
 				</view>
 				<view class="section2">
-					<evan-form-item label="电费"  prop="elecCost">
+					<evan-form-item label="电费(元/度)"  prop="elecCost" :fontBold="true">
 						<template v-slot:main>
 							<input class="form-input" type="number" placeholder-class="form-input-placeholder" v-model="info.elecCost" placeholder="元/度" />
 						</template>
@@ -50,7 +50,7 @@
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 						</template>
 					</evan-form-item>
-					<evan-form-item label="水费" prop="waterCost">
+					<evan-form-item label="水费(元/月)" prop="waterCost" :fontBold="true">
 						<template v-slot:main>
 							<input class="form-input" type="number" placeholder-class="form-input-placeholder" v-model="info.waterCost" placeholder="元/月" />
 						</template>
@@ -58,7 +58,7 @@
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 						</template>
 					</evan-form-item>
-					<evan-form-item label="宽带费" prop="netCost">
+					<evan-form-item label="宽带费(元/月)" prop="netCost" :fontBold="true" :border="false">
 						<template v-slot:main>
 							<input class="form-input" type="number" placeholder-class="form-input-placeholder" v-model="info.netCost" placeholder="元/月" />
 						</template>
@@ -92,7 +92,7 @@
 			
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form" :model="info">
 				<view class="section1">
-					<evan-form-item label="租金" prop="rentPrice">
+					<evan-form-item label="租金" prop="rentPrice" :fontBold="true">
 						<template v-slot:main>
 							<input class="form-input" placeholder-class="form-input-placeholder" v-model="info.rentPrice" placeholder="元/月" />
 						</template>
@@ -100,7 +100,7 @@
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 						</template>
 					</evan-form-item>
-					<evan-form-item label="收租周期" prop="rentCycle">
+					<evan-form-item label="收租周期" prop="rentCycle" :fontBold="true">
 							<template v-slot:main>
 								<input  class="form-input" disabled="true" placeholder-class="form-input-placeholder"  v-model="info.rentCycle" placeholder="请选择收租周期" @click="showList"/>
 							</template>
@@ -111,7 +111,7 @@
 					</evan-form-item>
 				</view>
 				<view class="section2">
-					<evan-form-item label="电费" prop="elecCost">
+					<evan-form-item label="电费(元/度)" prop="elecCost" :fontBold="true">
 						<template v-slot:main>
 							<input class="form-input" placeholder-class="form-input-placeholder" v-model="info.elecCost" placeholder="元/度" />
 						</template>
@@ -119,7 +119,7 @@
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 						</template>
 					</evan-form-item>
-					<evan-form-item label="水费" prop="waterCost">
+					<evan-form-item label="水费(元/月)" prop="waterCost" :fontBold="true">
 						<template v-slot:main>
 							<input class="form-input" placeholder-class="form-input-placeholder" v-model="info.waterCost" placeholder="元/月" />
 						</template>
@@ -127,7 +127,7 @@
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 						</template>
 					</evan-form-item>
-					<evan-form-item label="宽带费" prop="netCost">
+					<evan-form-item label="宽带费(元/月)" prop="netCost" :fontBold="true">
 						<template v-slot:main>
 							<input class="form-input" placeholder-class="form-input-placeholder" v-model="info.netCost" placeholder="元/月" />
 						</template>
@@ -444,6 +444,7 @@
 		font-size: 32rpx;
 		margin-bottom: 17rpx;
 		background-color: #FFFFFF;
+		font-weight: bold;
 	}
 	.section2{
 		padding: 0 40rpx;

@@ -23,8 +23,8 @@
 				<view v-for="(item, idx) in selectList" :key="idx" @click="showBill(item)">
 					<view class="myBillItem">
 						<view class="itemFlex itemTop">
-							<view class="myBillName">租金账单</view>
-							<view class="topRight">￥<span v-if="para.billType == 1 && item.totalAmount != 0">-</span>{{ item.totalAmount | thousandsPoints}}<span class="reminder" v-if="item.depositAmount">(含押金)</span></view>
+							<view class="myBillName">{{item.billStatus == 5 ? '退租账单' : "租金账单"}}</view>
+							<view class="topRight">￥<span v-if="(item.billStatus == 5 || para.billType == 1) && item.totalAmount != 0">-</span>{{ item.totalAmount | thousandsPoints}}<span class="reminder" v-if="item.depositAmount">(含押金)</span></view>
 						</view>
 						<view class="itemFlex itemMiddle">
 							<view class="myBillDate">{{ item.payRentDate.substr(0, 10) }}</view>
@@ -180,16 +180,21 @@
 			},
 			showBill(item) {
 				console.log(item);
-				if (item.billType == 0) {
+				if(item.billStatus == 5){
 					uni.navigateTo({
-						url: '../billDetail/billDetail?billId=' + item.id + '&tenantId=' + item.tenantId + '&billType=' + item.billType
-					});
-				} else if (item.billType == 1) {
-					uni.navigateTo({
-						url: '../billDetail/billDetail?billId=' + item.id + '&ownerId=' + item.ownerId + '&billType=' + item.billType
-					});
+						url:'../endRenting/endRenting?billId='+item.id+'&houseAddr='+item.roomNo
+					})
+				}else{
+					if (item.billType == 0) {
+						uni.navigateTo({
+							url: '../billDetail/billDetail?billId=' + item.id + '&tenantId=' + item.tenantId + '&billType=' + item.billType
+						});
+					} else if (item.billType == 1) {
+						uni.navigateTo({
+							url: '../billDetail/billDetail?billId=' + item.id + '&ownerId=' + item.ownerId + '&billType=' + item.billType
+						});
+					}
 				}
-
 			},
 			init(e) {
 				this.mescroll = e;
@@ -445,6 +450,7 @@
 	.billList {
 		height: calc(100% - 200rpx);
 		background-color: #fafafa;
+		padding-bottom: 120rpx;
 	}
 
 	.billListLeft {

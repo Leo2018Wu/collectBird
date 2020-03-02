@@ -4,8 +4,7 @@
 			"path": "pages/home/home",
 			"style": {
 				"navigationBarTitleText": "收租鸟",
-				"enablePullDownRefresh": false,
-				"disableScroll": true
+				"enablePullDownRefresh": false
 			}
 		},{
 		    "path" : "pages/inviteRenter/inviteRenter",
@@ -132,7 +131,8 @@
 			"style": {
 				"navigationBarTextStyle": "#fff",
 				"navigationBarTitleText": "关于收租鸟",
-				"navigationBarBackgroundColor": "#F09A42"
+				"navigationBarBackgroundColor": "#F09A42",
+				"disableScroll": true
 			}
 		}, {
 			"path": "pages/reportForm/reportForm",
@@ -158,6 +158,12 @@
             "path" : "pages/keepRenting/keepRenting",
             "style" : {
 				"navigationBarTitleText": "续租"
+			}
+        }
+        ,{
+            "path" : "pages/endRenting/endRenting",
+            "style" : {
+				"navigationBarTitleText": "退租账单"
 			}
         }
     ],

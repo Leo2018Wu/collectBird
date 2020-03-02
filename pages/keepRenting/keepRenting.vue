@@ -60,6 +60,9 @@
 </template>
 
 <script>
+	import {
+		dateForm
+	} from '../../util/index.js';
 	import evanFormItem from '../../components/evan-form/evan-form-item.vue';
 	import evanForm from '../../components/evan-form/evan-form.vue';
 	import moment from 'moment';
@@ -71,48 +74,96 @@
 		data() {
 			const currentDate = this.$getDate();
 			return {
-				keepEndDate:'',
+				renterInfo: {},
+				id: null,
+				keepEndDate: '',
 				currentLiIndex: 1,
 				keepDateList: ['半年', '1年', '2年', '其他'],
 				endDate: currentDate,
-				info:{
-					rentUnitPrice:'',
-					endDate:'',
-					keepEndDate:'',
-					keepRentPrice:''
+				info: {
+					rentUnitPrice: '',
+					keepEndDate: '',
+					keepRentPrice: ''
 				},
-				rules:{
-					rentUnitPrice:{
-						required:true,
-						message:'请输入当前合约月租金'
+				rules: {
+					rentUnitPrice: {
+						required: true,
+						message: '请输入当前合约月租金'
 					},
-					endDate:{
-						required:true,
-						message:'请选择当前合约到期时间'
+
+					keepEndDate: {
+						required: false,
+						message: '请选择续约到期时间'
 					},
-					keepEndDate:{
-						required:true,
-						message:'请选择续约到期时间'
-					},
-					keepRentPrice:{
-						required:true,
-						message:'请输入续约月租金'
+					keepRentPrice: {
+						required: false,
+						message: '请输入续约月租金'
 					},
 				}
 			}
 		},
-		onShow() {
-			this.chooseLi(1)
+		computed: {
+			rentMonthNum() {
+				//用-分成数组
+				let _this = this;
+				if (_this.renterInfo.startDate) {
+					let date1 = dateForm(_this.renterInfo.startDate).split("-");
+					let date2 = dateForm(_this.keepEndDate).split("-");
+					//获取年,月数
+					var year1 = parseInt(date1[0]),
+						month1 = parseInt(date1[1]),
+						year2 = parseInt(date2[0]),
+						month2 = parseInt(date2[1]),
+						//通过年,月差计算月份差
+						months = (year2 - year1) * 12 + (month2 - month1);
+					return months;
+				}
+			}
 		},
-		onLoad() {
+		onShow() {},
+		onLoad(options) {
+			this.id = options.id
 			this.$nextTick(() => {
 				this.$refs.form.setRules(this.rules)
 			})
+			this.getRenterInfo(this.id)
 		},
 		methods: {
-			save(){
+			getRenterInfo(id) {
+				this.$request.post('/roomUser/findByTenantId', {
+					tenantId: id
+				}).then((res) => {
+					console.log(res)
+					let data = res.data.data;
+					this.renterInfo = data;
+					this.info.rentUnitPrice = data.rentPrice;
+					this.info.keepRentPrice = data.rentPrice;
+					this.endDate = dateForm(data.endDate)
+					this.chooseLi(1)
+				})
+			},
+			save() {
+				let _this = this;
 				this.$refs.form.validate(res => {
-					
+					if (res) {
+						
+						_this.renterInfo.rentMonthNum = _this.rentMonthNum;
+						_this.renterInfo.rentPrice = _this.info.keepRentPrice;
+						_this.renterInfo.endDate = _this.keepEndDate + ' 00:00:00';
+						let par = _this.renterInfo;
+						par.historyStatus = 0;
+						_this.$request.post('/roomUser/reletTenant',par).then((data)=>{
+							if(data.data.code == 200){
+								uni.showToast({
+									title:'续租成功！',
+									duration:1500
+								})
+								setTimeout(()=>{
+									uni.navigateBack()
+								},1500)
+							}
+						})
+					}
 				})
 			},
 			chooseLi(index) {
@@ -126,17 +177,17 @@
 					case 0:
 						keepDate = moment(this.endDate)
 							.add(6, 'month')
-							.subtract(1, 'days');
+							// .subtract(1, 'days');
 						break;
 					case 1:
 						keepDate = moment(this.endDate)
 							.add(12, 'month')
-							.subtract(1, 'days');
+							// .subtract(1, 'days');
 						break;
 					case 2:
 						keepDate = moment(this.endDate)
 							.add(24, 'month')
-							.subtract(1, 'days');
+							// .subtract(1, 'days');
 						break;
 					case 3:
 						uni.showToast({
@@ -149,6 +200,8 @@
 				}
 				if (index != 3) {
 					return this.$getDate(keepDate);
+				} else {
+					return this.endDate;
 				}
 			},
 			bindDateChange(e) {
@@ -229,13 +282,14 @@
 	.keepDateLi:last-of-type {
 		margin-right: unset;
 	}
-	.save{
-		width:257rpx;
-		height:82rpx;
+
+	.save {
+		width: 257rpx;
+		height: 82rpx;
 		line-height: 82rpx;
 		text-align: center;
-		background:linear-gradient(-90deg,rgba(234,185,93,1) 0%,rgba(228,158,84,1) 100%);
-		border-radius:41rpx;
+		background: linear-gradient(-90deg, rgba(234, 185, 93, 1) 0%, rgba(228, 158, 84, 1) 100%);
+		border-radius: 41rpx;
 		font-size: 34rpx;
 		color: #FFFFFF;
 		margin: 230rpx auto 0 auto;

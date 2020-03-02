@@ -23,12 +23,12 @@
 
 					<scroll-view class="roomScroll" scroll-x="true">
 						<view class="roomItem" :class="[{noRent:p.rentStatus == 0},{hasPayBill: p.unPayBill >= 1}]" v-for="(p,idx) in item.roomList"
-						 :key="idx" @click="goRoom(p.id,idx,index)">
+						 :key="idx" @click="goRoom(p.id,idx,index,p.tenantId)">
 							<view class="roomItemLi">
 								<view v-if="item.rentType != 0">卧<span class="roomNo">{{p.roomNo}}</span></view>
 								<view v-if="item.rentType == 0">整租</view>
 								<span v-if="p.rentStatus == 0" style="fontSize:28rpx">闲置</span>
-								<span v-if="p.unPayBill == 1" style="fontSize:28rpx">有账单</span>
+								<span v-if="p.unPayBill >= 1" style="fontSize:28rpx">有账单</span>
 								<span v-if="p.rentStatus == 1 && p.unPayBill == 0">{{p.tenantNum}}人</span>
 							</view>
 						</view>
@@ -95,7 +95,7 @@
 					url: '../addRoomNum/addRoomNum?communityName=' + this.communityInfo.communityName + '&communityId=' + this.houseId
 				})
 			},
-			goRoom(id, idx, index) {
+			goRoom(id, idx, index,tenantId) {
 				console.log('sss', id, idx, index)
 				let communityInfo = {}
 				communityInfo.name = this.communityInfo.communityName
@@ -109,7 +109,7 @@
 				let houseId = this.houseInfo[index].id
 				uni.navigateTo({
 					url: '../renter/renter?id=' + id + '&communityInfo=' + JSON.stringify(communityInfo) + '&houseId=' + houseId +
-						'&communityId=' + this.houseId
+						'&communityId=' + this.houseId+'&tenantId='+tenantId
 				})
 			},
 			getCommuny(id) {
