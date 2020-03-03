@@ -21,14 +21,19 @@
 			</view>
 			<view class="renterListBox" :class="{active:isShow && currentIndex == index}">
 				<view class="renterLi" v-for="(p,idx) in item.tenantList" :key="idx" @click="goRenter(p,item.communityName,p.id)">
-					<image class="renterImg" v-if="p.tenantSex == 0" src="../../static/defaultMale.png" mode="aspectFill"></image>
-					<image class="renterImg" v-else src="../../static/defaultFemale.png" mode="aspectFill"></image>
+					<image class="renterImg" v-if="p.tenantImg" :src="p.tenantImg" mode="aspectFill"></image>
+					<view v-if="!p.tenantImg">
+						<image class="renterImg" v-if="p.tenantSex == 0" src="../../static/defaultMale.png" mode="aspectFill"></image>
+						<image class="renterImg" v-else src="../../static/defaultFemale.png" mode="aspectFill"></image>
+					</view>
 					<view class="renterInfoBox">
 						<view class="textOverFlow">{{p.tenantName}}</view>
 						<view class="renterTel textOverFlow">{{p.tenantPhone}}</view>
 						<view class="roomNo textOverFlow">{{p.map.buildingNo}}号{{p.map.houseNo}}-卧{{p.map.roomNo}}</view>
 					</view>
-					<view class="overDue" v-if="p.overdue != 0">账单逾期</view>
+					<view class="overDue" v-if="p.overdueDays > 0">逾期{{p.overdueDays}}天</view>
+					<view class="overDue" v-if="p.overdueDays == 0">今日账单</view>
+					<view class="overDue" v-if="p.overdueDays < 0">{{-p.overdueDays}}天后交租</view>
 					<image class="rightArr" src="../../static/right_arrow.png" mode="aspectFit"></image>
 				</view>
 			</view>
@@ -276,7 +281,8 @@
 		background-color: #FFECEC;
 		border-radius: 20rpx;
 		height: 40rpx;
-		width: 142rpx;
+		width: fit-content;
+		padding: 0 12rpx;
 		text-align: center;
 		line-height: 40rpx;
 		margin-right: 15rpx;

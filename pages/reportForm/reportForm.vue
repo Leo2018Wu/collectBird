@@ -6,7 +6,7 @@
 				<image class="trinagle" src="../../static/triangle.png" mode="aspectFit"></image>
 			</view>
 			<view class="secProfit">
-				纯利润￥<span>10000</span>
+				纯利润￥<span>{{monthIncome}}</span>
 			</view>
 		</view>
 		<view class="sectionTwo whiteBg">
@@ -15,7 +15,7 @@
 				<image class="trinagle" src="../../static/triangle.png" mode="aspectFit"></image>
 			</view>
 			<view class="houseChoose" @click="chooseHouse">
-				{{choosedHouse ? '房号'+choosedHouse : '全部房号'}}
+				{{choosedHouse ? choosedHouse : '全部房号'}}
 				<image class="trinagle" src="../../static/triangle.png" mode="aspectFit"></image>
 			</view>
 		</view>
@@ -37,7 +37,7 @@
 			</view>
 		</view>
 
-		<view class="pickerMask" v-if="visible" @click="pickerCancel"></view>
+		<view class="pickerMask" v-if="visible" @click="pickerCancel" @catchtouchmove="true"></view>
 		<view class="pickerBox" :class="{shorterPick : pickerTypeCurIndex == 3 || pickerTypeCurIndex == 4}" v-if="visible">
 			<view class="pickerTop">
 				<view class="pickerCancel" @click="pickerCancel">取消</view>
@@ -79,7 +79,8 @@
 			</picker-view>
 			<picker-view v-if="pickerTypeCurIndex == 4" indicator-class="indicatorClass" :value="houseValue" @change="bindChange">
 				<picker-view-column>
-					<view class="item" v-for="(item,index) in houseList" :key="index">{{item.buildingNo}}</view>
+					<view class="item" v-for="(item,index) in houseList" v-if="index == 0" :key="index">{{item.buildingNo}}</view>
+					<view class="item" v-for="(item,index) in houseList" v-if="index != 0" :key="index">{{item.buildingNo}}栋{{item.houseNo}}号</view>
 				</picker-view-column>
 			</picker-view>
 		</view>
@@ -117,7 +118,7 @@
 			const month = date.getMonth() + 1
 			const seasons = []
 			const seasonsArr = ['01', '03', '04', '06', '07', '09', '10', '12']
-			for (let i = 2015; i <= 2032; i++) {
+			for (let i = 2018; i <= year; i++) {
 				years.push(i)
 				seasonsArr.forEach((item, index) => {
 					if (index % 2 == 0) {
@@ -131,6 +132,8 @@
 				months.push(i)
 			}
 			return {
+				curDateType: 3,
+				monthIncome: '',
 				params: {
 					id: '',
 					"communityId": "",
@@ -141,34 +144,34 @@
 					 * 季：startDate和endDate都传，格式为“yyyy-MM”, "yyyy-MM"
 					 * 月：只传startDate，格式为"yyyy-MM"
 					 */
-					"dateType": "1", // 必填
+					"dateType": "3", // 必填
 					"startDate": '',
 					"endDate": ""
 				},
 				isCanClickSure: true, //是否触发点击确定取值
 				itemProfitList: [{
 						name: '租金',
-						price: 1000
+						price: ''
 					},
 					{
 						name: '押金',
-						price: 1000
+						price: ''
 					},
 					{
 						name: '宽带',
-						price: 1000
+						price: ''
 					},
 					{
 						name: '水费',
-						price: 1000
+						price: ''
 					},
 					{
-						name: '电费',
-						price: 1000
+						name: '私人电费',
+						price: ''
 					},
 					{
-						name: '其他',
-						price: 1000
+						name: '均摊电费',
+						price: ''
 					},
 				],
 				cWidth: '',
@@ -187,10 +190,10 @@
 						"name": "水费",
 						"data": 20
 					}, {
-						"name": "电费",
+						"name": "私人电费",
 						"data": 18
 					}, {
-						"name": "其他",
+						"name": "均摊电费",
 						"data": 8
 					}]
 				},
@@ -208,9 +211,9 @@
 				month,
 				seasons,
 				seasonIndex: 0,
-				monthValue: [year - 2015, month - 1],
-				seasonValue: [(year - 2015) * 4 + this.seasonIndex],
-				yearValue: [year - 2015],
+				monthValue: [year - 2018, month - 1],
+				seasonValue: [(year - 2018) * 4 + this.seasonIndex],
+				yearValue: [year - 2018],
 				communityValue: [0],
 				houseValue: [0],
 				visible: false,
@@ -219,49 +222,62 @@
 		},
 		computed: {
 			...mapState(['landladyInfo']),
-			// houseList() {
-			// 		return this.communityList[this.communityValue[0]].houseList
-			// }
 		},
 		onLoad() {
 			let _this = this
 			_this.cWidth = uni.upx2px(686);
 			_this.cHeight = uni.upx2px(500);
 			_this.getSeasonIndex()
-			_this.seasonValue = [(_this.year - 2015) * 4 + _this.seasonIndex];
+			_this.seasonValue = [(_this.year - 2018) * 4 + _this.seasonIndex];
+			console.log(this.seasonValue)
 			_this.getReportPickerList(this.landladyInfo.id)
 			_this.params.id = this.landladyInfo.id;
-			_this.params.startDate = '2020'
+			_this.params.dateType = this.curDateType;
+			_this.params.startDate = _this.$getDate(null, true);
 			this.getReportFormData(this.params)
 		},
 		methods: {
 			getReportFormData(par) {
 				let _this = this;
-				_this.$request.post('report/reportQuery',par).then((res)=>{
+
+				_this.$request.post('report/reportQuery', par).then((res) => {
 					console.log(res.data)
 					let data = res.data.data
-					_this.showRing("canvasRing", _this.chartData, _this,data.totalAmount);
+					_this.monthIncome = data.monthIncome;
+					_this.chartData.series[0].data = parseInt(data.total)
+					_this.chartData.series[1].data = parseInt(data.depositAmount)
+					_this.chartData.series[2].data = parseInt(data.netAmount)
+					_this.chartData.series[3].data = parseInt(data.waterAmount)
+					_this.chartData.series[4].data = parseInt(data.eleAmount)
+					_this.chartData.series[5].data = parseInt(data.publicEleAmount)
+					let chartData = _this.chartData
+					_this.showRing("canvasRing", chartData, _this, data.totalAmount);
 					_this.itemProfitList[0].price = Number(data.total).toFixed(0);
 					_this.itemProfitList[1].price = Number(data.depositAmount).toFixed(0);
 					_this.itemProfitList[2].price = Number(data.netAmount).toFixed(0);
 					_this.itemProfitList[3].price = Number(data.waterAmount).toFixed(0);
 					_this.itemProfitList[4].price = Number(data.eleAmount).toFixed(0);
-					_this.itemProfitList[5].price = Number(data.otherAmount).toFixed(0);
-					console.log('你好不好',_this.chartData.series)
+					_this.itemProfitList[5].price = Number(data.publicEleAmount).toFixed(0);
+					console.log('你好不好', _this.chartData.series)
 				})
 			},
 			getReportPickerList(id) {
-				console
 				let _this = this
 				this.$request.post('report/findCommunityAndHouse', {
 					id
 				}).then((res) => {
 					console.log(res)
-					_this.communityList = res.data.data
-					_this.houseList = res.data.data[0].houseList
+					_this.communityList = res.data.data;
+					_this.communityList.unshift({
+						communityName: '全部房产'
+					});
+					_this.houseList = res.data.data[1].houseList;
+					this.houseList.unshift({
+						buildingNo: '全部房号'
+					})
 				})
 			},
-			showRing(canvasId, chartData, that,totalAmount) {
+			showRing(canvasId, chartData, that, totalAmount) {
 				canvaRing = new uCharts({
 					$this: that,
 					canvasId: canvasId,
@@ -281,13 +297,15 @@
 					background: '#FFFFFF',
 					pixelRatio: that.pixelRatio,
 					series: chartData.series,
-					animation: false,
-					width: that.cWidth * that.pixelRatio,
-					height: that.cHeight * that.pixelRatio,
+					animation: true,
+					// width: that.cWidth * that.pixelRatio,
+					// height: that.cHeight * that.pixelRatio,
+					width: 300,
+					height: 300,
 					disablePieStroke: true,
 					dataLabel: true,
 					subtitle: {
-						name: '￥'+totalAmount,
+						name: '￥' + totalAmount,
 						offsetX: -2,
 						color: '#7cb5ec',
 						fontSize: 18 * that.pixelRatio,
@@ -345,23 +363,31 @@
 			pickerSure() {
 				this.hidePicker();
 				if (this.isCanClickSure) {
+					let val
 					switch (this.pickerTypeCurIndex) {
+						case 0:
+							val = this.monthValue
+							break;
 						case 1:
-							this.choosedDate = this.seasons[this.seasonValue[0]]
+							val = this.seasonValue
 							break;
 						case 2:
-							this.choosedDate = this.years[this.yearValue[0]] + '年'
+							val = this.yearValue
 							break;
 						case 3:
-							this.houseList = this.communityList[0].houseList
-							this.choosedCommunity = this.communityList[0].communityName
+							val = this.communityValue
 							break;
 						case 4:
-							this.choosedHouse = this.houseList[0].buildingNo
+							val = this.houseValue
 							break;
 						default:
 							break;
 					}
+					this.bindChange({
+						detail: {
+							value: val
+						}
+					})
 				}
 
 			},
@@ -392,35 +418,62 @@
 				}
 			},
 			choosePickerType(index) {
-				this.pickerTypeCurIndex = index
+				this.pickerTypeCurIndex = index;
+				this.curDateType = index == 0 ? 3 : (index == 1 ? 2 : 1);
+				this.params.dateType = this.curDateType;
 			},
 			bindChange: function(e) {
-				console.log('我好烦', e)
 				this.isCanClickSure = false
+				this.params.dateType = this.curDateType;
 				const val = e.detail.value
 				switch (this.pickerTypeCurIndex) {
 					case 0:
 						this.monthValue = val
 						this.choosedDate = this.years[this.monthValue[0]] + '年' + this.months[this.monthValue[1]] + '月'
+						this.params.endDate = '';
+						this.params.startDate = this.years[this.monthValue[0]] + '-' + (this.months[this.monthValue[1]] < 10 ? '0' +
+							this.months[this.monthValue[1]] : this.months[this.monthValue[1]]);
+						this.getReportFormData(this.params)
 						break;
 					case 1:
 						this.seasonValue = val
 						this.choosedDate = this.seasons[this.seasonValue[0]]
+						let temp = this.seasons[this.seasonValue[0]].replace(/\./g, '-').split('~')
+						this.params.startDate = temp[0];
+						this.params.endDate = temp[1];
+						this.getReportFormData(this.params);
 						break;
 					case 2:
 						this.yearValue = val
 						this.choosedDate = this.years[this.yearValue[0]] + '年'
+						this.params.endDate = '';
+						this.params.startDate = this.years[this.yearValue[0]];
+						this.getReportFormData(this.params)
 						break;
 					case 3:
 						this.communityValue = val;
 						console.log(this.communityList, this.communityValue)
 						this.choosedCommunity = this.communityList[this.communityValue[0]].communityName
 						this.houseList = this.communityList[this.communityValue[0]].houseList
-						console.log(this.choosedCommunity)
+						// this.houseList.unshift({
+						// 	buildingNo: '全部房号'
+						// })
+						if (this.communityList[this.communityValue[0]].id) {
+							this.params.communityId = this.communityList[this.communityValue[0]].id
+						}else{
+							this.params.communityId = ''
+						}
+						this.getReportFormData(this.params)
 						break;
 					case 4:
 						this.houseValue = val;
-						this.choosedHouse = this.houseList[this.houseValue[0]].buildingNo
+						this.choosedHouse = this.houseList[this.houseValue[0]].buildingNo == '全部房号' ? '全部房号' : this.houseList[this.houseValue[0]].buildingNo + '栋' + this.houseList[this.houseValue[0]].houseNo+'号'
+						if (this.houseList[this.houseValue[0]].id) {
+							this.params.houseId = this.houseList[this.houseValue[0]].id
+						}else{
+							this.params.houseId = ''
+						}
+						this.getReportFormData(this.params)
 						break;
 					default:
 						break;
@@ -475,6 +528,7 @@
 
 	.secProfit {
 		font-size: 32rpx;
+		text-align: right;
 	}
 
 	.secProfit span {
@@ -522,7 +576,7 @@
 
 	.sectionThree {
 		width: 100%;
-		height: 500rpx;
+		height: 600rpx;
 		border-radius: 10rpx;
 		position: relative;
 	}

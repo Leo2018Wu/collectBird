@@ -39,7 +39,7 @@ const dateForm = function dateForm(value) {
 	let data = value.split(' ')[0];
 	return data;
 }
-const getDate = function getDate(value) {
+const getDate = function getDate(value,two) {
 	let date;
 	if (value) {
 		date = new Date(value);
@@ -51,7 +51,11 @@ const getDate = function getDate(value) {
 	let day = date.getDate();
 	month = month > 9 ? month : '0' + month;
 	day = day > 9 ? day : '0' + day;
-	return `${year}-${month}-${day}`;
+	if(two){
+		return `${year}-${month}`
+	}else{
+		return `${year}-${month}-${day}`;
+	}
 }
 
 module.exports = {

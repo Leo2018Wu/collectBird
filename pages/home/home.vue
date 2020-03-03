@@ -48,12 +48,12 @@
 			<view class="noticeBox">
 				<image class="leftImg" src="../../static/updateIcon.png" mode="aspectFit"></image>
 				<view class="noticeContent">
-					<swiper class="noticeContentSwiper" :vertical="true" :indicator-dots="false" autoplay="true" interval="4000"
+					<swiper class="noticeContentSwiper" :vertical="true" :indicator-dots="false" autoplay="true" interval="5000"
 					 duration="800">
-						<block v-for="(item,index) in [0,1,2]" :key="index">
+						<block v-for="(item,index) in contentList" :key="index">
 							<swiper-item>
-								<view>账单支持删除</view>
-								<view>支持手动生成最新一期账单</view>
+								<view>{{item.text1}}</view>
+								<view>{{item.text2}}</view>
 							</swiper-item>
 						</block>
 					</swiper>
@@ -84,6 +84,13 @@
 		name: 'home',
 		data() {
 			return {
+				contentList: [{
+					text1: '支持手动生成最新账单',
+					text2: '账单明细支持编辑'
+				}, {
+					text1: '租客支持退租、续租',
+					text2: '支持均摊电费'
+				}],
 				mouthIncome: '0', //本月净收入
 				billDuein: '0', //本月账单待收
 				billReceived: '0', //本月账单已收
@@ -122,7 +129,13 @@
 					title: '房东账单',
 					imgUrl: '../../static/homeIcon5.png',
 					url: '../billManage/billManage?billType=' + 1
-				}],
+				},
+				{
+					title: '帮助',
+					imgUrl: '../../static/homeIcon6.png',
+					url: '../help/help'
+				}
+				],
 				indicatorDots: true,
 				autoplay: true,
 				interval: 3000,
@@ -149,8 +162,7 @@
 				})
 			},
 			swiperChange(e) {
-				console.log(e)
-				this.swiperCurrent =  e.detail.current;
+				this.swiperCurrent = e.detail.current;
 			},
 			checkLoginStatus() {
 				let _this = this;
@@ -557,11 +569,11 @@
 	}
 
 	.dots .dot {
-		width:20rpx;
-		height:4rpx;
-		background:rgba(255,255,255,1);
-		opacity:0.4;
-		border-radius:2rpx;
+		width: 20rpx;
+		height: 4rpx;
+		background: rgba(255, 255, 255, 1);
+		opacity: 0.4;
+		border-radius: 2rpx;
 		margin: 0 6rpx;
 	}
 

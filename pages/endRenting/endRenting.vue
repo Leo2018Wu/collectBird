@@ -134,29 +134,24 @@
 				commEleCost: {},
 			}
 		},
-		onShow() {
-			if(this.tenantId){
-				this.getEndRentInfo(this.tenantId)
-			}
-			if(this.billId){
-				this.getBill(this.billId)
-			}
-		},
 		onLoad(options) {
 			if(options.tenantId){
 				this.tenantId = options.tenantId
-				// this.getEndRentInfo(options.tenantId)
+				this.getEndRentInfo(options.tenantId)
 			}
 			if(options.billId){
 				this.billId = options.billId
-				// this.getBill(options.billId)
+				this.getBill(options.billId)
 			}
 			this.houseAddr = options.houseAddr
 			
 		},
 		methods: {
+			updateData(billId){
+				console.log('你好',)
+				this.getBill(billId);
+			},
 			editBill() {
-				
 				uni.navigateTo({
 					url: '../editBill/editBill?billId=' + this.endRentingInfo.id + '&billType=' + this.endRentingInfo.billType + '&titleContent=' +
 						this.houseAddr
@@ -226,6 +221,7 @@
 				}).then((res) => {
 					_this.init = true;
 					_this.endRentingInfo = res.data.data;
+					_this.tenantId = null;
 					_this.endRentingInfo.payRentDate = res.data.data.payRentDate.split(' ')[0];
 					_this.endRentingInfo.items.forEach((item, index) => {
 						if (item.itemName == 1) {

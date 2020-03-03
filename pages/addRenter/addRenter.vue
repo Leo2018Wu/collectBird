@@ -55,8 +55,8 @@
 				</view>
 			</view>
 		</view>
+		<view class="section2Name">签约资料</view>
 		<view class="section2 whiteBg">
-			<view class="section2Name">签约资料</view>
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form2" :model="info2">
 				<evan-form-item label="起租日期" prop="startDate" :fontBold="true">
 					<template v-slot:main>
@@ -117,8 +117,8 @@
 				</evan-form-item>
 			</evan-form>
 		</view>
+		<view class="section2Name">基本费用</view>
 		<view class="section3 whiteBg">
-			<view class="section2Name">基本费用</view>
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form3" :model="info3">
 				<evan-form-item label="电费(1元/度)" prop="eleCost" :fontBold="true">
 					<template v-slot:main>
@@ -865,7 +865,6 @@
 	.section3,
 	.section4 {
 		padding: 0 40rpx;
-		margin-bottom: 17rpx;
 	}
 
 	.eleCommonBox {
@@ -944,7 +943,7 @@
 	}
 
 	.section2Name {
-		padding-top: 32rpx;
+		padding: 36rpx 0 26rpx 40rpx;
 		font-weight: bold;
 		font-size: 34rpx;
 	}

@@ -162,8 +162,10 @@
 				this.$refs.form.validate(res => {
 					if(res){
 						_this.billInfo.payRentDate = _this.date + ' 00:00:00';
-						_this.billInfo.startDate = _this.date + ' 00:00:00';
-						_this.billInfo.endDate = _this.endCycleDate + ' 00:00:00';
+						if(_this.billInfo.billStatus != 5){
+							_this.billInfo.startDate = _this.date + ' 00:00:00';
+							_this.billInfo.endDate = _this.endCycleDate + ' 00:00:00';
+						}
 						_this.billInfo.total = _this.billType == 0 ? _this.info.rentUnitPrice : (Number(_this.info.rentUnitPrice) < 0 ? -Number(_this.info.rentUnitPrice) : Number(_this.info.rentUnitPrice));
 						_this.billInfo.remarks = _this.remarks;
 						if(_this.info.deposit){
@@ -192,7 +194,16 @@
 									duration:1500
 								})
 								setTimeout(()=>{
-									uni.navigateBack()
+									let pages = getCurrentPages();
+									if (pages.length > 1) {
+										let beforePage = pages[pages.length - 2];
+										if(_this.billInfo.billStatus == 5){
+											beforePage.$vm.updateData(result.data.data.id)
+										}
+										uni.navigateBack({
+											delta: 1,
+										})
+									}
 								},1500)
 							}
 						})
