@@ -19,6 +19,10 @@
 			</view>
 			<view class="emptyBackground"></view>
 			<view class="houseTotalMsg">
+				<view class="keepUsing" @click.stop="goKeepUsing">
+					续费
+					<image src="../../static/keepUsingRight.png" mode="aspectFit"></image>
+				</view>
 				<view class="leftMsg">
 					<view class="leftMsgTitle">剩余天数</view>
 					<view class="leftMsgValue">{{ remainDay }}</view>
@@ -46,14 +50,14 @@
 					<view class="jumpPortalText">手机号</view>
 				</view>
 				<view class="rightPart">
-					<button class="getTelNumImg" v-if="showTelNum" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber"></button>
+					<button class="getTelNumImg" hover-class="btnHoverClass" v-if="showTelNum" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber"></button>
 					<view class="getTelNum" v-if="!showTelNum">已绑定 {{ phoneNumber }}</view>
 				</view>
 			</view>
 			<view class="jumpPortalitem" @click="openInviteFriends">
 				<view class="leftPart">
 					<image class="jumpPortalImg" src="../../static/myIcon5.png" mode=""></image>
-					<view class="jumpPortalText">邀请好友</view>
+					<button class="jumpPortalText" hover-class="btnHoverClass" open-type="share" >邀请好友</button>
 				</view>
 				<view class="rightPart"><image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image></view>
 			</view>
@@ -165,7 +169,19 @@ export default {
 			}
 		});
 	},
+	onShareAppMessage(res) {
+		return  {
+			title: this.$store.state.landladyInfo.userName + '邀请您体验收租神奇',
+			imageUrl:'/static/share1.jpg',
+			path: '/pages/home/home'
+		}
+	},
 	methods: {
+		goKeepUsing(){
+			uni.navigateTo({
+				url:'../keepUsing/keepUsing?trialDate='+this.trialDate+'&roomLimitNum='+this.roomNum
+			})
+		},
 		getUserInfo(){
 			console.log(11111);
 			let self = this;
@@ -681,7 +697,7 @@ export default {
 	height: 15%;
 	border-bottom: 3rpx solid #f5f5f5;
 	display: flex;
-	justify-content: space-between;
+	justify-content: flex-start;
 	align-items: center;
 	position: relative;
 }
@@ -689,6 +705,10 @@ export default {
 .leftPart {
 	display: flex;
 	justify-content: flex-start;
+	margin-right: auto;
+	width: 100%;
+	height: 100%;
+	align-items: center;
 }
 
 .rightPartImg {
@@ -697,9 +717,13 @@ export default {
 }
 
 .jumpPortalText {
+	width: calc(100% - 100rpx);
+	height: 100%;
 	margin-left: 25rpx;
 	font-size: 32rpx;
 	font-family: PingFang SC;
+	display: flex;
+	align-items: center;
 	/* font-weight: 500; */
 }
 .modalNum {
@@ -924,7 +948,23 @@ export default {
 	outline: none !important;
 	border-radius: 30rpx;
 }
-button::after {
-	border: none;
+.keepUsing{
+	width: 138rpx;
+	height: 50rpx;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: #FFA449;
+	border-radius: 25rpx;
+	font-size: 25rpx;
+	color: #FFFFFF;
+	position: absolute;
+	bottom: -20rpx;
+	left: calc((100% - 138rpx) / 2);
+}
+.keepUsing image{
+	width: 11rpx;
+	height: 18rpx;
+	margin-left: 8rpx;
 }
 </style>

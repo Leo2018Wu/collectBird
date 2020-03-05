@@ -166,6 +166,14 @@
 				"navigationBarTitleText": "退租账单"
 			}
         }
+        ,{
+            "path" : "pages/keepUsing/keepUsing",
+            "style" : {
+				"navigationBarTextStyle": "black",
+				"navigationBarTitleText": "续约",
+				"navigationBarBackgroundColor": "#FFFFFF"
+			}
+        }
     ],
 	"permission": {
 		"scope.userLocation": {

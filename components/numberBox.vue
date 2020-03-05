@@ -1,8 +1,8 @@
 <template>
 	<view>
-		<view class="numberBox">
+		<view class="numberBox" :class="{noBorder:noBorder}">
 			<view class="one" @click="del"></view>
-			<view class="two">
+			<view class="two" :class="{noBorder:noBorder}">
 				<input type="number" v-model="trVal" @input="getValue"/>
 			</view>
 			<view class="three" @click="add"></view>
@@ -15,7 +15,7 @@
 		props:{
 			valNum:{
 				type:Number,
-				default:3
+				default:0
 			},
 			maxNum:{
 				type:Number,
@@ -24,6 +24,10 @@
 			miuNum:{
 				type:Number,
 				default:0
+			},
+			noBorder:{
+				type:Boolean,
+				default:false
 			}
 		},
 		computed:{
@@ -105,5 +109,8 @@
 		left: 50%;
 		top: 10rpx;
 		transform: translateX(-50%);
+	}
+	.noBorder{
+		border:  none !important;
 	}
 </style>

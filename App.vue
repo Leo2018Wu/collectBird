@@ -105,4 +105,8 @@ button {
 button::after {
 	border: none;
 }
+button { background-color: #fff; }
+.btnHoverClass {
+	background-color: #FFFFFF !important;
+}
 </style>

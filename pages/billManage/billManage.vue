@@ -209,8 +209,8 @@
 					const response = await _this.$request.post('/bill/billList', _this.para);
 					let arr = [];
 					console.log(response.data.data);
-					if (response.data.data.length > 0) {
-						response.data.data.forEach((item, index) => {
+					if (response.data.data.list.length > 0) {
+						response.data.data.list.forEach((item, index) => {
 							if (item.communityImgs == null) {
 								item.communityImgs = [];
 								item.communityImgs.push(
@@ -223,7 +223,7 @@
 					}
 
 					response.data.data.list = arr;
-					return response.data.data;
+					return response.data.data.list;
 				} catch (e) {
 					console.log(e);
 				}

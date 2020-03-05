@@ -1,24 +1,29 @@
 <template>
 	<view class="reportForm">
-		<view class="sectionOne whiteBg">
-			<view class="secDate" @click="chooseDate">
-				{{choosedDate}}
-				<image class="trinagle" src="../../static/triangle.png" mode="aspectFit"></image>
-			</view>
-			<view class="secProfit">
-				纯利润￥<span>{{monthIncome}}</span>
-			</view>
-		</view>
-		<view class="sectionTwo whiteBg">
-			<view class="communityChoose" @click="chooseCommuinty">
-				{{choosedCommunity ? choosedCommunity : '全部房产'}}
-				<image class="trinagle" src="../../static/triangle.png" mode="aspectFit"></image>
-			</view>
-			<view class="houseChoose" @click="chooseHouse">
-				{{choosedHouse ? choosedHouse : '全部房号'}}
-				<image class="trinagle" src="../../static/triangle.png" mode="aspectFit"></image>
-			</view>
-		</view>
+		<cover-view class="coverBox">
+			<cover-view class="sectionOne whiteBg">
+				<cover-view class="secDate" @click="chooseDate">
+					{{choosedDate}}
+					<!-- <cover-image class="trinagle" src="../../static/triangle.png" mode="aspectFit"></cover-image> -->
+				</cover-view>
+				<cover-view class="secProfit">
+					<cover-view>纯利润￥</cover-view>
+					<cover-view class="monthIncome">{{monthIncome}}</cover-view>
+				</cover-view>
+			</cover-view>
+			<cover-view class="divideBttom"></cover-view>
+			<cover-view class="sectionTwo whiteBg">
+				<cover-view class="communityChoose" @click="chooseCommuinty">
+					{{choosedCommunity ? choosedCommunity : '全部房产'}}
+					<!-- <cover-image class="trinagle" src="../../static/triangle.png" mode="aspectFit"></cover-image> -->
+				</cover-view>
+				<cover-view class="verDivide"></cover-view>
+				<cover-view class="houseChoose" @click="chooseHouse">
+					{{choosedHouse ? choosedHouse : '全部房号'}}
+					<!-- <cover-image class="trinagle" src="../../static/triangle.png" mode="aspectFit"></cover-image> -->
+				</cover-view>
+			</cover-view>
+		</cover-view>
 		<view class="contentContainer">
 			<view class="totalProfit">总收入</view>
 			<view class="sectionThree">
@@ -79,8 +84,11 @@
 			</picker-view>
 			<picker-view v-if="pickerTypeCurIndex == 4" indicator-class="indicatorClass" :value="houseValue" @change="bindChange">
 				<picker-view-column>
-					<view class="item" v-for="(item,index) in houseList" v-if="index == 0" :key="index">{{item.buildingNo}}</view>
-					<view class="item" v-for="(item,index) in houseList" v-if="index != 0" :key="index">{{item.buildingNo}}栋{{item.houseNo}}号</view>
+					<view class="item" v-for="(item,index) in houseList" :key="index">
+						<view v-if="index == 0">{{item.buildingNo}}</view>
+						<view v-else>{{item.buildingNo}}栋{{item.houseNo}}号</view>
+					</view>
+					<!-- <view class="item" v-for="(item,index) in houseList" v-if="index != 0" :key="index">{{item.buildingNo}}栋{{item.houseNo}}号</view> -->
 				</picker-view-column>
 			</picker-view>
 		</view>
@@ -201,7 +209,7 @@
 				choosedCommunity: '',
 				choosedHouse: '',
 				choosedDate: year + '年' + month + '月',
-				houseList: ['房屋1', '房屋2', '房屋3'],
+				houseList: [{buildingNo:'全部房产'}],
 				communityList: ['新德公寓', '青春里', '新凯家园'],
 				pickerTypeCurIndex: 0,
 				pickerTypeList: ['月', '季', '年'],
@@ -271,10 +279,6 @@
 					_this.communityList.unshift({
 						communityName: '全部房产'
 					});
-					_this.houseList = res.data.data[1].houseList;
-					this.houseList.unshift({
-						buildingNo: '全部房号'
-					})
 				})
 			},
 			showRing(canvasId, chartData, that, totalAmount) {
@@ -455,22 +459,23 @@
 						console.log(this.communityList, this.communityValue)
 						this.choosedCommunity = this.communityList[this.communityValue[0]].communityName
 						this.houseList = this.communityList[this.communityValue[0]].houseList
-						// this.houseList.unshift({
-						// 	buildingNo: '全部房号'
-						// })
+						this.houseList.unshift({
+							buildingNo: '全部房号'
+						})
 						if (this.communityList[this.communityValue[0]].id) {
 							this.params.communityId = this.communityList[this.communityValue[0]].id
-						}else{
+						} else {
 							this.params.communityId = ''
 						}
 						this.getReportFormData(this.params)
 						break;
 					case 4:
 						this.houseValue = val;
-						this.choosedHouse = this.houseList[this.houseValue[0]].buildingNo == '全部房号' ? '全部房号' : this.houseList[this.houseValue[0]].buildingNo + '栋' + this.houseList[this.houseValue[0]].houseNo+'号'
+						this.choosedHouse = this.houseList[this.houseValue[0]].buildingNo == '全部房号' ? '全部房号' : this.houseList[this.houseValue[
+							0]].buildingNo + '栋' + this.houseList[this.houseValue[0]].houseNo + '号'
 						if (this.houseList[this.houseValue[0]].id) {
 							this.params.houseId = this.houseList[this.houseValue[0]].id
-						}else{
+						} else {
 							this.params.houseId = ''
 						}
 						this.getReportFormData(this.params)
@@ -489,18 +494,27 @@
 		height: 100%;
 		min-height: 100vh;
 		background-color: #FAFAFA;
+		padding-top: 216rpx;
 	}
 
 	.whiteBg {
 		background-color: #FFFFFF;
 	}
-
+	.coverBox{
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+	}
 	.sectionOne {
 		padding: 30rpx 30rpx 38rpx 30rpx;
-		display: flex;
+		/* display: flex;
 		justify-content: flex-start;
-		align-items: center;
+		align-items: center; */
 		color: #333333;
+	}
+	.sectionOne cover-view{
+		display: inline-block;
 	}
 
 	.trinagle {
@@ -517,6 +531,7 @@
 	.secDate {
 		width: fit-content;
 		height: 56rpx;
+		line-height: 56rpx;
 		display: flex;
 		align-items: center;
 		padding: 0 24rpx;
@@ -529,33 +544,47 @@
 	.secProfit {
 		font-size: 32rpx;
 		text-align: right;
+		width: calc(100% - 262rpx);
+		line-height: 36rpx;
 	}
 
-	.secProfit span {
-		font-size: 40rpx;
+	.secProfit cover-view {
+		display: inline-block;
+		
+	}
+	.monthIncome{
+		/* font-size: 40rpx; */
 		font-weight: bold;
 	}
-
+	.divideBttom{
+		width: 100%;
+		height: 1rpx;
+		background-color:#F5F5F8;
+	}
 	.sectionTwo {
 		width: 100%;
 		height: 78rpx;
+		line-height: 78rpx;
+		text-align: center;
 		font-size: 32rpx;
 		font-weight: 500;
+		position: relative;
 		/* display:flex; */
-		border-top: 1rpx solid #F5F5F8;
+		/* border-top: 1rpx solid #F5F5F8; */
 	}
 
-	.sectionTwo view {
+	.communityChoose ,.houseChoose{
 		width: 50%;
-		height: 100%;
-		display: inline-flex;
-		justify-content: center;
-		align-items: center;
+		height: 78rpx;
+		display: inline-block;
+	}
+	cover-image{
+		display: inline-block;
 	}
 
-	.sectionTwo view:first-of-type {
+/* 	.sectionTwo view:first-of-type {
 		border-right: 1rpx solid #F5F5F8;
-	}
+	} */
 
 	.contentContainer {
 		width: 686rpx;
@@ -733,5 +762,16 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+	}
+	cover-image,cover-view{
+		line-height: unset;
+	}
+	.verDivide{
+		position: absolute;
+		top: 0;
+		left: 50%;
+		width: 2rpx;
+		height: 100%;
+		background-color: #F5F5F8;
 	}
 </style>
