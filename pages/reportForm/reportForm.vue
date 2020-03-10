@@ -1,6 +1,6 @@
 <template>
 	<view class="reportForm">
-		<cover-view class="coverBox">
+		<cover-view class="coverBox" v-if="showTime">
 			<cover-view class="sectionOne whiteBg">
 				<cover-view class="secDate" @click="chooseDate">
 					{{choosedDate}}
@@ -8,17 +8,17 @@
 				</cover-view>
 				<cover-view class="secProfit">
 					<cover-view>纯利润￥</cover-view>
-					<cover-view class="monthIncome">{{monthIncome}}</cover-view>
+					<cover-view class="monthIncome">{{monthIncome | thousandsPoints}}</cover-view>
 				</cover-view>
 			</cover-view>
 			<cover-view class="divideBttom"></cover-view>
 			<cover-view class="sectionTwo whiteBg">
-				<cover-view class="communityChoose" @click="chooseCommuinty">
+				<cover-view class="communityChoose textOverFlow" @click="chooseCommuinty">
 					{{choosedCommunity ? choosedCommunity : '全部房产'}}
 					<!-- <cover-image class="trinagle" src="../../static/triangle.png" mode="aspectFit"></cover-image> -->
 				</cover-view>
 				<cover-view class="verDivide"></cover-view>
-				<cover-view class="houseChoose" @click="chooseHouse">
+				<cover-view class="houseChoose textOverFlow" @click="chooseHouse">
 					{{choosedHouse ? choosedHouse : '全部房号'}}
 					<!-- <cover-image class="trinagle" src="../../static/triangle.png" mode="aspectFit"></cover-image> -->
 				</cover-view>
@@ -33,10 +33,10 @@
 			<view class="sectionFour">
 				<view class="secForItem" v-for="(item,index) in itemProfitList" :key="index">
 					<view class="itemName">
-						{{item.name}}
+						{{item.name}}<span>{{item.percentNum}}%</span>
 					</view>
 					<view class="itemPrice">
-						￥<span>{{item.price}}</span>
+						￥<span>{{item.price | thousandsPoints}}</span>
 					</view>
 				</view>
 			</view>
@@ -85,7 +85,7 @@
 			<picker-view v-if="pickerTypeCurIndex == 4" indicator-class="indicatorClass" :value="houseValue" @change="bindChange">
 				<picker-view-column>
 					<view class="item" v-for="(item,index) in houseList" :key="index">
-						<view v-if="index == 0">{{item.buildingNo}}</view>
+						<view v-if="!item.houseNo">{{item.buildingNo}}</view>
 						<view v-else>{{item.buildingNo}}栋{{item.houseNo}}号</view>
 					</view>
 					<!-- <view class="item" v-for="(item,index) in houseList" v-if="index != 0" :key="index">{{item.buildingNo}}栋{{item.houseNo}}号</view> -->
@@ -159,27 +159,28 @@
 				isCanClickSure: true, //是否触发点击确定取值
 				itemProfitList: [{
 						name: '租金',
-						price: ''
+						price: '',
+						percentNum:''
 					},
 					{
 						name: '押金',
-						price: ''
+						price: '',
+						percentNum:''
 					},
 					{
 						name: '宽带',
-						price: ''
+						price: '',
+						percentNum:''
 					},
 					{
 						name: '水费',
-						price: ''
+						price: '',
+						percentNum:''
 					},
 					{
-						name: '私人电费',
-						price: ''
-					},
-					{
-						name: '均摊电费',
-						price: ''
+						name: '电费',
+						price: '',
+						percentNum:''
 					},
 				],
 				cWidth: '',
@@ -198,18 +199,15 @@
 						"name": "水费",
 						"data": 20
 					}, {
-						"name": "私人电费",
+						"name": "电费",
 						"data": 18
-					}, {
-						"name": "均摊电费",
-						"data": 8
 					}]
 				},
 				pixelRatio: 1,
 				choosedCommunity: '',
 				choosedHouse: '',
 				choosedDate: year + '年' + month + '月',
-				houseList: [{buildingNo:'全部房产'}],
+				houseList: [{buildingNo:'全部房号'}],
 				communityList: ['新德公寓', '青春里', '新凯家园'],
 				pickerTypeCurIndex: 0,
 				pickerTypeList: ['月', '季', '年'],
@@ -225,6 +223,7 @@
 				communityValue: [0],
 				houseValue: [0],
 				visible: false,
+				showTime:false
 			}
 
 		},
@@ -256,17 +255,24 @@
 					_this.chartData.series[1].data = parseInt(data.depositAmount)
 					_this.chartData.series[2].data = parseInt(data.netAmount)
 					_this.chartData.series[3].data = parseInt(data.waterAmount)
-					_this.chartData.series[4].data = parseInt(data.eleAmount)
-					_this.chartData.series[5].data = parseInt(data.publicEleAmount)
+					_this.chartData.series[4].data = parseInt(data.totalEleAmount)
 					let chartData = _this.chartData
 					_this.showRing("canvasRing", chartData, _this, data.totalAmount);
+					setTimeout(()=>{
+						_this.showTime = true
+					},200)
+					
 					_this.itemProfitList[0].price = Number(data.total).toFixed(0);
 					_this.itemProfitList[1].price = Number(data.depositAmount).toFixed(0);
 					_this.itemProfitList[2].price = Number(data.netAmount).toFixed(0);
 					_this.itemProfitList[3].price = Number(data.waterAmount).toFixed(0);
-					_this.itemProfitList[4].price = Number(data.eleAmount).toFixed(0);
-					_this.itemProfitList[5].price = Number(data.publicEleAmount).toFixed(0);
-					console.log('你好不好', _this.chartData.series)
+					_this.itemProfitList[4].price = Number(data.totalEleAmount).toFixed(0);
+					
+					_this.itemProfitList[0].percentNum = (Number(data.total).toFixed(0)/data.totalAmount * 100).toFixed(2);
+					_this.itemProfitList[1].percentNum = (Number(data.depositAmount).toFixed(0)/data.totalAmount * 100).toFixed(2);
+					_this.itemProfitList[2].percentNum = (Number(data.netAmount).toFixed(0)/data.totalAmount * 100).toFixed(2);
+					_this.itemProfitList[3].percentNum = (Number(data.waterAmount).toFixed(0)/data.totalAmount * 100).toFixed(2);
+					_this.itemProfitList[4].percentNum = (Number(data.totalEleAmount).toFixed(0)/data.totalAmount * 100).toFixed(2);
 				})
 			},
 			getReportPickerList(id) {
@@ -287,9 +293,9 @@
 					canvasId: canvasId,
 					type: 'ring',
 					fontSize: 11,
-					padding: [5, 5, 5, 5],
+					// padding: [5, 5, 5, 5],
 					legend: {
-						show: true,
+						show: false,
 						position: 'top',
 						float: 'center',
 						itemGap: 10,
@@ -302,17 +308,17 @@
 					pixelRatio: that.pixelRatio,
 					series: chartData.series,
 					animation: true,
-					// width: that.cWidth * that.pixelRatio,
-					// height: that.cHeight * that.pixelRatio,
-					width: 300,
-					height: 300,
+					width: that.cWidth * that.pixelRatio,
+					height: that.cHeight * that.pixelRatio,
+					// width: 300,
+					// height: 300,
 					disablePieStroke: true,
 					dataLabel: true,
 					subtitle: {
 						name: '￥' + totalAmount,
 						offsetX: -2,
 						color: '#7cb5ec',
-						fontSize: 18 * that.pixelRatio,
+						fontSize: 14 * that.pixelRatio,
 					},
 					title: {
 						offsetX: 4,
@@ -459,9 +465,15 @@
 						console.log(this.communityList, this.communityValue)
 						this.choosedCommunity = this.communityList[this.communityValue[0]].communityName
 						this.houseList = this.communityList[this.communityValue[0]].houseList
-						this.houseList.unshift({
-							buildingNo: '全部房号'
+						const myIndex =this.houseList.findIndex((item)=>{
+							item.buildingNo == '全部房号'
 						})
+						if(myIndex == -1){
+							this.houseList.unshift({
+								buildingNo: '全部房号',
+								houseNo:''
+							})
+						}
 						if (this.communityList[this.communityValue[0]].id) {
 							this.params.communityId = this.communityList[this.communityValue[0]].id
 						} else {
@@ -544,8 +556,9 @@
 	.secProfit {
 		font-size: 32rpx;
 		text-align: right;
-		width: calc(100% - 262rpx);
-		line-height: 36rpx;
+		float: right;
+		margin-top: 10rpx;
+		line-height: 34rpx;
 	}
 
 	.secProfit cover-view {
@@ -577,14 +590,13 @@
 		width: 50%;
 		height: 78rpx;
 		display: inline-block;
+		padding: 0 12rpx;
 	}
 	cover-image{
 		display: inline-block;
 	}
 
-/* 	.sectionTwo view:first-of-type {
-		border-right: 1rpx solid #F5F5F8;
-	} */
+
 
 	.contentContainer {
 		width: 686rpx;
@@ -605,7 +617,7 @@
 
 	.sectionThree {
 		width: 100%;
-		height: 600rpx;
+		height: 500rpx;
 		border-radius: 10rpx;
 		position: relative;
 	}
@@ -629,7 +641,12 @@
 		border-bottom: 2rpx solid #F7F7F7;
 		font-size: 32rpx;
 	}
-
+	.itemName span{
+		font-size: 32rpx;
+		color: #C4C4C4;
+		margin-left: 12rpx;
+	}
+	
 	.itemPrice {
 		font-size: 24rpx;
 	}

@@ -13,11 +13,11 @@
 				</view>
 			</view>
 		</view>
-		<view class="section2">
+		<view class="section2" >
 			<add-bar v-on:addCommunity="addCommunity"></add-bar>
 			<view class="serchBar">
-				<span>筛选：</span>
-				<view class="scrollContainer">
+				<span v-if="wordList.length != 0">筛选：</span>
+				<view class="scrollContainer" v-if="wordList.length != 0">
 					<scroll-tab v-on:return-tab="chooseTab" :list="wordList"></scroll-tab>
 				</view>
 			</view>
@@ -25,7 +25,6 @@
 		<view class="section3">
 			<mescroll-uni :down="downOption" @down="downCallback" :up="upOption" @up="upCallback" :fixed="false" @init="init">
 				<view class="houseSkuBox" v-for="(item, index) in houseInfoList" :key="index" @click="goDetail(item.id, item.landlordId)">
-					<!-- <house-sku :houseInfoList="item"></house-sku> -->
 					<new-house-sku :item="item"></new-house-sku>
 				</view>
 			</mescroll-uni>
@@ -81,7 +80,8 @@
 					noMoreSize: 5, // 配置列表的总数量要大于等于5条才显示'-- END --'的提示
 					empty: {
 						use: true,
-						tip: '暂无相关数据'
+						icon:'/static/houseEmpty.png',
+						tip: '暂无房源'
 					}
 				}
 			};
@@ -91,20 +91,18 @@
 		},
 		onShow() {
 			let _this = this;
-			this.getWords();
-			this.downCallback(this.mescroll);
-			this.$request
-				.post('user/findByOpenId', {
-					openId: this.$store.state.userOpenId
-				})
-				.then(res => {
-					_this.$store.commit('landladyInfo', res.data.data);
-				})
-				.catch(err => {});
-		},
-		created() {
-			let _this = this;
-			_this.getWords();
+			if(this.$store.state.landladyInfo.id){
+				this.getWords();
+				this.downCallback(this.mescroll);
+				this.$request
+					.post('user/findByOpenId', {
+						openId: this.$store.state.userOpenId
+					})
+					.then(res => {
+						_this.$store.commit('landladyInfo', res.data.data);
+					})
+					.catch(err => {});
+			}
 		},
 		methods: {
 			childByValue(value) {
@@ -287,7 +285,7 @@
 
 	.section2 {
 		width: 100%;
-		height: 245rpx;
+		/* height: 245rpx; */
 		padding-top: 95rpx;
 		padding-bottom: 10rpx;
 		background-color: #ffffff;
@@ -311,7 +309,7 @@
 	}
 
 	.scrollContainer {
-		width: 608rpx;
+		width: 666px;
 		overflow: hidden;
 		white-space: nowrap;
 	}
@@ -330,5 +328,16 @@
 		width: 670rpx;
 		height: fit-content;
 		margin: 0 auto 18rpx auto;
+	}
+	.emptyList{
+		padding-top: 290rpx;
+		text-align: center;
+		color: #BBBBBB;
+		font-size: 28rpx;
+	}
+	.noRenterIcon{
+		width: 136rpx;
+		height: 190rpx;
+		margin: 0 auto 14rpx auto;
 	}
 </style>

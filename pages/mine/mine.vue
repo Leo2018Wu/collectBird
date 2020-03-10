@@ -1,9 +1,31 @@
 <template>
 	<view class="mine">
 		<view class="topContent">
-			<view class="myMsg">
+			<view class="coverBlock">
+				<view class="vipBg">
+					<view class="vipBgContainer" v-if="landladyInfo.userStatus == '1'">
+						<image src="../../static/beVip.png" mode="aspectFit"></image>
+						<view class="vipTip">开通VIP会员</view>
+						<view class="vipRight">
+							<view>购买</view>
+							<image src="../../static/vipRight.png" mode="aspectFill"></image>
+						</view>
+					</view>
+					<view class="vipBgContainer" v-else>
+						<image src="../../static/isVip.png" mode="aspectFit"></image>
+						<view class="vipTip">VIP会员</view>
+						<view class="vipRight">
+							<view>续费</view>
+							<image src="../../static/vipRight.png" mode="aspectFill"></image>
+						</view>
+					</view>
+				</view>
+			</view>
+			<view class="topContainer">
 				<view class="myContainer">
-					<view class=""><image class="myPhoto" :src="userImg"></image></view>
+					<view class="">
+						<image class="myPhoto" :src="userImg"></image>
+					</view>
 					<view v-if="show"><button class="login" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true">登录</button></view>
 					<view class="detail" v-else>
 						<view class="detailTop">
@@ -17,23 +39,7 @@
 					</view>
 				</view>
 			</view>
-			<view class="emptyBackground"></view>
-			<view class="houseTotalMsg">
-				<view class="keepUsing" @click.stop="goKeepUsing">
-					续费
-					<image src="../../static/keepUsingRight.png" mode="aspectFit"></image>
-				</view>
-				<view class="leftMsg">
-					<view class="leftMsgTitle">剩余天数</view>
-					<view class="leftMsgValue">{{ remainDay }}</view>
-					<view class="leftMsgDate">{{ trialDate }}到期</view>
-				</view>
-				<view class="line"></view>
-				<view class="rightMsg">
-					<view class="rightMsgTitle">房号容量</view>
-					<view class="rightMsgValue">{{ roomNum }}</view>
-				</view>
-			</view>
+
 		</view>
 		<view class="jumpPortal">
 			<view class="jumpPortalitem" @click="openNewsInvitationCode">
@@ -42,45 +48,66 @@
 					<view class="jumpPortalText">填写邀请码</view>
 					<view class="modalNum">{{ usedInviCode ? usedInviCode : '' }}</view>
 				</view>
-				<view class="rightPart"><image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image></view>
+				<view class="rightPart">
+					<image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image>
+				</view>
 			</view>
-			<view class="jumpPortalitem" @click="openPhoneNumber">
+			<view class="jumpPortalitem" v-if="landladyInfo.id">
 				<view class="leftPart">
 					<image class="jumpPortalImg" src="../../static/telphone.png" mode=""></image>
 					<view class="jumpPortalText">手机号</view>
 				</view>
 				<view class="rightPart">
-					<button class="getTelNumImg" hover-class="btnHoverClass" v-if="showTelNum" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber"></button>
-					<view class="getTelNum" v-if="!showTelNum">已绑定 {{ phoneNumber }}</view>
+					<button class="getTelNumImg" hover-class="btnHoverClass" v-if="!landladyInfo.phoneNumber" open-type="getPhoneNumber"
+					 @getphonenumber="getPhoneNumber"></button>
+					<view class="getTelNum" v-if="landladyInfo.phoneNumber">{{ landladyInfo.phoneNumber }}</view>
+				</view>
+			</view>
+			<view class="jumpPortalitem" v-else @click.stop="openPhoneNumber">
+				<view class="leftPart">
+					<image class="jumpPortalImg" src="../../static/telphone.png" mode=""></image>
+					<view class="jumpPortalText">手机号</view>
+				</view>
+				<view class="rightPart">
+					<button class="getTelNumImg" hover-class="btnHoverClass" v-if="!landladyInfo.phoneNumber"></button>
+					<view class="getTelNum" v-if="landladyInfo.phoneNumber">{{ phoneNumber }}</view>
 				</view>
 			</view>
 			<view class="jumpPortalitem" @click="openInviteFriends">
 				<view class="leftPart">
 					<image class="jumpPortalImg" src="../../static/myIcon5.png" mode=""></image>
-					<button class="jumpPortalText" hover-class="btnHoverClass" open-type="share" >邀请好友</button>
+					<button class="jumpPortalText" hover-class="btnHoverClass" open-type="share">邀请好友</button>
 				</view>
-				<view class="rightPart"><image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image></view>
+				<view class="rightPart">
+					<image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image>
+				</view>
 			</view>
 			<view class="jumpPortalitem" @click="openFeedBack">
 				<view class="leftPart">
 					<image class="jumpPortalImg" src="../../static/myIcon2.png" mode=""></image>
 					<view class="jumpPortalText">意见反馈</view>
 				</view>
-				<view class="rightPart"><image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image></view>
+				<view class="rightPart">
+					<image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image>
+				</view>
 			</view>
 			<view class="jumpPortalitem" @click="openHelp">
 				<view class="leftPart">
 					<image class="jumpPortalImg" src="../../static/myIcon3.png" mode=""></image>
 					<view class="jumpPortalText">帮助</view>
 				</view>
-				<view class="rightPart"><image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image></view>
+				<view class="rightPart">
+					<image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image>
+				</view>
 			</view>
 			<view class="jumpPortalitem" @click="openAboutUs">
 				<view class="leftPart">
 					<image class="jumpPortalImg" src="../../static/myIcon4.png" mode=""></image>
 					<view class="jumpPortalText">关于收租鸟</view>
 				</view>
-				<view class="rightPart"><image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image></view>
+				<view class="rightPart">
+					<image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image>
+				</view>
 			</view>
 		</view>
 		<!-- 填写邀请码弹窗 -->
@@ -89,17 +116,8 @@
 			<view class="modalTitle">填写邀请码</view>
 			<view class="modalContent">
 				<view class="modalInput">
-					<input
-						class="text"
-						type="text"
-						value=""
-						maxlength="6"
-						v-model="usedInviCode"
-						placeholder="请输入邀请码(仅填写1次)"
-						style="font-size: 30rpx;"
-						autofocus
-						required
-					/>
+					<input class="text" type="text" value="" maxlength="6" v-model="usedInviCode" placeholder="请输入邀请码(仅填写1次)" style="font-size: 30rpx;"
+					 autofocus required />
 					<view class="inputLine"></view>
 				</view>
 				<view class="button">
@@ -109,6 +127,7 @@
 				</view>
 			</view>
 		</view>
+		<message-modal v-if="showMessageModal" :deadNum="deadNum" v-on:emitCancel="returntCancel" v-on:emitSure="returnSure"></message-modal>
 		<!-- 授权弹窗 -->
 		<is-login v-show="loginFlag" v-on:isShowloginBtn="isShowloginBtn" :childLoginFlag="loginFlag" v-on:childByValue="childByValue"></is-login>
 		<!-- <view class="isloginModal" v-show="loginFlag" @click="cancleLogin"></view> -->
@@ -125,846 +144,925 @@
 </template>
 
 <script>
-import evanFormItem from '../../components/evan-form/evan-form-item.vue';
-import evanForm from '../../components/evan-form/evan-form.vue';
-import { mapState, mapMutations } from 'vuex';
-import { isLogin } from '../../components/isLogin.vue';
-export default {
-	components: {
-		evanFormItem,
-		evanForm,
-		'is-login': isLogin
-	},
-	data() {
-		return {
-			showTelNum: true, // 默认展示获取手机号按钮
-			invitationCodeFlag: false, // 是否显示填写邀请码弹窗
-			loginFlag: false, //登录弹窗
-			userImg: '../../static/tourist.png', //用户头像
-			userName: '', //用户昵称
-			// gender: '', //用户性别
-			show: true, //是否显示点击登录
-			roomNum: '50', // 房间容量暂时写死
-			inviCode: '', // 我的邀请码
-			usedInviCode: '', //填写邀请码
-			level: '', // 级别
-			remainDay: '0', //剩余天数
-			trialDate: '2030-01-01',
-			phoneNumber: '', // 绑定手机号
-			loginingStatus: false //登录状态
-		};
-	},
-	computed: {
-		...mapState(['landladyInfo'])
-	},
-	onLoad(options) {},
-	onShow(options) {
-		this.checkLoginStatus().then(res => {
-			console.log(res);
-			if (res) {
-				this.show = true;
-			} else {
-				this.show = false;
-				this.getMineMsg({ openId: this.$store.state.userOpenId });
-			}
-		});
-	},
-	onShareAppMessage(res) {
-		return  {
-			title: this.$store.state.landladyInfo.userName + '邀请您体验收租神奇',
-			imageUrl:'/static/share1.jpg',
-			path: '/pages/home/home'
-		}
-	},
-	methods: {
-		goKeepUsing(){
-			uni.navigateTo({
-				url:'../keepUsing/keepUsing?trialDate='+this.trialDate+'&roomLimitNum='+this.roomNum
-			})
+	import messageModal from '../../components/messageModal.vue';
+	import evanFormItem from '../../components/evan-form/evan-form-item.vue';
+	import evanForm from '../../components/evan-form/evan-form.vue';
+	import {
+		mapState,
+		mapMutations,
+
+	} from 'vuex';
+	import {
+		isLogin
+	} from '../../components/isLogin.vue';
+	export default {
+		components: {
+			evanFormItem,
+			evanForm,
+			'is-login': isLogin,
+			messageModal
 		},
-		getUserInfo(){
-			console.log(11111);
-			let self = this;
-			uni.login({
-				provider: 'weixin',
-				success: function(loginRes) {
-					console.log(loginRes, '1111');
-					uni.checkSession({
-						success() {
-							// session_key 未过期，并且在本生命周期一直有效
-							self.$store.commit('openCode', loginRes.code);
-							self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
+		data() {
+			return {
+				showMessageModal: false,
+				invitationCodeFlag: false, // 是否显示填写邀请码弹窗
+				loginFlag: false, //登录弹窗
+				userImg: '../../static/tourist.png', //用户头像
+				userName: '', //用户昵称
+				// gender: '', //用户性别
+				show: true, //是否显示点击登录
+				roomNum: '50', // 房间容量暂时写死
+				inviCode: '', // 我的邀请码
+				usedInviCode: '', //填写邀请码
+				level: '', // 级别
+				remainDay: '0', //剩余天数
+				trialDate: '2030-01-01',
+				phoneNumber: '', // 绑定手机号
+				loginingStatus: false, //登录状态
+				deadNum: ''
+			};
+		},
+		computed: {
+			...mapState(['landladyInfo'])
+		},
+		onLoad(options) {
+			this.caclTrialDate()
+		},
+		onShow(options) {
+			this.checkLoginStatus().then(res => {
+				console.log(res);
+				if (res) {
+					this.show = true;
+				} else {
+					this.show = false;
+					// this.getMineMsg({
+					// 	openId: this.$store.state.userOpenId
+					// });
+				}
+			});
+		},
+		onShareAppMessage(res) {
+			return {
+				title: this.$store.state.landladyInfo.userName + '邀请您体验收租神器',
+				imageUrl: '/static/share1.jpg',
+				path: '/pages/home/home'
+			}
+		},
+		methods: {
+			returntCancel() {
+				this.showMessageModal = false
+			},
+			returnSure() {
+				this.goKeepUsing();
+				this.showMessageModal = false
+			},
+			caclTrialDate() {
+				console.log('Nihhao')
+				let date, sDate1, sDate2, dateSpan, iDays
+				console.log(date, this.trialDate)
+				date = this.$getDate()
+				sDate1 = Date.parse(date.replace(/\-/g, "/"));
+				sDate2 = Date.parse(this.$store.state.landladyInfo.trialDate.replace(/\-/g, "/"));
+				dateSpan = sDate2 - sDate1;
+				iDays = Math.floor(dateSpan / (24 * 3600 * 1000));
+				console.log(iDays)
+				if (iDays <= 0) {
+					this.showMessageModal = true;
+				} else if (iDays <= 15) {
+					this.showMessageModal = true;
+					this.deadNum = iDays
+				}
+			},
+			goKeepUsing() {
+				uni.navigateTo({
+					url: '../keepUsing/keepUsing?trialDate=' + this.trialDate + '&roomLimitNum=' + this.landladyInfo.buyNum
+				})
+			},
+			getUserInfo() {
+				console.log(11111);
+				let self = this;
+				uni.login({
+					provider: 'weixin',
+					success: function(loginRes) {
+						console.log(loginRes, '1111');
+						uni.checkSession({
+							success() {
+								// session_key 未过期，并且在本生命周期一直有效
+								self.$store.commit('openCode', loginRes.code);
+								self.$request.post('/wx/login', {
+									code: loginRes.code
+								}).then(res => {
+									console.log(res);
+									if (res) {
+										self.openId = res.data.data.openid;
+										self.$store.commit('isloginStatus', true);
+										self.$store.commit('userOpenId', res.data.data.openid);
+										self.$store.commit('sessionKey', res.data.data.session_key);
+										uni.getUserInfo({
+											provider: 'weixin',
+											success: function(infoRes) {
+												console.log(infoRes);
+												if (infoRes.userInfo) {
+													self.show = false;
+													// 微信的gender 1 男 2 女 0 未知
+													// 收租鸟userSex 0 男 1 女
+													if (infoRes.userInfo.gender == '1') {
+														self.gender = '0';
+													} else if (infoRes.userInfo.gender == '2') {
+														self.gender = '1';
+													} else {
+														self.gender = '未知';
+													}
+													let userInfo = {
+														openId: res.data.data.openid,
+														userName: infoRes.userInfo.nickName,
+														userImg: infoRes.userInfo.avatarUrl,
+														userSex: self.gender
+													};
+													self.getMineMsg(userInfo);
+
+												}
+											},
+											fail: function(res) {
+												uni.showToast({
+													title: '微信授权不成功！',
+													icon: 'none',
+													duration: 2000
+												});
+											}
+										});
+									}
+								});
+							},
+							fail() {
+								// session_key 已经失效，需要重新执行登录流程
+								uni.login({
+									provider: 'weixin',
+									success: function(loginRes) {
+										self.$request.post('/wx/login', {
+											code: loginRes.code
+										}).then(res => {
+											console.log(res);
+										});
+									}
+								}); // 重新登录
+							}
+						});
+					},
+					fail: function(res) {}
+				});
+			},
+			checkLoginStatus() {
+				let _this = this;
+				return new Promise((reslove, rej) => {
+					//判断用户是否授权过
+					uni.getSetting({
+						success(res) {
+							console.log(res);
+							if (res.authSetting['scope.userInfo']) {
+								_this.$store.commit('isloginStatus', true);
+								_this.show = false;
+								let userInfo = {
+									openId: _this.$store.state.userOpenId,
+									userName: _this.$store.state.landladyInfo.userName,
+									userImg: _this.$store.state.landladyInfo.userImg,
+									userSex: _this.$store.state.landladyInfo.userSex
+								};
+								_this.getMineMsg(userInfo);
+							}
+						},
+						complete() {
+							reslove(!_this.$store.state.isloginStatus);
+						}
+					});
+				});
+			},
+			isShowloginBtn(value) {
+				console.log(value);
+				this.show = value;
+			},
+			childByValue(value) {
+				let _this = this;
+				console.log('进入父组件获取到子组件传来数据', value);
+				_this.loginFlag = false;
+				if (value) {
+					_this.userName = value.userName;
+					_this.userImg = value.userImg;
+					_this.usedInviCode = value.usedInviCode;
+					_this.level = value.level;
+					_this.inviCode = value.inviCode;
+					_this.trialDate = value.trialDate;
+					_this.remainDay = value.remainDay;
+				}
+			},
+
+			// 获取手机号方法
+			getTelNum(res) {
+				this.$request
+					.post('/wx/takeWxDecode', res)
+					.then(v => {
+						this.phoneNumber = v.data.data.phoneNumber;
+						this.landladyInfo.phoneNumber = v.data.data.phoneNumber;
+						this.$store.commit('landladyInfo', this.landladyInfo)
+					})
+					.catch(err => {
+						console.log(err);
+					});
+			},
+			// 点击获取手机号
+			getPhoneNumber(e) {
+				let _this = this;
+				uni.login({
+					provider: 'weixin',
+					success: function(loginRes) {
+						console.log(loginRes, '1111');
+						let result = {
+							encryptedData: e.detail.encryptedData,
+							iv: e.detail.iv,
+							code: loginRes.code
+						};
+						_this.getTelNum(result);
+					}
+				});
+			},
+			// 获取用户信息
+			getMineMsg(userInfo) {
+				let _this = this;
+				_this.$request
+					.post('user/findByOpenId', userInfo)
+					.then(res => {
+						_this.$store.commit('landladyInfo', res.data.data);
+						console.log(res.data.data);
+						let myMsgs = res.data.data;
+						_this.userName = myMsgs.userName;
+						_this.userImg = myMsgs.userImg;
+						_this.usedInviCode = myMsgs.usedInviCode;
+						_this.level = myMsgs.level;
+						_this.inviCode = myMsgs.inviCode;
+						_this.trialDate = myMsgs.trialDate;
+						_this.remainDay = myMsgs.remainDay;
+					})
+					.catch(err => {
+						console.log(err);
+					});
+			},
+			// 提交邀请码
+			submit() {
+				let _this = this;
+				if (_this.usedInviCode) {
+					// 校验方法
+					// console.log(/^[A-Z]\d{5}$/.test(_this.usedInviCode));
+					// console.log(_this.usedInviCode.replace(/^[A-Z]\d{4}$/,true));
+					let checkoutFlag = /^[A-Z0-9]{6}$/.test(_this.usedInviCode);
+					if (checkoutFlag) {
+						uni.showLoading({
+							title: '正在提交'
+						});
+						let v = {
+							id: _this.$store.state.landladyInfo.id,
+							usedInviCode: _this.usedInviCode
+						};
+						_this.$request
+							.post('/user/useInviCode', v)
+							.then(res => {
 								console.log(res);
 								if (res) {
-									self.openId = res.data.data.openid;
-									self.$store.commit('isloginStatus', true);
-									self.$store.commit('userOpenId', res.data.data.openid);
-									self.$store.commit('sessionKey', res.data.data.session_key);
-									uni.getUserInfo({
-										provider: 'weixin',
-										success: function(infoRes) {
-											console.log(infoRes);
-											if (infoRes.userInfo) {
-												self.show = false;
-												// 微信的gender 1 男 2 女 0 未知
-												// 收租鸟userSex 0 男 1 女
-												if (infoRes.userInfo.gender == '1') {
-													self.gender = '0';
-												} else if (infoRes.userInfo.gender == '2') {
-													self.gender = '1';
-												} else {
-													self.gender = '未知';
-												}
-												let userInfo = {
-													openId: res.data.data.openid,
-													userName: infoRes.userInfo.nickName,
-													userImg: infoRes.userInfo.avatarUrl,
-													userSex: self.gender
-												};
-												self.getMineMsg(userInfo);
-												
-											}
-										},
-										fail: function(res) {
-											uni.showToast({
-												title: '微信授权不成功！',
-												icon:'none',
-												duration: 2000
-											});
-										}
+									uni.showToast({
+										title: '提交成功'
+									});
+									_this.usedInviCode = '';
+									_this.invitationCodeFlag = false;
+									_this.getMineMsg({
+										openId: _this.$store.state.userOpenId
 									});
 								}
+							})
+							.catch(() => {
+								uni.hideLoading();
 							});
-						},
-						fail() {
-							// session_key 已经失效，需要重新执行登录流程
-							uni.login({
-								provider: 'weixin',
-								success: function(loginRes) {
-									self.$request.post('/wx/login', { code: loginRes.code }).then(res => {
-										console.log(res);
-									});
-								}
-							}); // 重新登录
-						}
-					});
-				},
-				fail: function(res) {}
-			});
-		},
-		checkLoginStatus() {
-			let _this = this;
-			return new Promise((reslove, rej) => {
-				//判断用户是否授权过
-				uni.getSetting({
-					success(res) {
-						console.log(res);
-						if (res.authSetting['scope.userInfo']) {
-							_this.$store.commit('isloginStatus', true);
-							_this.show = false;
-							let userInfo = {
-								openId: _this.$store.state.userOpenId,
-								userName: _this.$store.state.landladyInfo.userName,
-								userImg: _this.$store.state.landladyInfo.userImg,
-								userSex: _this.$store.state.landladyInfo.userSex
-							};
-							_this.getMineMsg(userInfo);
-						}
-					},
-					complete() {
-						reslove(!_this.$store.state.isloginStatus);
-					}
-				});
-			});
-		},
-		isShowloginBtn(value) {
-			console.log(value);
-			this.show = value;
-		},
-		childByValue(value) {
-			let _this = this;
-			console.log('进入父组件获取到子组件传来数据', value);
-			_this.loginFlag = false;
-			if (value) {
-				_this.userName = value.userName;
-				_this.userImg = value.userImg;
-				_this.usedInviCode = value.usedInviCode;
-				_this.level = value.level;
-				_this.inviCode = value.inviCode;
-				_this.trialDate = value.trialDate;
-				_this.remainDay = value.remainDay;
-			}
-		},
-
-		// 获取手机号方法
-		getTelNum(res) {
-			this.$request
-				.post('/wx/takeWxDecode', res)
-				.then(v => {
-					if (v && v.phoneNumber) {
-						this.showTelNum = false;
-						this.phoneNumber = v.phoneNumber;
-					}
-				})
-				.catch(err => {
-					console.log(err);
-				});
-		},
-		// 点击获取手机号
-		getPhoneNumber(e) {
-			console.log('telNum11111');
-			// let _this = this;
-			// console.log('errMsg', e.detail.errMsg);
-			// console.log('iv', e.detail.iv);
-			// console.log('encryptedData', e.detail.encryptedData);
-			// let res = {
-			// 	encryptedData: encodeURIComponent(e.detail.encryptedData),
-			// 	iv: e.detail.iv,
-			// 	sessionKey: this.$store.state.sessionKey
-			// };
-			// console.log('解密参数',res);
-			// this.getTelNum(res);
-			// if (e.detail.errMsg == 'getPhoneNumber:fail user deny') {
-			// 	uni.showModal({
-			// 		title: '提示',
-			// 		showCancel: false,
-			// 		content: '未授权',
-			// 		success: function(res) {}
-			// 	});
-			// } else {
-			// 	uni.showModal({
-			// 		title: '提示',
-			// 		showCancel: false,
-			// 		content: '同意授权',
-			// 		success: function(res) {
-			// 			console.log('同意授权后拿到的res', res);
-			// 		}
-			// 	});
-			// }
-
-			// uni.login({
-			// 	provider: 'weixin',
-			// 	success: function(loginRes) {
-			// 		console.log(loginRes, '1111');
-			// 		uni.checkSession({
-			// 			success() {
-			// 				let res = {
-			// 					encryptedData: encodeURIComponent(e.detail.encryptedData),
-			// 					iv: e.detail.iv,
-			// 					sessionKey: this.$store.state.sessionKey
-			// 				};
-			// 				this.getTelNum(res);
-			// 			},
-			// 			fail() {
-			// 				self.show = false;
-			// 				// session_key 已经失效，需要重新执行登录流程
-			// 				// 重新登录
-			// 				uni.login({
-			// 					provider: 'weixin',
-			// 					success: function(loginRes) {
-			// 						let res = {
-			// 							encryptedData: encodeURIComponent(e.detail.encryptedData),
-			// 							iv: e.detail.iv,
-			// 							sessionKey: this.$store.state.sessionKey
-			// 						};
-			// 						this.getTelNum(res);
-			// 					}
-			// 				});
-			// 			}
-			// 		});
-			// 	},
-			// 	fail: function(res) {
-			// 	}
-			// });
-		},
-		// 获取用户信息
-		getMineMsg(userInfo) {
-			let _this = this;
-			_this.$request
-				.post('user/findByOpenId', userInfo)
-				.then(res => {
-					_this.$store.commit('landladyInfo', res.data.data);
-					console.log(res.data.data);
-					let myMsgs = res.data.data;
-					_this.userName = myMsgs.userName;
-					_this.userImg = myMsgs.userImg;
-					_this.usedInviCode = myMsgs.usedInviCode;
-					_this.level = myMsgs.level;
-					_this.inviCode = myMsgs.inviCode;
-					_this.trialDate = myMsgs.trialDate;
-					_this.remainDay = myMsgs.remainDay;
-				})
-				.catch(err => {
-					console.log(err);
-				});
-		},
-		// 提交邀请码
-		submit() {
-			let _this = this;
-			if (_this.usedInviCode) {
-				// 校验方法
-				// console.log(/^[A-Z]\d{5}$/.test(_this.usedInviCode));
-				// console.log(_this.usedInviCode.replace(/^[A-Z]\d{4}$/,true));
-				let checkoutFlag = /^[A-Z0-9]{6}$/.test(_this.usedInviCode);
-				if (checkoutFlag) {
-					uni.showLoading({
-						title: '正在提交'
-					});
-					let v = {
-						id: _this.$store.state.landladyInfo.id,
-						usedInviCode: _this.usedInviCode
-					};
-					_this.$request
-						.post('/user/useInviCode', v)
-						.then(res => {
-							console.log(res);
-							if (res) {
-								uni.showToast({
-									title: '提交成功'
-								});
-								_this.usedInviCode = '';
-								_this.invitationCodeFlag = false;
-								_this.getMineMsg({ openId: _this.$store.state.userOpenId });
-							}
-						})
-						.catch(() => {
-							uni.hideLoading();
+					} else {
+						uni.showToast({
+							title: '请输入包含数字和大写字母的6位邀请码!',
+							icon: 'none'
 						});
+					}
 				} else {
 					uni.showToast({
-						title: '请输入包含数字和大写字母的6位邀请码!',
+						title: '请填写邀请码!',
 						icon: 'none'
 					});
 				}
-			} else {
-				uni.showToast({
-					title: '请填写邀请码!',
-					icon: 'none'
+			},
+
+			// 弹窗其他页面跳转
+
+			//打开获取手机号
+			openPhoneNumber() {
+				this.checkLoginStatus().then(res => {
+					this.loginFlag = res;
 				});
+			},
+			// 打开填写邀请码弹窗
+			openNewsInvitationCode(e) {
+				this.checkLoginStatus().then(res => {
+					this.loginFlag = res;
+					if (!this.loginFlag && !this.usedInviCode) {
+						this.invitationCodeFlag = true;
+					}
+				});
+			},
+			// 关闭填写邀请码弹窗
+			cancle() {
+				this.invitationCodeFlag = false;
+			},
+			//跳转意见反馈
+			openFeedBack(e) {
+				this.checkLoginStatus().then(res => {
+					this.loginFlag = res;
+					if (!this.loginFlag) {
+						uni.navigateTo({
+							url: '../feedback/feedback'
+						});
+					}
+				});
+			},
+			//跳转关于收租鸟
+			openAboutUs(e) {
+				uni.navigateTo({
+					url: '../aboutUs/aboutUs'
+				});
+			},
+			//跳转帮助
+			openHelp(e) {
+				uni.navigateTo({
+					url: '../help/help'
+				});
+			},
+			// 跳转邀请好友
+			openInviteFriends(e) {
+				this.checkLoginStatus().then(res => {
+					this.loginFlag = res;
+					// if (!this.loginFlag) {
+					// 	uni.navigateTo({
+					// 		url: '../feedback/feedback'
+					// 	});
+					// }
+				});
+			},
+			// 点击关闭登录弹窗
+			cancleLogin(e) {
+				this.loginFlag = false;
+			},
+			// 未登录状态下点击登录
+			openLogin(e) {
+				this.loginFlag = true;
 			}
-		},
-
-		// 弹窗其他页面跳转
-
-		//打开获取手机号
-		openPhoneNumber() {
-			this.checkLoginStatus().then(res => {
-				this.loginFlag = res;
-			});
-		},
-		// 打开填写邀请码弹窗
-		openNewsInvitationCode(e) {
-			this.checkLoginStatus().then(res => {
-				this.loginFlag = res;
-				if (!this.loginFlag && !this.usedInviCode) {
-					this.invitationCodeFlag = true;
-				}
-			});
-		},
-		// 关闭填写邀请码弹窗
-		cancle() {
-			this.invitationCodeFlag = false;
-		},
-		//跳转意见反馈
-		openFeedBack(e) {
-			this.checkLoginStatus().then(res => {
-				this.loginFlag = res;
-				if (!this.loginFlag) {
-					uni.navigateTo({
-						url: '../feedback/feedback'
-					});
-				}
-			});
-		},
-		//跳转关于收租鸟
-		openAboutUs(e) {
-			uni.navigateTo({
-				url: '../aboutUs/aboutUs'
-			});
-		},
-		//跳转帮助
-		openHelp(e) {
-			uni.navigateTo({
-				url: '../help/help'
-			});
-		},
-		// 跳转邀请好友
-		openInviteFriends(e) {
-			this.checkLoginStatus().then(res => {
-				this.loginFlag = res;
-				// if (!this.loginFlag) {
-				// 	uni.navigateTo({
-				// 		url: '../feedback/feedback'
-				// 	});
-				// }
-			});
-		},
-		// 点击关闭登录弹窗
-		cancleLogin(e) {
-			this.loginFlag = false;
-		},
-		// 未登录状态下点击登录
-		openLogin(e) {
-			this.loginFlag = true;
 		}
-	}
-};
+	};
 </script>
 
 <style>
-.mine {
-	height: 100vh;
-	width: 100%;
-	background-color: #fafafa;
-}
-.myContainer {
-	height: 114rpx;
-	width: 100%;
-	display: flex;
-	margin-top: 40rpx;
-}
+	.mine {
+		height: 100vh;
+		width: 100%;
+	}
 
-.topContent {
-	/* height: 36%; */
-	height: 460rpx;
-	width: 100%;
-	position: relative;
-	overflow: hidden;
-}
-.login {
-	width: 150rpx;
-	height: 60rpx;
-	/* background: -webkit-linear-gradient(146deg, rgba(244, 183, 74, 1) 0%, rgba(240, 153, 66, 1) 100%); */
-	background: linear-gradient(-56deg, rgba(244, 183, 74, 1) 0%, rgba(240, 153, 66, 1) 100%);
-	opacity: 0.8;
-	border-radius: 30rpx;
-	margin-left: 30rpx;
-	text-align: center;
-	line-height: 60rpx;
-	margin-top: 34rpx;
-	font-size: 32rpx;
-	font-family: PingFang SC;
-	font-weight: 400;
-	color: rgba(255, 255, 255, 1);
-}
+	.myContainer {
+		height: 114rpx;
+		width: 100%;
+		display: flex;
+		margin-top: 40rpx;
+		position: relative;
+	}
 
-.myMsg {
-	height: 72%;
-	/* background:linear-gradient(-56deg,rgba(244,183,74,1) 0%,rgba(240,153,66,1) 100%); */
-	background-color: #f09a42;
-	padding: 20rpx 30rpx;
-	display: flex;
-	justify-content: flex-start;
-}
-.emptyBackground {
-	background-color: #fafafa;
-}
-.myPhoto {
-	width: 115rpx;
-	height: 115rpx;
-	border-radius: 50%;
-}
+	.topContent {
+		height: 350rpx;
+		width: 100%;
+		position: relative;
 
-.detailTop {
-	position: relative;
-	display: flex;
-	justify-content: flex-start;
-	align-items: center;
-}
+	}
 
-.myLevel {
-	width: 121rpx;
-	height: 40rpx;
-	margin-left: 7rpx;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	font-size: 22rpx;
-	border-radius: 20rpx;
-	background: linear-gradient(-56deg, rgba(244, 183, 74, 1) 0%, rgba(240, 153, 66, 1) 100%);
-}
-.detail {
-	padding-left: 19rpx;
-	height: 57rpx;
-}
+	.topContainer {
+		background: #F09942;
+		height: 282rpx;
+		width: 100%;
+		overflow: hidden;
+		padding: 20rpx 30rpx;
+		display: flex;
+		justify-content: flex-start;
+	}
 
-.levelIcon {
-	width: 20rpx;
-	height: 20rpx;
-	color: #fff;
-}
+	.vipBg {
+		background: url(../../static/vipBg.png);
+		background-size: 100% 100%;
+		width: 690rpx;
+		height: 92rpx;
+		position: absolute;
+		z-index: 99;
+		left: 50%;
+		transform: translateX(-50%);
+		bottom: 0;
+		padding: 20rpx 65rpx 0 65rpx;
+		
+	}
+	.vipBgContainer{
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+		font-size: 26rpx;
+		color: #F9DFAD;
+	}
+	.vipTip{
+		margin-right: auto;
+	}
+	.vipBgContainer image{
+		width: 39rpx;
+		height: 38rpx;
+		margin-right: 16rpx;
+		
+	}
+	.vipRight{
+		font-size: 24rpx;
+		color: #66550A;
+		padding-left: 18rpx;
+		height: 40rpx;
+		line-height: 40rpx;
+		display: flex;
+		align-items: center;
+		background-color: #F9DE6B;
+		border-radius: 20rpx;
+	}
+	.vipRight image{
+		width: 10rpx;
+		height: 20rpx;
+		margin-left: 6rpx;
+	}
 
-.levelText {
-	color: #fff;
-	margin-left: 20rpx;
-	font-family: PingFang SC;
-	font-weight: 500;
-}
+	.coverBlock {
+		background-color: #F09942;
+	/* 	width: 750rpx;
+		height: 68rpx; */
+	/* 	position: absolute;
+		z-index: 100;
+		left: 0rpx;
+		bottom: 0rpx; */
+		
+		 position: absolute;
+		 width: 1700px;
+		   height: 1300px;
+		  left: 50%;
+		  bottom: 10px;
+		  transform: translateX(-50%);
+		  border-radius: 100%;
+		  overflow: hidden;
+	}
 
-.detailBottom {
-	margin-top: 25rpx;
-	color: #fff;
-	font-size: 32rpx;
-	font-family: PingFang SC;
-	font-weight: 500;
-}
+	.login {
+		width: 150rpx;
+		height: 60rpx;
+		background: linear-gradient(-56deg, rgba(244, 183, 74, 1) 0%, rgba(240, 153, 66, 1) 100%);
+		opacity: 0.8;
+		border-radius: 30rpx;
+		margin-left: 30rpx;
+		text-align: center;
+		line-height: 60rpx;
+		margin-top: 34rpx;
+		font-size: 32rpx;
+		font-family: PingFang SC;
+		font-weight: 400;
+		color: rgba(255, 255, 255, 1);
+	}
 
-.myName {
-	font-size: 40rpx;
-	font-family: PingFang SC;
-	font-weight: bold;
-	color: rgba(255, 255, 255, 1);
-}
+	.myPhoto {
+		width: 115rpx;
+		height: 115rpx;
+		border-radius: 50%;
+	}
 
-.houseTotalMsg {
-	width: 690rpx;
-	height: 180rpx;
-	position: absolute;
-	bottom: 40rpx;
-	left: 30rpx;
-	background-color: #fff;
-	border-radius: 15rpx;
-	display: flex;
-	justify-content: space-between;
-}
+	.detailTop {
+		position: relative;
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+	}
 
-.leftMsg {
-	width: 48%;
-	text-align: center;
-	padding-top: 30rpx;
-}
+	.myLevel {
+		width: 121rpx;
+		height: 40rpx;
+		margin-left: 7rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-size: 22rpx;
+		border-radius: 20rpx;
+		background: linear-gradient(-56deg, rgba(244, 183, 74, 1) 0%, rgba(240, 153, 66, 1) 100%);
+	}
 
-.leftMsgTitle {
-	font-size: 24rpx;
-	font-family: PingFang SC;
-	font-weight: 500;
-}
+	.detail {
+		padding-left: 19rpx;
+		height: 57rpx;
+	}
 
-.leftMsgValue {
-	font-size: 55rpx;
-	font-family: PingFang SC;
-	font-weight: bold;
-	color: rgba(255, 164, 73, 1);
-}
+	.levelIcon {
+		width: 20rpx;
+		height: 20rpx;
+		color: #fff;
+	}
 
-.leftMsgDate {
-	font-size: 22rpx;
-	font-family: PingFang SC;
-	font-weight: 500;
-	color: rgba(153, 153, 153, 1);
-}
+	.levelText {
+		color: #fff;
+		margin-left: 20rpx;
+		font-family: PingFang SC;
+		font-weight: 500;
+	}
 
-.rightMsg {
-	width: 48%;
-	text-align: center;
-	padding-top: 30rpx;
-}
+	.detailBottom {
+		margin-top: 25rpx;
+		color: #fff;
+		font-size: 32rpx;
+		font-family: PingFang SC;
+		font-weight: 500;
+	}
 
-.rightMsgTitle {
-	font-size: 24rpx;
-	font-family: PingFang SC;
-	font-weight: 500;
-}
+	.myName {
+		font-size: 40rpx;
+		font-family: PingFang SC;
+		font-weight: bold;
+		color: rgba(255, 255, 255, 1);
+	}
 
-.rightMsgValue {
-	font-size: 55rpx;
-	font-family: PingFang SC;
-	font-weight: bold;
-	color: rgba(255, 164, 73, 1);
-}
+	.houseTotalMsg {
+		width: 690rpx;
+		height: 180rpx;
+		position: absolute;
+		bottom: 40rpx;
+		left: 30rpx;
+		background-color: #fff;
+		border-radius: 15rpx;
+		display: flex;
+		justify-content: space-between;
+	}
 
-.line {
-	width: 1rpx;
-	height: 61rpx;
-	/* border: 1rpx solid rgba(166, 166, 166, 1); */
-	position: absolute;
-	top: 57rpx;
-	left: 50%;
-	background-color: rgba(190, 190, 190, 1);
-}
+	.leftMsg {
+		width: 48%;
+		text-align: center;
+		padding-top: 30rpx;
+	}
 
-.jumpPortal {
-	background-color: #fff;
-	height: 65%;
-	padding: 20rpx 40rpx;
-}
-.jumpPortalImg {
-	width: 48rpx;
-	height: 48rpx;
-}
+	.leftMsgTitle {
+		font-size: 24rpx;
+		font-family: PingFang SC;
+		font-weight: 500;
+	}
 
-.jumpPortalitem {
-	height: 15%;
-	border-bottom: 3rpx solid #f5f5f5;
-	display: flex;
-	justify-content: flex-start;
-	align-items: center;
-	position: relative;
-}
+	.leftMsgValue {
+		font-size: 55rpx;
+		font-family: PingFang SC;
+		font-weight: bold;
+		color: rgba(255, 164, 73, 1);
+	}
 
-.leftPart {
-	display: flex;
-	justify-content: flex-start;
-	margin-right: auto;
-	width: 100%;
-	height: 100%;
-	align-items: center;
-}
+	.leftMsgDate {
+		font-size: 22rpx;
+		font-family: PingFang SC;
+		font-weight: 500;
+		color: rgba(153, 153, 153, 1);
+	}
 
-.rightPartImg {
-	width: 24rpx;
-	height: 24rpx;
-}
+	.rightMsg {
+		width: 48%;
+		text-align: center;
+		padding-top: 30rpx;
+	}
 
-.jumpPortalText {
-	width: calc(100% - 100rpx);
-	height: 100%;
-	margin-left: 25rpx;
-	font-size: 32rpx;
-	font-family: PingFang SC;
-	display: flex;
-	align-items: center;
-	/* font-weight: 500; */
-}
-.modalNum {
-	position: absolute;
-	font-size: 28rpx;
-	font-family: PingFang SC;
-	font-weight: 500;
-	color: rgba(153, 153, 153, 1);
-	top: 34%;
-	right: 40rpx;
-}
-.getTelNumImg {
-	background-image: url(../../static/getTelNum.png);
-	width: 213rpx !important;
-	height: 53rpx !important;
-	background-size: 100% 100%;
-	border: none !important;
-	outline: none !important;
-}
-.getTelNum {
-	font-size: 28rpx;
-	font-family: PingFang SC;
-	font-weight: 500;
-	color: rgba(153, 153, 153, 1);
-}
+	.rightMsgTitle {
+		font-size: 24rpx;
+		font-family: PingFang SC;
+		font-weight: 500;
+	}
 
-/* 弹窗 */
-.modal {
-	width: 100%;
-	height: 100%;
-	position: fixed;
-	top: 0;
-	left: 0;
-	z-index: 1000;
-	background: #000;
-	opacity: 0.5;
-	overflow: hidden;
-	z-index: 500;
-}
-.modalTitle {
-	height: 28%;
-}
-.modalContent {
-	height: 72%;
-}
-.modalBox {
-	width: 540rpx;
-	height: 362rpx;
-	overflow: hidden;
-	position: fixed;
-	top: 28%;
-	left: 15%;
-	z-index: 1001;
-	background: rgba(255, 255, 255, 1);
-	/* background: #FAFAFA; */
-	border-radius: 25rpx;
-}
+	.rightMsgValue {
+		font-size: 55rpx;
+		font-family: PingFang SC;
+		font-weight: bold;
+		color: rgba(255, 164, 73, 1);
+	}
 
-.modalTitle {
-	height: 28%;
-	padding-top: 40rpx;
-	font-size: 36rpx;
-	font-family: PingFang SC;
-	font-weight: bold;
-	color: rgba(51, 51, 51, 1);
-	text-align: center;
-}
+	.line {
+		width: 1rpx;
+		height: 61rpx;
+		/* border: 1rpx solid rgba(166, 166, 166, 1); */
+		position: absolute;
+		top: 57rpx;
+		left: 50%;
+		background-color: rgba(190, 190, 190, 1);
+	}
 
-.modalInput {
-	padding: 80rpx 0rpx 0rpx 0rpx;
-	text-align: center;
-	margin: 0 auto;
-	font-size: 30rpx;
-	width: 376rpx;
-	height: 151rpx;
-}
-.reminderText {
-	font-size: 22rpx;
-	font-family: PingFang SC;
-	font-weight: 500;
-	color: rgba(255, 160, 68, 1);
-}
-.reminder {
-	text-align: center;
-	color: #ffa044;
-	font-size: 22rpx;
-	font-family: PingFang SC;
-	font-weight: 500;
-	color: rgba(255, 160, 68, 1);
-	display: flex;
-	justify-content: center;
-	padding: 10rpx 20rpx 25rpx;
-}
+	.jumpPortal {
+		background-color: #fff;
+		height: 65%;
+		padding:0 40rpx 20rpx 40rpx;
+	}
 
-.reminderSymbol {
-	width: 30rpx;
-	height: 30rpx;
-	border: 1rpx solid #ffa044;
-	border-radius: 50%;
-	margin-right: 10rpx;
-	line-height: 24rpx;
-	text-align: center;
-}
+	.jumpPortalImg {
+		width: 48rpx;
+		height: 48rpx;
+	}
 
-.button {
-	width: 100%;
-	height: 90rpx;
-	border-top: 1rpx solid rgba(238, 238, 238, 1);
-	display: flex;
-	justify-content: space-around;
-	font-size: 34rpx;
-	font-family: PingFang SC;
-	font-weight: 500;
-	color: rgba(51, 51, 51, 1);
-	position: relative;
-	line-height: 80rpx;
-	margin-top: 20rpx;
-}
-.inputLine {
-	width: 184px;
-	height: 1px;
-	background: rgba(238, 238, 238, 1);
-	margin-top: 10rpx;
-}
-.modalLine {
-	width: 1rpx;
-	height: 89rpx;
-	/* border: 1rpx solid rgba(238, 238, 238, 1); */
-	background-color: rgba(238, 238, 238, 1);
-	position: absolute;
-	top: 0%;
-	left: 50%;
-}
-/* .text{
+	.jumpPortalitem {
+		height: 15%;
+		border-bottom: 3rpx solid #f5f5f5;
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+		position: relative;
+	}
+
+	.leftPart {
+		display: flex;
+		justify-content: flex-start;
+		margin-right: auto;
+		width: 100%;
+		height: 100%;
+		align-items: center;
+	}
+
+	.rightPartImg {
+		width: 24rpx;
+		height: 24rpx;
+	}
+
+	.jumpPortalText {
+		width: calc(100% - 100rpx);
+		height: 100%;
+		margin-left: 25rpx;
+		font-size: 32rpx;
+		font-family: PingFang SC;
+		display: flex;
+		align-items: center;
+		/* font-weight: 500; */
+	}
+
+	.modalNum {
+		position: absolute;
+		font-size: 28rpx;
+		font-family: PingFang SC;
+		font-weight: 500;
+		color: rgba(153, 153, 153, 1);
+		top: 34%;
+		right: 40rpx;
+	}
+
+	.getTelNumImg {
+		background-image: url(../../static/getTelNum.png);
+		width: 213rpx !important;
+		height: 53rpx !important;
+		background-size: 100% 100%;
+		border: none !important;
+		outline: none !important;
+	}
+
+	.getTelNum {
+		font-size: 28rpx;
+		font-family: PingFang SC;
+		font-weight: 500;
+		color: rgba(153, 153, 153, 1);
+	}
+
+	/* 弹窗 */
+	.modal {
+		width: 100%;
+		height: 100%;
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 1000;
+		background: #000;
+		opacity: 0.5;
+		overflow: hidden;
+		z-index: 500;
+	}
+
+	.modalTitle {
+		height: 28%;
+	}
+
+	.modalContent {
+		height: 72%;
+	}
+
+	.modalBox {
+		width: 540rpx;
+		height: 362rpx;
+		overflow: hidden;
+		position: fixed;
+		top: 28%;
+		left: 15%;
+		z-index: 1001;
+		background: rgba(255, 255, 255, 1);
+		/* background: #FAFAFA; */
+		border-radius: 25rpx;
+	}
+
+	.modalTitle {
+		height: 28%;
+		padding-top: 40rpx;
+		font-size: 36rpx;
+		font-family: PingFang SC;
+		font-weight: bold;
+		color: rgba(51, 51, 51, 1);
+		text-align: center;
+	}
+
+	.modalInput {
+		padding: 80rpx 0rpx 0rpx 0rpx;
+		text-align: center;
+		margin: 0 auto;
+		font-size: 30rpx;
+		width: 376rpx;
+		height: 151rpx;
+	}
+
+	.reminderText {
+		font-size: 22rpx;
+		font-family: PingFang SC;
+		font-weight: 500;
+		color: rgba(255, 160, 68, 1);
+	}
+
+	.reminder {
+		text-align: center;
+		color: #ffa044;
+		font-size: 22rpx;
+		font-family: PingFang SC;
+		font-weight: 500;
+		color: rgba(255, 160, 68, 1);
+		display: flex;
+		justify-content: center;
+		padding: 10rpx 20rpx 25rpx;
+	}
+
+	.reminderSymbol {
+		width: 30rpx;
+		height: 30rpx;
+		border: 1rpx solid #ffa044;
+		border-radius: 50%;
+		margin-right: 10rpx;
+		line-height: 24rpx;
+		text-align: center;
+	}
+
+	.button {
+		width: 100%;
+		height: 90rpx;
+		border-top: 1rpx solid rgba(238, 238, 238, 1);
+		display: flex;
+		justify-content: space-around;
+		font-size: 34rpx;
+		font-family: PingFang SC;
+		font-weight: 500;
+		color: rgba(51, 51, 51, 1);
+		position: relative;
+		line-height: 80rpx;
+		margin-top: 20rpx;
+	}
+
+	.inputLine {
+		width: 184px;
+		height: 1px;
+		background: rgba(238, 238, 238, 1);
+		margin-top: 10rpx;
+	}
+
+	.modalLine {
+		width: 1rpx;
+		height: 89rpx;
+		/* border: 1rpx solid rgba(238, 238, 238, 1); */
+		background-color: rgba(238, 238, 238, 1);
+		position: absolute;
+		top: 0%;
+		left: 50%;
+	}
+
+	/* .text{
 	border-bottom: 1rpx solid rgba(238,238,238,1);
 } */
-.active {
-	color: #ffa044;
-}
+	.active {
+		color: #ffa044;
+	}
 
-/* 登录弹窗 */
-.isloginModal {
-	width: 100%;
-	height: 100%;
-	position: fixed;
-	top: 0;
-	left: 0;
-	z-index: 1000;
-	background: #000;
-	opacity: 0.5;
-	overflow: hidden;
-	z-index: 500;
-}
-.isloginBox {
-	width: 513rpx;
-	height: 537rpx;
-	overflow: hidden;
-	position: fixed;
-	top: 19%;
-	left: 15%;
-	z-index: 1001;
-}
-.bgcImg {
-	width: 100%;
-	height: 100%;
-	z-index: 9000;
-}
-.loginTxt {
-	font-size: 30rpx;
-	font-family: PingFang SC;
-	font-weight: 400;
-	color: rgba(102, 102, 102, 1);
-	line-height: 36px;
-	text-align: center;
-	z-index: 9000;
-	position: absolute;
-	bottom: 79px;
-	left: 106rpx;
-}
-.deleteImg {
-	width: 38rpx;
-	height: 38rpx;
-	position: absolute;
-	top: 15rpx;
-	right: 15rpx;
-	z-index: 9000;
-}
-.deleteImg image {
-	width: 100%;
-	height: 100%;
-}
-.loginImg {
-	position: absolute;
-	z-index: 9000;
-	bottom: 60rpx;
-	left: 0rpx;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 0rpx 52rpx;
-}
-.notLogin {
-	width: 185rpx;
-	height: 70rpx;
-}
+	/* 登录弹窗 */
+	.isloginModal {
+		width: 100%;
+		height: 100%;
+		position: fixed;
+		top: 0;
+		left: 0;
+		z-index: 1000;
+		background: #000;
+		opacity: 0.5;
+		overflow: hidden;
+		z-index: 500;
+	}
 
-.notLogin image {
-	width: 100%;
-	height: 100%;
-}
-.isLogin image {
-	width: 100%;
-	height: 100%;
-}
-.loginButton {
-	width: 185rpx !important;
-	height: 70rpx !important;
-	background-image: url(../../static/login.png);
-	background-size: 100% 100%;
-	margin-left: 37rpx;
-	border: none !important;
-	outline: none !important;
-	border-radius: 30rpx;
-}
-.keepUsing{
-	width: 138rpx;
-	height: 50rpx;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	background-color: #FFA449;
-	border-radius: 25rpx;
-	font-size: 25rpx;
-	color: #FFFFFF;
-	position: absolute;
-	bottom: -20rpx;
-	left: calc((100% - 138rpx) / 2);
-}
-.keepUsing image{
-	width: 11rpx;
-	height: 18rpx;
-	margin-left: 8rpx;
-}
+	.isloginBox {
+		width: 513rpx;
+		height: 537rpx;
+		overflow: hidden;
+		position: fixed;
+		top: 19%;
+		left: 15%;
+		z-index: 1001;
+	}
+
+	.bgcImg {
+		width: 100%;
+		height: 100%;
+		z-index: 9000;
+	}
+
+	.loginTxt {
+		font-size: 30rpx;
+		font-family: PingFang SC;
+		font-weight: 400;
+		color: rgba(102, 102, 102, 1);
+		line-height: 36px;
+		text-align: center;
+		z-index: 9000;
+		position: absolute;
+		bottom: 79px;
+		left: 106rpx;
+	}
+
+	.deleteImg {
+		width: 38rpx;
+		height: 38rpx;
+		position: absolute;
+		top: 15rpx;
+		right: 15rpx;
+		z-index: 9000;
+	}
+
+	.deleteImg image {
+		width: 100%;
+		height: 100%;
+	}
+
+	.loginImg {
+		position: absolute;
+		z-index: 9000;
+		bottom: 60rpx;
+		left: 0rpx;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0rpx 52rpx;
+	}
+
+	.notLogin {
+		width: 185rpx;
+		height: 70rpx;
+	}
+
+	.notLogin image {
+		width: 100%;
+		height: 100%;
+	}
+
+	.isLogin image {
+		width: 100%;
+		height: 100%;
+	}
+
+	.loginButton {
+		width: 185rpx !important;
+		height: 70rpx !important;
+		background-image: url(../../static/login.png);
+		background-size: 100% 100%;
+		margin-left: 37rpx;
+		border: none !important;
+		outline: none !important;
+		border-radius: 30rpx;
+	}
+
+	.keepUsing {
+		width: 138rpx;
+		height: 50rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		background-color: #FFA449;
+		border-radius: 25rpx;
+		font-size: 25rpx;
+		color: #FFFFFF;
+		position: absolute;
+		bottom: -20rpx;
+		left: calc((100% - 138rpx) / 2);
+	}
+
+	.keepUsing image {
+		width: 11rpx;
+		height: 18rpx;
+		margin-left: 8rpx;
+	}
 </style>

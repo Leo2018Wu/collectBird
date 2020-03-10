@@ -11,6 +11,7 @@ export default {
 	// 	}
 	// })
 	},
+	
 	onShow: function() {
 		console.log('App Show');
 	},
@@ -21,10 +22,7 @@ export default {
 	globalData: {
 		userName: '',
 		userImg: '',
-		networkType: 'net' //当前网络状态
-		// topicNum:'',
-		// likeNum:'',
-		// commentNum:''
+		networkType: 'net' ,//当前网络状态
 	},
 	userOpenId: '1', //用户得openid
 	// 当用户执行授权时更新后台用户信息

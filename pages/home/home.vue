@@ -1,80 +1,101 @@
 <template>
 	<view class="home">
-		<view class="mouth">
-			<view class="mouthIncome">
-				<view class="mouthIncomeText">本月净收入 (元)</view>
-				<span class="mouthIncomeNum">{{ mouthIncome | thousandsPoints }}</span>
-			</view>
-			<view class="payment">
-				<view class="">
-					<view class="paymentText">本月账单待收</view>
-					<span class="paymentNum">{{ billDuein | thousandsPoints}}</span>
+		<view v-if="true">
+			<view class="mouth">
+				<view class="mouthIncome">
+					<view class="mouthIncomeText">本月净收入 (元)</view>
+					<span class="mouthIncomeNum">{{ mouthIncome | thousandsPoints }}</span>
 				</view>
-				<view class="">
-					<view class="paymentText">本月账单已收</view>
-					<span class="paymentNum">{{ billReceived | thousandsPoints}}</span>
-				</view>
-				<view class="">
-					<view class="paymentText">今日已收金额</view>
-					<span class="paymentNum">{{ todayReceived | thousandsPoints}}</span>
-				</view>
-			</view>
-		</view>
-		<view class="bannerBox">
-			<view class="bannerTop">
-				<view v-for="(item,index) in homeList" @click="switchPage(item.url)" :key="index">
-					<view class="bannerItem">
-						<image class="bannerImg" :src="item.imgUrl" mode="aspectFit"></image>
+				<view class="payment">
+					<view class="">
+						<view class="paymentText">本月账单待收</view>
+						<span class="paymentNum">{{ billDuein | thousandsPoints}}</span>
 					</view>
-					<span class="bannerText">{{item.title}}</span>
-				</view>
-			</view>
-			<view class="banner">
-				<swiper class="swiper" :indicator-dots="false" autoplay="true" interval="5000" duration="1000" @change="swiperChange">
-					<block v-for="(item, index) in imgUrls" :key="index">
-						<navigator :url="item.link">
-							<swiper-item class="radius">
-								<image :src="item.url" class="slide-image" mode="aspectFill" />
-							</swiper-item>
-						</navigator>
-					</block>
-				</swiper>
-				<view class="dots">
-					<view v-for="(item, index) in imgUrls" :key="index">
-						<view class="dot" :class="{active : index == swiperCurrent}"></view>
+					<view class="">
+						<view class="paymentText">本月账单已收</view>
+						<span class="paymentNum">{{ billReceived | thousandsPoints}}</span>
+					</view>
+					<view class="">
+						<view class="paymentText">今日已收金额</view>
+						<span class="paymentNum">{{ todayReceived | thousandsPoints}}</span>
 					</view>
 				</view>
 			</view>
-			<view class="noticeBox">
-				<image class="leftImg" src="../../static/updateIcon.png" mode="aspectFit"></image>
-				<view class="noticeContent">
-					<swiper class="noticeContentSwiper" :vertical="true" :indicator-dots="false" autoplay="true" interval="5000"
-					 duration="800">
-						<block v-for="(item,index) in contentList" :key="index">
-							<swiper-item>
-								<view>{{item.text1}}</view>
-								<view>{{item.text2}}</view>
-							</swiper-item>
+			<view class="bannerBox">
+				<view class="bannerTop">
+					<view v-for="(item,index) in homeList" @click="switchPage(item.url)" :key="index">
+						<view class="bannerItem">
+							<image class="bannerImg" :src="item.imgUrl" mode="aspectFit"></image>
+						</view>
+						<span class="bannerText">{{item.title}}</span>
+					</view>
+				</view>
+				<view class="banner">
+					<swiper class="swiper" :indicator-dots="false" autoplay="true" interval="5000" duration="1000" @change="swiperChange">
+						<block v-for="(item, index) in imgUrls" :key="index">
+							<navigator :url="item.link">
+								<swiper-item class="radius">
+									<image :src="item.url" class="slide-image" mode="aspectFill" />
+								</swiper-item>
+							</navigator>
 						</block>
 					</swiper>
+					<view class="dots">
+						<view v-for="(item, index) in imgUrls" :key="index">
+							<view class="dot" :class="{active : index == swiperCurrent}"></view>
+						</view>
+					</view>
+				</view>
+				<view class="noticeBox">
+					<image class="leftImg" src="../../static/updateIcon.png" mode="aspectFit"></image>
+					<view class="noticeContent">
+						<swiper class="noticeContentSwiper" :vertical="true" :indicator-dots="false" autoplay="true" interval="5000"
+						 duration="800">
+							<block v-for="(item,index) in contentList" :key="index">
+								<swiper-item>
+									<view>{{item.text1}}</view>
+									<view>{{item.text2}}</view>
+								</swiper-item>
+							</block>
+						</swiper>
 
+					</view>
+				</view>
+			</view>
+			<!-- 授权弹窗 -->
+			<view class="isloginModal" v-if="loginFlag" @click="cancleLogin"></view>
+			<view class="isloginBox" v-if="loginFlag">
+				<image class="bgcImg" src="../../static/authorization.png" mode=""></image>
+				<view class="deleteImg" @click="cancleLogin">
+					<image src="../../static/delete.png" mode=""></image>
+				</view>
+				<view class="loginTxt">授权登录体验完整功能</view>
+				<view class="loginImg">
+					<view class="notLogin" @click="cancleLogin">
+						<image src="../../static/notLogin.png" mode=""></image>
+					</view>
+					<button class="loginButton" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true"></button>
 				</view>
 			</view>
 		</view>
-		<!-- 授权弹窗 -->
-		<view class="isloginModal" v-if="loginFlag" @click="cancleLogin"></view>
-		<view class="isloginBox" v-if="loginFlag">
-			<image class="bgcImg" src="../../static/authorization.png" mode=""></image>
-			<view class="deleteImg" @click="cancleLogin">
-				<image src="../../static/delete.png" mode=""></image>
-			</view>
-			<view class="loginTxt">授权登录体验完整功能</view>
-			<view class="loginImg">
-				<view class="notLogin" @click="cancleLogin">
-					<image src="../../static/notLogin.png" mode=""></image>
-				</view>
-				<button class="loginButton" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true"></button>
-			</view>
+
+		<!-- 新手指引 -->
+		<view class="guideMask" @catchtouchmove="true" v-if="stepOne || stepTwo || stepThree || stepFour"></view>
+		<view v-if="stepOne">
+			<image class="guide1" src="../../static/guide1.png" mode="aspectFit"></image>
+			<image class="guide2" src="../../static/guide2.png" mode="aspectFit" @click="showNextOne"></image>
+		</view>
+		<view v-if="stepTwo">
+			<image class="guide6" src="../../static/guide6.png" mode="aspectFit"></image>
+			<image class="guide3" src="../../static/guide3.png" mode="aspectFit" @click="showNextTwo"></image>
+		</view>
+		<view v-if="stepThree">
+			<image class="guide4" src="../../static/guide4.png" mode="aspectFit" @click="showNextThree"></image>
+			<image class="guide5" src="../../static/homeIcon4.png" mode="aspectFit"></image>
+		</view>
+		<view v-if="stepFour">
+			<image class="guide7" src="../../static/guide5.png" mode="aspectFit" @click="showNextFour"></image>
+			<image class="guide8" src="../../static/homeIcon6.png" mode="aspectFit"></image>
 		</view>
 	</view>
 </template>
@@ -84,6 +105,11 @@
 		name: 'home',
 		data() {
 			return {
+				init: false,
+				stepOne: false,
+				stepTwo: false,
+				stepThree: false,
+				stepFour: false,
 				contentList: [{
 					text1: '支持手动生成最新账单',
 					text2: '账单明细支持编辑'
@@ -110,31 +136,31 @@
 					}
 				],
 				homeList: [{
-					title: '房源',
-					imgUrl: '../../static/homeIcon1.png',
-					url: '../houseList/houseList'
-				}, {
-					title: '租客',
-					imgUrl: '../../static/homeIcon2.png',
-					url: '../renterManage/renterManage'
-				}, {
-					title: '账单',
-					imgUrl: '../../static/homeIcon3.png',
-					url: '../billManage/billManage?billType=' + 0
-				}, {
-					title: '统计',
-					imgUrl: '../../static/homeIcon4.png',
-					url: '../reportForm/reportForm'
-				}, {
-					title: '房东账单',
-					imgUrl: '../../static/homeIcon5.png',
-					url: '../billManage/billManage?billType=' + 1
-				},
-				{
-					title: '帮助',
-					imgUrl: '../../static/homeIcon6.png',
-					url: '../help/help'
-				}
+						title: '房源',
+						imgUrl: '../../static/homeIcon1.png',
+						url: '../houseList/houseList'
+					}, {
+						title: '租客',
+						imgUrl: '../../static/homeIcon2.png',
+						url: '../renterManage/renterManage'
+					}, {
+						title: '账单',
+						imgUrl: '../../static/homeIcon3.png',
+						url: '../billManage/billManage?billType=' + 0
+					}, {
+						title: '报表',
+						imgUrl: '../../static/homeIcon4.png',
+						url: '../reportForm/reportForm'
+					}, {
+						title: '房东账单',
+						imgUrl: '../../static/homeIcon5.png',
+						url: '../billManage/billManage?billType=' + 1
+					},
+					{
+						title: '帮助',
+						imgUrl: '../../static/homeIcon6.png',
+						url: '../help/help'
+					}
 				],
 				indicatorDots: true,
 				autoplay: true,
@@ -142,20 +168,38 @@
 				duration: 500,
 			};
 		},
-		onLoad() {
-
-		},
+		onLoad() {},
 		onShow(option) {
-			console.log(this)
-			// if (this.isPopUpModal) {
 			this.checkLoginStatus().then(res => {
 				this.loginFlag = res;
 			});
-			console.log(this.$store.state.isloginStatus);
-			// }
-			// this.getMoneyInfo();
 		},
 		methods: {
+			showNextOne() {
+				this.stepOne = false;
+				this.stepTwo = true;
+			},
+			showNextTwo() {
+				this.stepTwo = false;
+				this.stepThree = true;
+			},
+			showNextThree() {
+				console.log('wobedianjile')
+				this.stepThree = false;
+				this.stepFour = true;
+			},
+			showNextFour() {
+				this.stepFour = false;
+				this.$request.post('/user/updateByOpenId', {
+					openId: this.$store.state.landladyInfo.openId,
+					isNovice: 1
+				}).then((res) => {
+					uni.showToast({
+						title: '已完成新手指导',
+						icon: 'none'
+					})
+				})
+			},
 			switchPage(url) {
 				uni.navigateTo({
 					url
@@ -188,10 +232,27 @@
 					.post('user/findByOpenId', userInfo)
 					.then(res => {
 						console.log(res);
+						_this.init = true;
+						if (res.data.data.isNovice == 0) {
+							_this.stepOne = true;
+						}
 						_this.$store.commit('landladyInfo', res.data.data);
 						_this.getMoneyInfo();
+						_this.getMessageTotal(_this.$store.state.landladyInfo.id)
 					})
 					.catch(err => {});
+			},
+			getMessageTotal(id) {
+				this.$request.post('userMessage/messageList', {
+					addresseeId: id
+				}).then((res) => {
+					let result = res.data.data
+					uni.setTabBarBadge({
+						index: 1,
+						text: parseInt(result.billUnreadCount) + parseInt(result.tenantUnreadCount) + parseInt(result.systemUnreadCount) +
+							'',
+					})
+				})
 			},
 			getMoneyInfo() {
 				let _this = this;
@@ -285,7 +346,7 @@
 	}
 
 	.mouth {
-		height: 32%;
+		height: 400rpx;
 		background-color: #f09a42;
 	}
 
@@ -333,7 +394,7 @@
 		background-color: #fff;
 		border-radius: 25rpx;
 		position: absolute;
-		top: 30%;
+		top: 380rpx;
 		left: 0rpx;
 	}
 
@@ -580,5 +641,88 @@
 	.dots .dot.active {
 		background: #FFFFFF;
 		opacity: 1;
+	}
+
+	.guideMask {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: #000000;
+		opacity: 0.6;
+		z-index: 990;
+	}
+
+	.guide1 {
+		width: 670rpx;
+		height: 318rpx;
+		position: absolute;
+		top: 28rpx;
+		left: 40rpx;
+		z-index: 991;
+	}
+
+	.guide2 {
+		width: 423rpx;
+		height: 617rpx;
+		position: absolute;
+		top: 356rpx;
+		left: 185rpx;
+		z-index: 991;
+	}
+
+	.guide6 {
+		width: 469rpx;
+		height: 106rpx;
+		position: absolute;
+		top: 430rpx;
+		left: 48rpx;
+		z-index: 991;
+	}
+
+	.guide3 {
+		width: 442rpx;
+		height: 572rpx;
+		position: absolute;
+		top: 546rpx;
+		left: 130rpx;
+		z-index: 991;
+	}
+
+	.guide4 {
+		width: 467rpx;
+		height: 586rpx;
+		position: absolute;
+		top: 546rpx;
+		left: 172rpx;
+		z-index: 991;
+	}
+
+	.guide5 {
+		width: 94rpx;
+		height: 94rpx;
+		position: absolute;
+		z-index: 991;
+		top: 436rpx;
+		right: 64rpx;
+	}
+
+	.guide7 {
+		width: 382rpx;
+		height: 468rpx;
+		position: absolute;
+		top: 658rpx;
+		left: 194rpx;
+		z-index: 991;
+	}
+
+	.guide8 {
+		width: 94rpx;
+		height: 94rpx;
+		position: absolute;
+		z-index: 991;
+		top: 616rpx;
+		right: 64rpx;
 	}
 </style>

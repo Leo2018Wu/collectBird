@@ -20,7 +20,7 @@
 		<view class="billList">
 			<mescroll-uni :down="downOption" @down="downCallback" :up="upOption" @up="upCallback" :fixed="false" @init="init">
 				<!-- <mescroll-empty v-if="selectList.length==0"></mescroll-empty> -->
-				<view v-for="(item, idx) in selectList" :key="idx" @click="showBill(item)">
+				<view v-for="(item, idx) in billListInfo" :key="idx" @click="showBill(item)">
 					<view class="myBillItem">
 						<view class="itemFlex itemTop">
 							<view class="myBillName">{{item.billStatus == 5 ? '退租账单' : "租金账单"}}</view>
@@ -28,12 +28,12 @@
 						</view>
 						<view class="itemFlex itemMiddle">
 							<view class="myBillDate">{{ item.payRentDate.substr(0, 10) }}</view>
-							<view class="myOverDueNum" v-if="currentIndex != 3 && currentIndex != 2">
+							<!-- <view class="myOverDueNum" v-if="currentIndex != 3 && currentIndex != 2">
 								<span v-if="currentIndex == 0">逾期{{ item.overdueDays }}天</span>
 								<span v-if="currentIndex == 1 && item.overdueDays < 0">{{ -item.overdueDays }}天后交租</span>
 								<span v-if="currentIndex == 1 && item.overdueDays == 0">当天交租</span>
-							</view>
-							<view class="myOverDueNum" v-if="currentIndex == 3 && item.billStatus != 4">
+							</view> -->
+							<view class="myOverDueNum" v-if="item.billStatus != 4">
 								<span v-if="item.overdueDays > 0">逾期{{ item.overdueDays }}天</span>
 								<span v-if="item.overdueDays < 0">{{ -item.overdueDays }}天后交租</span>
 								<span v-if="item.overdueDays == 0">当天交租</span>
@@ -65,7 +65,7 @@
 			return {
 				billListInfo: [],
 				// billStatus: '3', // 默认展示已逾期
-				billStatus: '0', // 默认展示已逾期
+				billStatus: '3', // 默认展示已逾期
 				userId: '',
 				// arr: ['已逾期', '未收款', '已收款', '全部'],
 				currentIndex: 0,
@@ -106,20 +106,20 @@
 				let list = this.para.billType == 0 ? ['已逾期', '未收款', '已收款', '全部'] : ['已逾期', '未付款', '已付款', '全部'];
 				return list
 			},
-			selectList() {
-				const overdueList = function(item) {
-					return item.overdueDays > 0
-				}
-				const normalList = function(item) {
-					return item.overdueDays <= 0
-				}
-				const fullList = function(item) {
-					return item
-				}
-				let par = this.currentIndex == 0 ? overdueList : (this.currentIndex == 1 ? normalList : fullList)
-				let arr = this.billListInfo.filter(par)
-				return arr
-			}
+			// selectList() {
+			// 	const overdueList = function(item) {
+			// 		return item.overdueDays > 0
+			// 	}
+			// 	const normalList = function(item) {
+			// 		return item.overdueDays <= 0
+			// 	}
+			// 	const fullList = function(item) {
+			// 		return item
+			// 	}
+			// 	let par = this.currentIndex == 0 ? overdueList : (this.currentIndex == 1 ? normalList : fullList)
+			// 	let arr = this.billListInfo.filter(par)
+			// 	return arr
+			// }
 		},
 		onShow() {
 			this.getMoney();
@@ -159,7 +159,7 @@
 				switch (index) {
 					case 0:
 						// this.billStatus = '3';
-						this.billStatus = '0';
+						this.billStatus = '3';
 						this.downCallback(this.mescroll);
 						break;
 					case 1:

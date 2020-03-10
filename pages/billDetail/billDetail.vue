@@ -4,16 +4,19 @@
 			<view class="profitContainer">
 				<view class="profitBox">
 					<view class="profitBar">{{billType == 0 ? '应收' : '应付'}}(元)</view>
-					<span v-if="billType == 1 && unIncome != 0">-</span><span>{{ billInfo.totalAmount}}</span>
+					<span v-if="billType == 1 && unIncome != 0 && !fromShare">-</span><span>{{ billInfo.totalAmount}}</span>
 				</view>
 				<view v-if="billInfo.billStatus == 4" class="profitBox">
 					<view class="profitBar">{{billType == 0 ? '实收' : '实付'}}(元)</view>
-					<span v-if="billType == 1 && unIncome != 0">-</span><span>{{ billInfo.totalAmount ? billInfo.totalAmount : '0' }}</span>
+					<span v-if="billType == 1 && unIncome != 0 && !fromShare">-</span><span>{{ billInfo.totalAmount ? billInfo.totalAmount : '0' }}</span>
 				</view>
 			</view>
-			<view v-if="billType == 0" class="houseAddr">{{ houseAddrInfo.communityName }}-{{ houseAddrInfo.houseNo }}-{{ houseAddrInfo.roomNo }}
-				<span @click="editBill">修改</span></view>
-			<view v-else class="houseAddr">{{ ownerInfo.communityName }}-{{ ownerInfo.houseNo }} <span @click="editBill">修改</span></view>
+			<view v-if="fromShare"  class="houseAddr">{{titleContent}}</view>
+			<view v-else>
+				<view v-if="billType == 0" class="houseAddr">{{ houseAddrInfo.communityName }}-{{ houseAddrInfo.houseNo }}-{{ houseAddrInfo.roomNo }}
+					<span @click="editBill">修改</span></view>
+				<view v-else class="houseAddr">{{ ownerInfo.communityName }}-{{ ownerInfo.houseNo }} <span @click="editBill">修改</span></view>
+			</view>
 		</view>
 		<view class="section1">
 			<view class="billStatus">
@@ -44,14 +47,14 @@
 			<view class="billDateBox">
 				<view class="billDateLi">
 					<span class="billDateTitle">租金</span>
-					<span v-if="billType == 1 && unIncome != 0">-</span><span>{{ !billInfo.total ? 0 : billInfo.total }}</span>
+					<span v-if="billType == 1 && unIncome != 0 && !fromShare">-</span><span>{{ !billInfo.total ? 0 : billInfo.total }}</span>
 				</view>
 				<view class="billDateLi" v-if="billInfo.depositAmount != 0">
 					<span class="billDateTitle">押金</span>
-					<span v-if="billType == 1 && unIncome != 0">-</span><span class="billDate">{{ !billInfo.depositAmount ? 0 : billInfo.depositAmount }}</span>
+					<span v-if="billType == 1 && unIncome != 0 && !fromShare">-</span><span class="billDate">{{ !billInfo.depositAmount ? 0 : billInfo.depositAmount }}</span>
 				</view>
 			</view>
-			<view v-if="billType == 0">
+			<view v-if="billType == 0 || fromShare">
 				<view class="costDetail">费用明细</view>
 				<view class="waterBox">
 					<view class="waterOuter eleOuter">
@@ -81,32 +84,34 @@
 			<view class="remarksDivide">备注</view>
 		{{ billInfo.remarks ? billInfo.remarks  : ''}}</view>
 		<!-- <view v-if="billType == 0"> -->
-		<view class="section3" v-if="billInfo.billStatus == 4">
+		<view class="section3" v-if="billInfo.billStatus == 4 && !fromShare">
 			<view class="sendBillBox">
 				<image class="sendIcon" src="../../static/sendBill.png" mode="aspectFit"></image>
 				<view>发送账单</view>
 			</view>
 		</view>
 		<view class="section2" v-else>
-			<view class="leftBtnBox">
-				<view class="sendBillBox" @click="deleteBill">
-					<image class="sendIcon" src="../../static/delete_btn.png" mode="aspectFit"></image>
-					<view>删除</view>
+			<view v-if="!fromShare" class="leftBtnBox">
+				<!-- <view> -->
+					<view class="sendBillBox" @click="deleteBill">
+						<image class="sendIcon" src="../../static/delete_btn.png" mode="aspectFit"></image>
+						<!-- <view>删除</view> -->
+					</view>
+					<view v-if="billType == 0" class="sendBillBox" @click="openMeterRead">
+						<image class="sendIcon" src="../../static/eleWater.png" mode="aspectFit"></image>
+						<!-- <view>抄表</view> -->
+					</view>
+					<button class="sendBillBox" open-type="share" hover-class="btnHoverClass">
+						<image class="sendIcon" src="../../static/sendBill.png" mode="aspectFit"></image>
+						<!-- <span>发送账单</span> -->
+					</button>
 				</view>
-				<view v-if="billType == 0" class="sendBillBox" @click="openMeterRead">
-					<image class="sendIcon" src="../../static/eleWater.png" mode="aspectFit"></image>
-					<view>抄表</view>
-				</view>
-				<view class="sendBillBox">
-					<image class="sendIcon" src="../../static/sendBill.png" mode="aspectFit"></image>
-					<view>发送账单</view>
-				</view>
-			</view>
-			<view class="" v-if="billType == 1">
+			<!-- </view> -->
+			<view class="" v-if="billType == 1 && !fromShare">
 				<view class="sureBtn" v-if="billInfo.billStatus != 4" @click="checkMoney">交租</view>
 				<view class="sureBtn" v-if="billInfo.billStatus == 4">已交租</view>
 			</view>
-			<view v-if="billType == 0" class="sureBtn" @click="checkMoney">到账</view>
+			<view v-if="billType == 0  && !fromShare" class="sureBtn" @click="checkMoney">到账</view>
 		</view>
 
 		<tip-modal v-if="isShowTipModal" :title="'删除账单'" :describition="'是否确认删除账单?'" v-on:emitCancel="hideTipModal"
@@ -181,7 +186,9 @@
 				endDate: '',
 				payRentDate: '',
 				arrivalDate: '',
-				quantity: ''
+				quantity: '',
+				fromShare:false,
+				titleContent:''
 			};
 		},
 		onShow() {
@@ -189,6 +196,12 @@
 		},
 		onLoad(option) {
 			console.log(this)
+			if(option.fromShare){
+				this.fromShare = option.fromShare
+			}
+			if(option.titleContent){
+				this.titleContent = option.titleContent
+			}
 			if (option.billType) {
 				this.billType = option.billType;
 			}
@@ -200,7 +213,17 @@
 				this.getOwnerInfo(option.ownerId)
 			}
 		},
+		onShareAppMessage(){
+			let titleContent = this.billType == 0 ? this.houseAddrInfo.communityName + '-' + this.houseAddrInfo.houseNo + '-' +
+				this.houseAddrInfo.roomNo : this.ownerInfo.communityName + '-' + this.ownerInfo.houseNo
+			return {
+				title:'您有一笔租金账单待支付',
+				imageUrl:'/static/shareBill.jpg',
+				path:'/pages/billDetail/billDetail?billType='+1+'&billId='+this.billId+'&fromShare='+true+'&titleContent='+titleContent
+			}
+		},
 		methods: {
+			
 			editBill() {
 				let titleContent = this.billType == 0 ? this.houseAddrInfo.communityName + '-' + this.houseAddrInfo.houseNo + '-' +
 					this.houseAddrInfo.roomNo : this.ownerInfo.communityName + '-' + this.ownerInfo.houseNo
@@ -320,7 +343,7 @@
 			checkMoney() {
 				console.log('你好')
 				let _this = this;
-				if (this.billType == 1) {
+				if (this.billType == 1 && !this.fromShare) {
 					this.ll()
 				}
 				if (_this.electricityInfo.itemName == '1') {
@@ -662,16 +685,23 @@
 	}
 
 	.sendBillBox {
-		height: 82rpx;
+		/* height: 82rpx; */
+		height: 100%;
+		display: flex;
+		align-items: center;
 		width: fit-content;
 		text-align: center;
 		font-size: 28rpx;
+	}
+	.sendBillBox span{
+		display: block;
 	}
 
 	.leftBtnBox {
 		width: calc(100% - 258rpx);
 		display: flex;
 		justify-content: space-around;
+		align-items: center;
 	}
 
 	/* .sendBillBox:first-of-type {
@@ -679,8 +709,8 @@
 	} */
 
 	.sendIcon {
-		width: 40rpx;
-		height: 40rpx;
+		width: 50rpx;
+		height: 50rpx;
 		margin: 0 auto;
 	}
 

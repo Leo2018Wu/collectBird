@@ -13,7 +13,11 @@
 				</view>
 			</view>
 		</view>
-		<view class="section" :class="{secFirst : index == 0}" v-for="(item,index) in renterList" :key="index">
+		<view class="emptyList" v-if="renterList.length == 0 && loadEnd">
+			<image class="noRenterIcon" src="../../static/renterListEmpty.png" mode="aspectFit"></image>
+			<view>暂无租客</view>
+		</view>
+		<view v-else class="section" :class="{secFirst : index == 0}" v-for="(item,index) in renterList" :key="index">
 			<view class="sectionBar" @click="showRenterList(index)">
 				<span :class="[isShow && currentIndex == index ? 'tips1' : 'tips0']"></span>
 				<view class="secName">{{item.communityName}}</view>
@@ -49,7 +53,8 @@
 				renterList: [],
 				currentIndex: null,
 				aboutToExpire: '',
-				inRentTenantNum: ''
+				inRentTenantNum: '',
+				loadEnd:false
 			}
 		},
 		onLoad() {
@@ -90,6 +95,7 @@
 					id
 				}).then((res) => {
 					console.log(res)
+					this.loadEnd = true;
 					this.renterList = res.data.data;
 					this.renterList.forEach((item, index) => {
 						item.tenantList.sort(function(newVal, oldVal) {
@@ -288,5 +294,16 @@
 		margin-right: 15rpx;
 		font-size: 24rpx;
 		color: #EB5E61;
+	}
+	.emptyList{
+		padding-top: 290rpx;
+		text-align: center;
+		color: #BBBBBB;
+		font-size: 28rpx;
+	}
+	.noRenterIcon{
+		width: 136rpx;
+		height: 190rpx;
+		margin: 0 auto 14rpx auto;
 	}
 </style>

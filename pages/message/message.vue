@@ -1,43 +1,21 @@
 <template>
 	<view class="message">
-		<view class="messageItem">
-			<image class="messageIcon" src="../../static/messageIcon1.png" mode="aspectFit"></image>
+		<view class="messageItem" v-for="(item,index) in msgList" :key="index" @click="showMsgList(item.messageType)">
+			<image class="messageIcon" :src="item.imgUrl" mode="aspectFit"></image>
 			<view class="content">
 				<view class="myBox">
 					<view class="top">
-						<view>账单提醒</view>
-						<span>星期二</span>
+						<view>{{item.name}}</view>
+						<span>{{todayDate}}</span>
 					</view>
-					<view class="bottom">暂无消息</view>
+					<view class="bottom" :class="{posRight:item.unReadNum != 0}">
+						<span v-if="!item.unReadNum">暂无消息</span>
+						<span class="unReadNum" v-else>{{item.unReadNum}}</span>
+					</view>
 				</view>
 			</view>
 		</view>
-		<view class="messageItem">
-			<image class="messageIcon" src="../../static/messageIcon2.png" mode="aspectFit"></image>
-			<view class="content">
-				<view class="myBox">
-					<view class="top">
-						<view>租客提醒</view>
-						<span>星期二</span>
-					</view>
-					<view class="bottom">暂无消息</view>
-				</view>
 
-			</view>
-		</view>
-		<view class="messageItem">
-			<image class="messageIcon" src="../../static/messageIcon3.png" mode="aspectFit"></image>
-			<view class="content">
-				<view class="myBox">
-					<view class="top">
-						<view>系统消息</view>
-						<span>星期二</span>
-					</view>
-					<view class="bottom">暂无消息</view>
-				</view>
-
-			</view>
-		</view>
 	</view>
 </template>
 
@@ -45,11 +23,60 @@
 	export default {
 		data() {
 			return {
-
+				todayDate: '',
+				msgList: [{
+						imgUrl: '../../static/messageIcon1.png',
+						name: '账单提醒',
+						unReadNum: 0,
+						messageType: 1
+					},
+					{
+						imgUrl: '../../static/messageIcon2.png',
+						name: '租客提醒',
+						unReadNum: 0,
+						messageType: 2
+					},
+					{
+						imgUrl: '../../static/messageIcon3.png',
+						name: '系统消息',
+						unReadNum: 0,
+						messageType: 3
+					}
+				]
 			}
 		},
+		onShow() {
+			this.getMessageTotal(this.$store.state.landladyInfo.id)
+		},
+		onLoad() {
+			var now = new Date();
+			var day = now.getDay();
+			var weeks = new Array("星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六");
+			this.todayDate = weeks[day];
+		},
 		methods: {
-
+			getMessageTotal(id) {
+				this.$request.post('/userMessage/messageList', {
+					addresseeId: id
+				}).then((res) => {
+					let result = res.data.data
+					console.log(result)
+					this.msgList.forEach((item, index) => {
+						if (index == 0) {
+							item.unReadNum = result.billUnreadCount
+						} else if (index == 1) {
+							item.unReadNum = result.tenantUnreadCount
+						} else {
+							item.unReadNum = result.systemUnreadCount
+						}
+					})
+				})
+			},
+			showMsgList(type) {
+				uni.navigateTo({
+					url: '../systemMessage/systemMessage?messageType='+type
+				})
+			}
 		}
 	}
 </script>
@@ -77,7 +104,8 @@
 		padding-right: 30rpx;
 		border-bottom: 1rpx solid #F5F5F5;
 	}
-	.myBox{
+
+	.myBox {
 		margin: auto 0;
 		height: 90rpx;
 		width: 100%;
@@ -85,6 +113,7 @@
 		flex-direction: column;
 		justify-content: space-between;
 	}
+
 	.messageIcon {
 		margin-right: 30rpx;
 		width: 90rpx;
@@ -107,15 +136,27 @@
 	}
 
 	.bottom {
+		width: 100%;
 		color: #999999;
 		font-size: 26rpx;
-		/* margin-bottom: 20rpx; */
+	}
+
+	.posRight {
+		display: flex;
+		justify-content: flex-end;
+	}
+
+	.unReadNum {
+		color: #FFFFFF;
+		font-size: 24rpx;
+		padding: 0 20rpx;
+		background-color: #E0483C;
+		border-radius: 18rpx;
 	}
 
 	.line {
 		width: 618rpx;
 		height: 2rpx;
-		/* background-color: red; */
 		background: rgba(245, 245, 245, 1);
 	}
 </style>
