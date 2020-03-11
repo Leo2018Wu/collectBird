@@ -59,8 +59,8 @@
 
 	.img {
 		display: block;
-		width: 180rpx;
-		height: 180rpx;
+		width: 222rpx;
+		height: 222rpx;
 		margin: 200rpx auto 0 auto;
 	}
 

@@ -1,18 +1,29 @@
 <template>
 	<view class="help">
-		<view class="containerItem" v-for="(item,index) in list" :key="index">
-			<view class="containerIn" @click="showRenterList(index)">
-				<view class="question">{{item.question}}</view>
-				<view class="rightPart">
-					<view :class="[isShow && currentIndex == index ? 'tips1' : 'tips0']"></view>
-					<!-- <image class="rightPartImg1" :class="{active:isShowImg && currentIndex == index}" src="../../static/down_s.png" mode=""></image>
-					<image class="rightPartI mg2" :class="{active:!isShowImg && currentIndex == index}" src="../../static/up_s.png" mode=""></image> -->
-				</view>
+		<view class="section">
+			<view class="topBox">
+				<image src="../../static/aboutUs.png" mode="aspectFit"></image>
+				<span class="logoContent">收租鸟，慧收租</span>
 			</view>
-			<view class="detail" :class="{active:isShow && currentIndex == index}">
-				<view class="" v-for="(p,index) in item.detail" :key="index">
-					<view class="detailItem">
-						<view class="detailText"><view class="dot"></view>{{p}}</view>
+			<view class="miniDesc">收租鸟通过简单便捷的交互方式，让您高效完成房源、租客、账单等收租管理需求。并享有多维度报表，智能抄表，以及房源直租等优势。</view>
+		</view>
+		<view class="helpList">
+			<view class="helpBar">帮助手册</view>
+			<view class="helpLi" v-for="(item,index) in list" :key="index">
+				<view class="leftLi" @click="showMore(index)">
+					<view class="rightLiInner">
+						<image class="helpIcon" :src="item.iconUrl" mode=""></image>
+						<view>{{item.queType}}</view>
+						<image class="helpDown" :class="{isShow:isShow && isShowIndex == index}" src="../../static/helpDownIcon.png" mode="aspectFit"></image>
+					</view>
+				</view>
+				<view class="rightLi">
+					<view v-if="isShow && isShowIndex == index">
+						<view class="rightLiItem" v-for="(p,idx) in item.detail" :key="idx" @click="showDetail(p,index,idx)">{{p}}</view>
+					</view>
+					<view v-else>
+						<view class="rightLiItem"  @click="showDetail(item.detail[0],index,0)">{{item.detail[0]}}</view>
+						<view class="rightLiItem"  @click="showDetail(item.detail[1],index,1)">{{item.detail[1]}}</view>
 					</view>
 				</view>
 			</view>
@@ -25,141 +36,140 @@
 		data() {
 			return {
 				isShow:false,
-				currentIndex:0,
-				list:[
-					{
-						question:"收租鸟是什么?",
-						detail:['收租鸟是一款出租房屋管理工具，方便房东通过简单高效的操作完成例如房源、租客、账单等管理需求，轻松处理收租全流程。']
+				isShowIndex: null,
+				list: [{
+						iconUrl: '../../static/helpIcon0.png',
+						queType: "房源相关",
+						detail: ['如何添加房源？', '如何添加房号？','如何添加房间？']
 					},
 					{
-						question:"如何添加房源?",
-						detail:[
-							'首页>房源管理>添加房源，录入小区名、详细地址、上传小区照片（非必须），点击【保存】即可完成房源信息录入。',
-							'点击【继续添加房号】可以继续完善房号信息。'
-							]
+						iconUrl: '../../static/helpIcon1.png',
+						queType: "租客相关",
+						detail: ['如何添加租客？', '如何查看租客列表？']
 					},
 					{
-						question:"如何添加房号?",
-						detail:[
-							'首页>房源管理>选择某个小区>添加房号，其中选择户型后会自动生成对应数量卧室，选择整租，将只有一个卧室显示。',
-							'点击某个卧室，可以继续完善卧室信息。'
-							]
+						iconUrl: '../../static/helpIcon2.png',
+						queType: "账单相关",
+						detail: ['如何查看账单？', '账单如何生成？']
 					},
 					{
-						question:"如何添加房间?",
-						detail:['房间根据房屋户型自动生成，暂时不支持单独添加。']
+						iconUrl: '../../static/helpIcon3.png',
+						queType: "报表相关",
+						detail: ['报表统计了哪些信息？', '净利润是如何计算的？']
 					},
 					{
-						question:"如何添加租客?",
-						detail:['首页>房源管理>选择房源，标识为[闲置]的卧室可以添加租客。']
-					},
-					{
-						question:"如何查看账单?",
-						detail:[
-							'首页>账单管理，可以根据状态查看已生成账单和历史账单。',
-							'在房号页面和租客页面，都会有账单提醒。'
-							]
-					},
-					{
-						question:"账单如何生成?",
-						detail:[
-							'账单生成时间根据签约的起租日自动推算，根据下期交租日提前7天生成。',
-							'第一笔账单，会在签约完成时生成。'
-						]
+						iconUrl: '../../static/helpIcon4.png',
+						queType: "常见问题",
+						detail: ['我的信息是安全的吗？', '收租鸟有试用期吗？']
 					}
 				]
 			}
 		},
 		methods: {
-			showRenterList(index){
-				console.log(index)
-				this.currentIndex = index;
+			showMore(index){
 				this.isShow = !this.isShow;
+				this.isShowIndex = index;
+			},
+			showDetail(title,index,idx){
+				uni.navigateTo({
+					url:'../helpDetail/helpDetail?title='+title+'&index='+index+'&idx='+idx
+				})
 			}
 		}
 	}
 </script>
 
-<style>
-	.help{
-		height: 100hv;
-		width: 100%;
-		border-top: 1rpx solid #DBDBDB;
+<style scoped>
+	.section {
+		padding: 46rpx 26rpx;
+		border-bottom: 10rpx solid #FAFAFA;
 	}
-	.containerItem{
-		/* height: 311rpx; */
-		width: 100%;
-		padding: 0rpx 36rpx;
+
+	.section image {
+		width: 116rpx;
+		height: 116rpx;
 	}
-	.containerIn{
-		width: 678rpx;
-		height: 109rpx;
-		border-bottom: 1rpx solid rgba(236,236,236,1);
+
+	.topBox {
 		display: flex;
-		justify-content:space-between;
-		align-items:center;
+		align-items: center;
 	}
-	.question{
-		font-size:32rpx;
-		font-family:PingFang SC;
-		font-weight:400;
-		color:rgba(51,51,51,1);
-		line-height:36rpx;
+
+	.logoContent {
+		font-size: 32rpx;
+		color: #333333;
+		margin-left: 10rpx;
+		margin-top: -10rpx;
 	}
-	.rightPart{
-		width: 24rpx;
-		height: 24rpx;
-		position: relative;
+
+	.miniDesc {
+		color: #999999;
+		font-size: 30rpx;
+		padding-left: 20rpx;
 	}
-	.detail{
-		width: 100%;
-		display: none;
-		padding: 23rpx 0rpx;
+
+	.helpList {
+		color: #333333;
+		font-size: 28rpx;
+	}
+
+	.helpBar {
+		font-size: 32rpx;
+		padding: 32rpx 40rpx;
 		border-bottom: 1rpx solid #ECECEC;
 	}
-	.detailItem{
-		margin-top: 20rpx;
+
+	.helpLi {
+		min-height: 188rpx;
+		height: 100%;
+		display: flex;
 	}
-	.dot{
-		width:12rpx;
-		height:12rpx;
-		background:rgba(51,51,51,1);
-		border-radius:50%;
-		margin-right: 19rpx;
-		margin-top: 16rpx;
-		display: inline-block;
-		position: absolute;
-		top: 0rpx;
-		left: 0rpx;
+	.isShow{
+		transform: rotate(180deg);
 	}
-	.detailText{
-		font-size:30rpx;
-		font-family:PingFang SC;
-		font-weight:400;
-		color:rgba(51,51,51,1);
-		line-height:40rpx;
-		display: inline-block;
-		position: relative;
+
+	.helpLi {
+		border-bottom: 1rpx solid #ECECEC;
+	}
+
+	.leftLi {
+		width: 26%;
+		border-right: 1rpx solid #ECECEC;
+		display: flex;
+		align-items: center;
+	}
+	.rightLiInner{
+		width: 100%;
+		height: 188rpx;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-around;
+		align-items: center;
+		padding: 20rpx 0;
+	}
+
+	.rightLi {
+		width: 74%;
+	}
+
+	.rightLiItem {
+		width: 100%;
+		height: 94rpx;
+		line-height: 94rpx;
 		padding-left: 30rpx;
 	}
-	
-	.active{
-		display: block;
+
+	.rightLiItem:not(:last-of-type) {
+		border-bottom: 1rpx solid #ECECEC;
 	}
-	.tips0{
-		width: 24rpx;
-		height: 24rpx;
-		background-image: url(../../static/down_s.png);
-		background-repeat:no-repeat;
-		background-position: 50% 50%;
-		background-size: 24rpx 24rpx;
+
+	.helpIcon {
+		width: 64rpx;
+		height: 64rpx;
 	}
-	.tips1{
-		width: 24rpx;
-		height: 24rpx;
-		background-image: url(../../static/up_s.png);
-		background-repeat:no-repeat;
-		background-position: 50% 50%;
-		background-size: 24rpx 24rpx;
+
+	.helpDown {
+		width: 20rpx;
+		height: 20rpx;
 	}
 </style>

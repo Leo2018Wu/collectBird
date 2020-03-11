@@ -10,7 +10,12 @@
 					</view>
 					<view class="bottom" :class="{posRight:item.unReadNum != 0}">
 						<span v-if="!item.unReadNum">暂无消息</span>
-						<span class="unReadNum" v-else>{{item.unReadNum}}</span>
+						<view class="hasNewMessage"  v-else>
+							<view class="textOverFlow">
+								{{index == 0 ? billNewMessage : (index == 1 ? tenantNewMessage : sysNewMessage)}}
+							</view>
+							<span class="unReadNum">{{item.unReadNum}}</span>
+						</view>
 					</view>
 				</view>
 			</view>
@@ -42,7 +47,10 @@
 						unReadNum: 0,
 						messageType: 3
 					}
-				]
+				],
+				billNewMessage:'',
+				tenantNewMessage:'',
+				sysNewMessage:''
 			}
 		},
 		onShow() {
@@ -63,10 +71,19 @@
 					console.log(result)
 					this.msgList.forEach((item, index) => {
 						if (index == 0) {
+							if(result.billUnreadCount != '0'){
+								this.billNewMessage = result.billList.list[0].messageContent
+							}
 							item.unReadNum = result.billUnreadCount
 						} else if (index == 1) {
+							if(result.tenantUnreadCount != '0'){
+								this.tenantNewMessage = result.tenantList.list[0].messageContent
+							}
 							item.unReadNum = result.tenantUnreadCount
 						} else {
+							if(result.systemUnreadCount != '0'){
+								this.sysNewMessage = result.systemList.list[0].messageContent
+							}
 							item.unReadNum = result.systemUnreadCount
 						}
 					})
@@ -158,5 +175,11 @@
 		width: 618rpx;
 		height: 2rpx;
 		background: rgba(245, 245, 245, 1);
+	}
+	.hasNewMessage{
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 	}
 </style>

@@ -114,8 +114,7 @@
 			"path": "pages/mine/mine",
 			"style": {
 				"navigationBarTitleText": "我的",
-				"enablePullDownRefresh": false,
-				"disableScroll": true
+				"enablePullDownRefresh": false
 			}
 		},
 		{
@@ -180,6 +179,12 @@
 				"navigationBarTextStyle": "black",
 				"navigationBarTitleText": "系统消息",
 				"navigationBarBackgroundColor": "#FFFFFF"
+			}
+        }
+        ,{
+            "path" : "pages/helpDetail/helpDetail",
+            "style" : {
+				"navigationBarTitleText": "帮助详情"
 			}
         }
     ],

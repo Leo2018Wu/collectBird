@@ -7,7 +7,7 @@
 			<image class="crown" src="../../static/buyCrown.png" mode="aspectFit"></image>
 			<view class="vipTip" v-if="userStatus == '老'">
 				<image class="vipIcon" src="../../static/vipTip.png" mode="aspectFit"></image>
-				<view>VIP会员</view>
+				<view>会员</view>
 			</view>
 		</view>
 		<view class="chooseBar">选择购买</view>

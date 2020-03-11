@@ -787,7 +787,7 @@
 				if (index != 3) {
 					return this.$getDate(keepDate);
 				}else{
-					return this.info2.keepDate
+					return this.pickerKeepDate
 				}
 			},
 			bindDateChange(e) {
@@ -806,10 +806,11 @@
 					month2 = parseInt(date2[1]),
 					//通过年,月差计算月份差
 					months = (year2 - year1) * 12 + (month2 - month1);
-				this.chooseLi(months, true)
+				// this.chooseLi(months, true)
 				return months;
 			},
 			bindKeepDateChange(e) {
+				console.log(e,this.date)
 				let _this = this
 				let time1 = new Date((e.detail.value).replace(/\-/g, '/'))
 				let time2 = new Date((_this.date).replace(/\-/g, '/'))
@@ -822,6 +823,7 @@
 				} else {
 					this.pickerKeepDate = e.detail.value;
 					this.info2.keepDate = e.detail.value;
+					console.log(_this.date, _this.pickerKeepDate)
 					this.rentMonthNum = this.getRentMonth(_this.date, _this.pickerKeepDate)
 				}
 			}
