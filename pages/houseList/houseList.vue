@@ -40,14 +40,12 @@
 		mapMutations
 	} from 'vuex';
 	import scrollTab from '../../components/scrollTab.vue';
-	import houseSku from '../../components/houseSku.vue';
 	import addBar from '../../components/addBar.vue';
 	import isLogin from '../../components/isLogin.vue';
 	import MescrollUni from '../../components/mescroll-uni/mescroll-uni.vue';
 	export default {
 		components: {
 			'scroll-tab': scrollTab,
-			'house-sku': houseSku,
 			'add-Bar': addBar,
 			'is-login': isLogin,
 			MescrollUni,

@@ -218,7 +218,8 @@
 				this.houseAddrInfo.roomNo : this.ownerInfo.communityName + '-' + this.ownerInfo.houseNo
 			return {
 				title:'您有一笔租金账单待支付',
-				imageUrl:'/static/shareBill.jpg',
+				imageUrl:'https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/shareBill.jpg',
+				// imageUrl:'/static/shareBill.jpg',
 				path:'/pages/billDetail/billDetail?billType='+1+'&billId='+this.billId+'&fromShare='+true+'&titleContent='+titleContent
 			}
 		},

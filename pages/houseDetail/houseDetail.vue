@@ -6,7 +6,15 @@
 			<image class="houseRightIcon" src="../../static/right_arrow.png" mode="aspectFit"></image>
 		</view>
 		<view class="addBarBox">
-			<add-Bar title="添加房号" v-on:addCommunity="addHouse"></add-Bar>
+			<view class="formBox" @click="showCommForm">
+				<image src="../../static/formIcon.png" mode="aspectFit"></image>
+				<view>收支报表</view>
+			</view>
+			<view class="addHouseBtn" @click="addHouse">
+				<image src="../../static/addHouse.png" mode="aspectFit"></image>
+				<view>添加房号</view>
+			</view>
+			<!-- <add-Bar title="添加房号" v-on:addCommunity="addHouse"></add-Bar> -->
 		</view>
 		<view class="section">
 			<!-- @click="toEditHouse(item)" -->
@@ -42,7 +50,6 @@
 
 <script>
 	import houseSkuNew from '../../components/houseSkuNew.vue'
-	// import houseSku from "../../components/houseSku.vue"
 	import addBar from "../../components/addBar.vue"
 	export default {
 		components: {
@@ -71,6 +78,11 @@
 			this.getHouseInfo(this.houseId, this.landlordId)
 		},
 		methods: {
+			showCommForm(){
+				uni.navigateTo({
+					url:'../houseReportForm/houseReportForm?communityId='+this.houseId
+				})
+			},
 			toEditHouse(id) {
 				uni.navigateTo({
 					url: '../addRoomNum/addRoomNum?communityName=' + this.communityInfo.communityName + '&communityId=' + this.houseId +
@@ -168,6 +180,27 @@
 		/* border-top: 1rpx solid #DBDBDB; */
 		padding: 34rpx 0;
 		background-color: #FFFFFF;
+		display: flex;
+		color: #FFA344;
+		font-size: 34rpx;
+	}
+	.formBox image {
+		width: 38rpx;
+		height: 34rpx;
+		margin-bottom: 6rpx;
+	}
+	.addHouseBtn image{
+		width: 34rpx;
+		height: 34rpx;
+		margin-bottom: 6rpx;
+	}
+	.addBarBox view{
+		display: flex;
+		width: 50%;
+		height: 100%;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.section {

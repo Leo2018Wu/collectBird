@@ -18,20 +18,6 @@
 				</view>
 			</view>
 		</view>
-		<!-- <view class="section2 sectionBorderBottom">
-			<view class="itemBar">卧室配置</view>
-			<view class="facilityBox">
-				<view class="facilityItem" v-for="(item,index) in facBarList" :key="index">
-					<facility-bar :title="item"></facility-bar>
-				</view>
-			</view>
-			<view class="itemBar">公共区域</view>
-			<view class="facilityBox">
-				<view class="facilityItem" v-for="(item,index) in commonFacBarList" :key="index">
-					<facility-bar :title="item"></facility-bar>
-				</view>
-			</view>
-		</view> -->
 		<view class="renterTitle">
 			租客信息
 		</view>
@@ -63,12 +49,10 @@
 <script>
 	import tipModal from '../../components/tipModal.vue'
 	import iconBar from '../../components/iconBar.vue'
-	import facilityBar from '../../components/facilityBar.vue'
 	import renterInfoBar from '../../components/renterInfoBar.vue'
 	export default {
 		components: {
 			"icon-bar": iconBar,
-			"facility-bar": facilityBar,
 			renterInfoBar,
 			tipModal
 		},
@@ -132,7 +116,7 @@
 			let data = this.$store.state.landladyInfo
 			shareObject = {
 				title: _this.$store.state.landladyInfo.userName + '邀请你填写入住信息',
-				imageUrl:'/static/share.jpg',
+				imageUrl:'https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/share.jpg',
 				path: '/pages/inviteRenter/inviteRenter?roomId=' +this.roomId+'&landLordId='+data.id+'&landLordName='+data.userName+'&landLordAva='+data.userImg
 			}
 			return shareObject;

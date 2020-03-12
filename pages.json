@@ -187,6 +187,12 @@
 				"navigationBarTitleText": "帮助详情"
 			}
         }
+        ,{
+            "path" : "pages/houseReportForm/houseReportForm",
+            "style" : {
+				"navigationBarTitleText": "收支报表"
+			}
+        }
     ],
 	"permission": {
 		"scope.userLocation": {

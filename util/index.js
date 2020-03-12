@@ -49,8 +49,10 @@ const getDate = function getDate(value,two) {
 	let year = date.getFullYear();
 	let month = date.getMonth() + 1;
 	let day = date.getDate();
-	month = month > 9 ? month : '0' + month;
-	day = day > 9 ? day : '0' + day;
+	if(!two){
+		month = month > 9 ? month : '0' + month;
+		day = day > 9 ? day : '0' + day;
+	}
 	if(two){
 		return `${year}-${month}`
 	}else{

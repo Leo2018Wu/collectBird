@@ -32,7 +32,7 @@
 			<view class="skuItem active">
 				<view>{{listValue == '暂不续约' || listValue == '' ? '暂不续约' : '购买'+listValue }}</view>
 				<view class="itemPrice"><span>￥</span>{{totalPrice}}</view>
-				<view class="itemOldPrice">原价{{oldPrice}}一套</view>
+				<view class="itemOldPrice">原价{{oldPrice}}元/套/月</view>
 				<view class="itemSalePrice">特价{{actualPrice}}元/套/月</view>
 				<view class="gift">赠送{{awardNum}}个月</view>
 			</view>
@@ -42,12 +42,12 @@
 			 :key="index">
 				<view>购买{{index+1}}年</view>
 				<view v-if="index == 0" class="itemPrice"><span>￥</span>{{totalPrice}}</view>
-				<view v-if="index == 0" class="itemOldPrice">原价{{oldPrice}}一套</view>
+				<view v-if="index == 0" class="itemOldPrice">原价{{oldPrice}}元/套/月</view>
 				<view v-if="index == 0" class="itemSalePrice">特价{{actualPrice}}元/套/月</view>
 				<view v-if="index == 0" class="gift">赠送{{awardNum}}个月</view>
 
 				<view v-if="index == 1" class="itemPrice"><span>￥</span>{{totalPriceNew}}</view>
-				<view v-if="index == 1" class="itemOldPrice">原价{{oldPrice}}一套</view>
+				<view v-if="index == 1" class="itemOldPrice">原价{{oldPrice}}元/套/月</view>
 				<view v-if="index == 1" class="itemSalePrice">特价{{actualPriceNew}}元/套/月</view>
 				<view v-if="index == 1" class="gift">赠送{{awardNumNew}}个月</view>
 			</view>
@@ -56,7 +56,7 @@
 		 v-on:emitClick="returnEmit"></choose-list>
 		<cover-view class="modalMask" v-if="showQrCodeBox || showContactBox" @click="hideModal">
 			<cover-view class="qrCodeBox" v-if="showQrCodeBox">
-				<cover-image src="../../static/qrcode.jpg" mode="aspectFit"></cover-image>
+				<cover-image src="https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/qrcode.jpg" mode="aspectFit"></cover-image>
 				<cover-view class="divideBorder"></cover-view>
 				<cover-view class="savtCode" @click="saveCode">保存二维码</cover-view>
 			</cover-view>

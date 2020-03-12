@@ -33,7 +33,7 @@
 			<view class="sectionFour">
 				<view class="secForItem" v-for="(item,index) in itemProfitList" :key="index">
 					<view class="itemName">
-						{{item.name}}<span>{{item.percentNum}}%</span>
+						{{item.name}}<span v-if="item.price != 0">{{item.percentNum}}%</span>
 					</view>
 					<view class="itemPrice">
 						￥<span>{{item.price | thousandsPoints}}</span>
@@ -441,16 +441,17 @@
 						this.monthValue = val
 						this.choosedDate = this.years[this.monthValue[0]] + '年' + this.months[this.monthValue[1]] + '月'
 						this.params.endDate = '';
-						this.params.startDate = this.years[this.monthValue[0]] + '-' + (this.months[this.monthValue[1]] < 10 ? '0' +
-							this.months[this.monthValue[1]] : this.months[this.monthValue[1]]);
+						this.params.startDate = this.years[this.monthValue[0]] + '-' + this.months[this.monthValue[1]];
 						this.getReportFormData(this.params)
 						break;
 					case 1:
 						this.seasonValue = val
 						this.choosedDate = this.seasons[this.seasonValue[0]]
 						let temp = this.seasons[this.seasonValue[0]].replace(/\./g, '-').split('~')
-						this.params.startDate = temp[0];
-						this.params.endDate = temp[1];
+						let res1 = temp[0].split('-')
+						let res2 = temp[1].split('-')
+						this.params.startDate =res1[0]+'-'+parseInt(res1[1]);
+						this.params.endDate =res2[0]+'-'+parseInt(res2[1]);
 						this.getReportFormData(this.params);
 						break;
 					case 2:

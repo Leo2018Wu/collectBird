@@ -93,12 +93,8 @@
 	} from "vuex";
 	import evanFormItem from '../../components/evan-form/evan-form-item.vue'
 	import evanForm from '../../components/evan-form/evan-form.vue'
-	import facilityBar from '../../components/facilityBar.vue'
-	import inputBar from '../../components/inputBar.vue'
 	export default {
 		components: {
-			inputBar,
-			facilityBar,
 			evanFormItem,
 			evanForm,
 			chooseList,

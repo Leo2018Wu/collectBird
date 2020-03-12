@@ -35,7 +35,7 @@
 			userInfo:{
 				type:Object,
 				"default":{
-					userImg:'../static/el.jpg',
+					userImg:'../static/defaultMale.png',
 					userName:"小铭",
 					userSex:"0",
 					phoneNumber:"1111111111"

@@ -7,7 +7,7 @@
 				<span>上传图片</span>
 				<view class="changeBtn" @click="deleteImg">修改</view>
 				<image v-if="imgUrl" class="bannerImg" :src="imgUrl" mode="aspectFill"></image>
-				<image v-else class="bannerImg" src="../../static/el.jpg" mode="aspectFill"></image>
+				<image v-else class="bannerImg" src="https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/el.jpg" mode="aspectFill"></image>
 				<!-- <uImg  ref="upimg"
 				    :canUploadFile="true" 
 				    :limit="limitNum"
@@ -76,7 +76,7 @@
 				<span>上传图片</span>
 				<view class="changeBtn" @click="deleteImg">修改</view>
 				<image v-if="newHouseInfo.roomList[0].roomImgs" class="bannerImg" :src="newHouseInfo.roomList[0].roomImgs" mode="aspectFill"></image>
-				<image v-else class="bannerImg" src="../../static/el.jpg" mode="aspectFill"></image>
+				<image v-else class="bannerImg" src="https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/el.jpg" mode="aspectFill"></image>
 				<!-- <uImg  ref="upimg"
 				    :canUploadFile="true" 
 				    :limit="limitNum"
@@ -147,11 +147,9 @@
 	import chnToNumber from '../../util/index'
 	import evanFormItem from '../../components/evan-form/evan-form-item.vue'
 	import evanForm from '../../components/evan-form/evan-form.vue'
-	import inputBar from '../../components/inputBar.vue'
 	import chooseList from '../../components/chooseList.vue'
 	export default {
 		components:{
-			inputBar,
 			evanFormItem,
 			evanForm,
 			chooseList
