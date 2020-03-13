@@ -58,6 +58,7 @@
 		},
 		data() {
 			return {
+				addresseeId:'',
 				isWholeRent:false,
 				tenantId:null,
 				isShowTipModal:false,
@@ -70,6 +71,7 @@
 				configList: [],
 				facBarList: ['床', '衣柜', '书桌', '空调', '家居礼包'],
 				commonFacBarList: ['空调', '智能锁', '燃气灶', '热水器'],
+				msgId:''
 			}
 		},
 		computed: {},
@@ -91,9 +93,16 @@
 				this.communityInfo.livingroomNum = data.livingroomNum
 				this.communityInfo.toiletNum = data.toiletNum
 			})
+			if(this.addresseeId){
+				this.updateIsRead(this.addresseeId,this.msgId)
+			}
 		},
 		onLoad(option) {
-			console.log(this)
+			console.log(option)
+			if(option.addresseeId){
+				this.addresseeId = option.addresseeId
+				this.msgId = option.msgId
+			}
 			this.communityInfo = JSON.parse(option.communityInfo)
 			// this.getRoomInfo(option.id)
 			if(option.tenantId){
@@ -122,6 +131,12 @@
 			return shareObject;
 		},
 		methods: {
+			updateIsRead(addresseeId){
+				this.$request.post('/userMessage/updateIsRead',{
+					addresseeId,
+					id:this.msgId
+				}).then(()=>{})
+			},
 			// updateData(){
 			// 	this.getRoomInfo(this.roomId)
 			// },
@@ -192,6 +207,7 @@
 					// _this.commonFacBarList = res.data.data.houseConfigure.split(',')
 					_this.roomInfo = res.data.data
 					_this.communityInfo.roomPrice = res.data.data.roomPrice
+					_this.communityInfo.name = res.data.data.communityName
 					if (_this.roomInfo.tenants && _this.roomInfo.tenants.length == 0) {
 						this.isShowAddBtn = true;
 					} else {

@@ -11,7 +11,7 @@
 					<view class="bottom" :class="{posRight:item.unReadNum != 0}">
 						<span v-if="!item.unReadNum">暂无消息</span>
 						<view class="hasNewMessage"  v-else>
-							<view class="textOverFlow">
+							<view class="textOverFlow newMessage">
 								{{index == 0 ? billNewMessage : (index == 1 ? tenantNewMessage : sysNewMessage)}}
 							</view>
 							<span class="unReadNum">{{item.unReadNum}}</span>
@@ -69,6 +69,11 @@
 				}).then((res) => {
 					let result = res.data.data
 					console.log(result)
+					uni.setTabBarBadge({
+						index: 1,
+						text: parseInt(result.billUnreadCount) + parseInt(result.tenantUnreadCount) + parseInt(result.systemUnreadCount) +
+							'',
+					})
 					this.msgList.forEach((item, index) => {
 						if (index == 0) {
 							if(result.billUnreadCount != '0'){
@@ -181,5 +186,8 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+	}
+	.newMessage{
+		max-width: 490rpx;
 	}
 </style>

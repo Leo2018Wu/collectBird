@@ -17,6 +17,25 @@
 					</view>
 				</view>
 			</view>
+			<view v-if="messageType == 2">
+				<view class="msgContainer" v-for="(item, index) in msgList" :key="index">
+					<view class="dateDivide">{{item.showDate}}</view>
+					<view class="messageBox2 whiteBg">
+						<view style="padding: 0 26rpx;">
+							<view class="msgTop">
+								<view class="msgTopName">租客到期提醒</view>
+								<view v-if="item.isRead == 0" class="msgTip" :class="[{status0 :item.jsonData.remindType == 9}]">{{item.jsonData.remindType == 2 ? '即将到期' : '已到期'}}</view>
+								<view v-if="item.isRead == 1" class="msgTip status1" >已处理</view>
+								<view v-if="item.isRead == 0" class="tenantBtn" @click="goRenter(item.id,item.addresseeId,item.jsonData)">去处理</view>
+								<view v-if="item.isRead != 0" class="tenantBtn" @click="goRenter(item.id,item.addresseeId,item.jsonData)">去看看</view>
+								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
+							</view>
+							<view class="tenantLocation">{{item.jsonData.roomNo}}</view>
+							<view class="rentCycle">租期：{{item.jsonData.startDate}} ~ {{item.jsonData.endDate}}</view>
+						</view>
+					</view>
+				</view>
+			</view>
 			<view v-if="messageType == 1">
 				<view class="msgContainer" v-for="(item, index) in [0,1,2]" :key="index">
 					<view class="messageBox1 whiteBg">
@@ -80,6 +99,9 @@
 				msgList: [],
 			}
 		},
+		onShow() {
+			this.downCallback(this.mescroll);
+		},
 		onLoad(options) {
 			this.messageType = options.messageType
 			uni.setNavigationBarTitle({
@@ -87,6 +109,20 @@
 			})
 		},
 		methods: {
+			goRenter(id,addresseeId,data){
+				console.log(data)
+				let communityInfo = {}
+				communityInfo.name = ''
+				communityInfo.houseNo = ''
+				communityInfo.bedroomNum = ''
+				communityInfo.livingroomNum = ''
+				communityInfo.toiletNum = ''
+				communityInfo.roomNo = ''
+				communityInfo.roomPrice = ''
+				uni.navigateTo({
+					url: '../renter/renter?id=' + data.roomId + '&communityInfo=' + JSON.stringify(communityInfo) + '&houseId=' + data.houseId+'&tenantId='+data.tenantId+'&addresseeId='+addresseeId+'&msgId='+id
+				})
+			},
 			init(e) {
 				this.mescroll = e;
 			},
@@ -101,7 +137,7 @@
 				// 此时mescroll会携带page的参数:
 				let pageNum = mescroll.num; // 页码, 默认从1开始
 				let pageSize = mescroll.size; // 页长, 默认每页10条
-				if (mescroll.num == 1) _this.houseInfoList = []; //如果是第一页需手动置空列表
+				if (mescroll.num == 1) _this.msgList = []; //如果是第一页需手动置空列表
 				let res = await _this.getMessage(pageNum);
 				let curPageData = res;
 				_this.msgList = _this.msgList.concat(curPageData); //追加新数据
@@ -120,6 +156,10 @@
 					let curArr = _this.messageType == 1 ? response.data.data.billList.list : (_this.messageType == 2 ? response.data.data
 						.tenantList.list : response.data.data.systemList.list)
 					curArr.forEach((item, index) => {
+						if(_this.messageType == 2){
+							item.jsonData.startDate = item.jsonData.startDate.split('T')[0]
+							item.jsonData.endDate = item.jsonData.endDate.split('T')[0]
+						}
 						item.showDate = dateDiff(Date.parse(new Date((item.createTime).replace(/\-/g, '/'))))
 						arr.push(item)
 					})
@@ -160,6 +200,12 @@
 		margin-left: 30rpx;
 		border-radius: 10rpx;
 		position: relative;
+	}
+	.messageBox2{
+		width: 690rpx;
+		margin-left: 30rpx;
+		padding: 32rpx 0 10rpx 0;
+		border-radius: 10rpx;
 	}
 
 	.tip {
@@ -234,7 +280,6 @@
 	}
 
 	.msgTip {
-		height: 26rpx;
 		padding: 2rpx 8rpx;
 		border: 1rpx solid #FFA044;
 		color: #FFA044;
@@ -247,6 +292,11 @@
 		font-size: 28rpx;
 		color: #333333;
 		font-weight: bold;
+	}
+	.tenantBtn{
+		font-size: 28rpx;
+		color: #BBBBBB;
+		margin-right: 10rpx;
 	}
 
 	.msgPrice span {
@@ -267,6 +317,9 @@
 		font-size: 28rpx;
 		color: #666666;
 		margin-bottom: 20rpx;
+	}
+	.tenantLocation{
+		margin: 36rpx 0 16rpx 0;
 	}
 
 	.rentCycle {
@@ -295,5 +348,13 @@
 	.grayTip {
 		border: 1rpx solid #999999;
 		color: #A5A5A5;
+	}
+	.status0{
+		border: 1rpx solid #EB5E61;
+		color: #EB5E61;
+	}
+	.status1{
+		border: 1rpx solid #bbbbbb;
+		color: #bbbbbb;
 	}
 </style>

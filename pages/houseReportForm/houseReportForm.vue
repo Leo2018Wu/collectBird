@@ -2,29 +2,46 @@
 	<view class="houseReportForm">
 		<view class="section">
 			<view class="titleBar">
-				<view class="dateTitle active">
-					2020年3月
+				<view class="dateTitle active" @click="showPicker">
+					{{choosedDate}}
 				</view>
 				<view class="topRight">
-					<view class="cost ">支出</view>
-					<view class="cost active">收入</view>
-					<view class="cost ">净利润</view>
+					<view class="cost" :class="{active : index == curIndex}" v-for="(item,index) in typeList" :key="index" @click="chooseType(index)">{{item}}</view>
 				</view>
 			</view>
-			<view class="costNum">共支出1笔, 合计</view>
-			<view class="costTotal">￥6500.00</view>
+			<view class="costNum" v-if="curIndex != 2">共{{curIndex == 0 ? '收入' :'支出'}}{{curIndex == 1 ? curCost[0].payBillCount : curCost[0].amountBillCount}}笔,
+				合计</view>
+			<view class="costNum" v-if="curIndex == 2">合计</view>
+			<view class="costTotal">￥{{curIndex == 1 ? curCost[0].totalPay : (curIndex == 0 ? curCost[0].totalAmount : curCost[0].monthIncome)}}</view>
 		</view>
 		<view class="section1">
-			<view class="chartsTitle">支出对比</view>
+			<view class="chartsTitle">{{curIndex == 0 ? '收入对比' : (curIndex == 1 ? '支出对比' : '净利润对比')}}</view>
 			<image class="divideBar" src="../../static/reportFormDivide.png" mode="aspectFill"></image>
-			<canvas canvas-id="canvasColumn" id="canvasColumn"  class="charts" disable-scroll=true @touchstart="touchLineA"
-			 @touchmove="moveLineA" @touchend="touchEndLineA"></canvas>
-			<view class="chartsTitle selfMargin">支出明细</view>
-			<view class="costDetail" v-for="(item,index) in [0,1,2]" :key="index">
-				<view>1号 202</view>
-				<view class="detailPrice">￥2500.12</view>
+			<canvas v-show="!isShowPicker" canvas-id="canvasColumn" id="canvasColumn" class="charts" disable-scroll=true
+			 @touchstart="touchLineA" @touchmove="moveLineA" @touchend="touchEndLineA"></canvas>
+			<view class="chartsTitle selfMargin">{{curIndex == 0 ? '收入明细' : (curIndex == 1 ? '支出明细' : '净利润明细')}}</view>
+			<view class="costDetail" v-for="(item,index) in houseDataList" :key="index">
+				<view>{{item.buildingNo}}号 {{item.houseNo}}</view>
+				<view class="detailPrice">￥{{curIndex == 1 ? item.totalPay : (curIndex == 0 ? item.totalAmount : item.monthIncome)}}</view>
 			</view>
 		</view>
+		<view class="pickerMask" v-if="isShowPicker" @click="pickerCancel" @catchtouchmove="true"></view>
+		<view class="pickerBox" v-if="isShowPicker">
+			<view class="pickerTop">
+				<view class="pickerCancel" @click="pickerCancel">取消</view>
+				<view>选择时间</view>
+				<view class="pickerSure" @click="pickerSure">确定</view>
+			</view>
+			<picker-view indicator-class="indicatorClass" :value="monthValue" @change="bindChange">
+				<picker-view-column>
+					<view class="item" v-for="(item,index) in years" :key="index">{{item}}年</view>
+				</picker-view-column>
+				<picker-view-column>
+					<view class="item" v-for="(item,index) in months" :key="index">{{item}}月</view>
+				</picker-view-column>
+			</picker-view>
+		</view>
+
 	</view>
 </template>
 
@@ -35,21 +52,70 @@
 
 	export default {
 		data() {
+			const date = new Date()
+			const years = []
+			const year = date.getFullYear()
+			const months = []
+			const month = date.getMonth() + 1
+			for (let i = 2018; i <= year; i++) {
+				years.push(i)
+			}
+			for (let i = 1; i <= 12; i++) {
+				months.push(i)
+			}
 			return {
-				communityId:'',
+				houseDataList: [],
+				years,
+				months,
+				curMonth: month,
+				curYear: year,
+				monthValue: [year - 2018, month - 1],
+				isShowPicker: false,
+				curIndex: 0,
+				typeList: ['收入', '支出', '净利润'],
+				communityId: '',
 				cWidth: '',
 				cHeight: '',
 				pixelRatio: 1,
 				"chartData": {
-					"categories": ['1月','2月','3月','4月','5月','6月','7月','8月'],
+					"categories": [],
 					"series": [{
-						"name": "支出",
+						// "name": curIndex == 0 ? "支出(元)" :(curIndex == 1 ? "收入(元)" : "净利润(元)"),
+						"name": '支出(元)',
 						color: '#FFDEBC',
 						textColor: '#FFDEBC',
-						"data": [20,40,50,48,23,45,25,77,43]
+						"data": []
 					}]
 				},
+				communityData: [],
 				serverData: '',
+				choosedDate: year + '年' + month + '月',
+				housePar: {
+					"id": "92c12b79-eef4-4d55-bf72-734b136b786f", // 二房东id
+					"communityId": "c23aa04f-a75f-4a89-9ab6-1de781d0652a", // 小区id
+					"year": "2020", // 年
+					"month": "3", // 月
+					"countType": "3" // 统计类型 1-收入 2-支出 3-利润
+				}
+			}
+		},
+		computed: {
+			curCost() {
+				if (this.communityData.length != 0) {
+					console.log(this.communityData.filter(item => item.month == this.curMonth))
+					if (this.communityData.filter(item => item.month == this.curMonth).length == 0) {
+						return [{
+							billCount: 0,
+							payBillCount: 0,
+							amountBillCount: 0,
+							totalAmount: 0,
+							totalPay: 0,
+							monthIncome: 0
+						}]
+					} else {
+						return this.communityData.filter(item => item.month == this.curMonth)
+					}
+				}
 			}
 		},
 		onLoad(options) {
@@ -58,33 +124,128 @@
 			this.cWidth = uni.upx2px(750);
 			this.cHeight = uni.upx2px(500);
 			this.getReportData();
+			this.getHouseData();
+			_self.housePar.id = _self.$store.state.landladyInfo.id
+			_self.housePar.communityId = _self.communityId
 		},
 		methods: {
-			getReportData() {
-				let min, max
-				_self.$request.post('/report/reportQueryByCommunity', {
-					"id": _self.$store.state.landladyInfo.id,
-					"communityId": _self.communityId
-				}).then((res) => {
-					console.log(res)
-					// res.data.data.forEach((item, index) => {
-					// 	_self.chartData.categories.push(item.year + '年' + item.month + '月')
-					// 	_self.chartData.series[0].data.push(parseInt(item.totalAmount))
-					// })
-					// min = _self.chartData.series[0].data.sort(function(a, b) {
-					// 	return a - b;
-					// })
-					// max = _self.chartData.series[0].data.sort(function(a, b) {
-					// 	return b - a;
-					// })
+			getHouseData() {
+				_self.housePar.year = _self.curYear;
+				_self.housePar.month = _self.curMonth;
+				_self.housePar.countType = _self.curIndex == 0 ? 1 : (_self.curIndex == 1 ? 2 : 3);
+				_self.$request.post('/report/reportQueryByHouse', _self.housePar).then((res) => {
+					_self.houseDataList = res.data.data;
 				})
+			},
+			pickerCancel() {
+				this.isShowPicker = false
+			},
+			pickerSure() {
+				this.choosedDate = this.curYear + '年' + this.curMonth + '月';
+				this.getHouseData()
+				this.isShowPicker = false
+			},
+			showPicker() {
+				this.isShowPicker = true
+			},
+			bindChange: function(e) {
+				console.log(e)
+				const val = e.detail.value
+				this.curMonth = this.months[val[1]];
+				this.curYear = this.years[val[0]]
+			},
+			chooseType(index) {
+				if (index == _self.curIndex) return
+				_self.curIndex = index;
+				_self.chartData.series[0].data = []
+				_self.communityData.forEach((item, index) => {
+					console.log(new Date().getMonth() + 1)
+					let temp
+					if (item.month == (new Date().getMonth() + 1)) {
+						temp = {
+							value: _self.curIndex == 1 ? parseInt(item.totalPay) : (_self.curIndex == 0 ? parseInt(item.totalAmount) :
+								parseInt(item.monthIncome)),
+							color: '#F09A42'
+						}
+					} else {
+						temp = {
+							value: _self.curIndex == 1 ? parseInt(item.totalPay) : (_self.curIndex == 0 ? parseInt(item.totalAmount) :
+								parseInt(item.monthIncome)),
+							color: '#FFDEBC'
+						}
+					}
+					_self.chartData.series[0].data.push(temp)
+				})
+				let minVal, maxVal
+				if (_self.chartData.series[0].data.length <= 1) {
+					minVal = _self.chartData.series[0].data
+					maxVal = _self.chartData.series[0].data
+				} else {
+					minVal = _self.chartData.series[0].data.sort(function(a, b) {
+						console.log(a, b)
+						return a.value - b.value;
+					})
+					maxVal = _self.chartData.series[0].data.sort(function(a, b) {
+						return b.value - a.value;
+					})
+				}
 				setTimeout(() => {
-					// _self.showColumn("canvasColumn", _self.chartData, min[0], max[0]);
-					_self.showColumn("canvasColumn", _self.chartData);
+					_self.showColumn("canvasColumn", _self.chartData, (parseInt(minVal[0].value) * 0.8), (parseInt(maxVal[0].value) *
+						1.1));
 				}, 2000)
 			},
+			getReportData() {
+
+				_self.$request.post('/report/reportQueryByCommunity', {
+					"id": _self.$store.state.landladyInfo.id,
+					"communityId": _self.communityId,
+					// "communityId": "5e84032f-e346-4e6e-abb6-7af22ec99465",
+					// "id": "403cd7b8-a848-410b-af01-0b3f47226912"
+				}).then((res) => {
+					console.log(res)
+					_self.communityData = res.data.data;
+					res.data.data.forEach((item, index) => {
+						console.log(new Date().getMonth() + 1)
+						let temp
+						if (item.month == (new Date().getMonth() + 1)) {
+							temp = {
+								value: parseInt(item.totalPay),
+								color: '#F09A42'
+							}
+						} else {
+							temp = {
+								value: parseInt(item.totalPay),
+								color: '#FFDEBC'
+							}
+						}
+						console.log(temp)
+						_self.chartData.categories.push(item.year.substr(2,2) + '年' + item.month + '月')
+						_self.chartData.series[0].data.push(temp)
+					})
+					let minVal, maxVal
+					if (_self.chartData.series[0].data.length <= 1) {
+						minVal = _self.chartData.series[0].data
+						maxVal = _self.chartData.series[0].data
+					} else {
+						minVal = _self.chartData.series[0].data.sort(function(a, b) {
+							console.log(a, b)
+							return a.value - b.value;
+						})
+						maxVal = _self.chartData.series[0].data.sort(function(a, b) {
+							return b.value - a.value;
+						})
+					}
+					console.log(minVal)
+					setTimeout(() => {
+						_self.showColumn("canvasColumn", _self.chartData, (parseInt(minVal[0].value) * 0.8), (parseInt(maxVal[0].value) *
+							1.1));
+					}, 2000)
+				})
+
+
+			},
 			showColumn(canvasId, chartData, min, max) {
-				console.log(_self.chartData)
+				console.log(_self.chartData, min)
 				canvaColumn = new uCharts({
 					$this: _self,
 					canvasId: canvasId,
@@ -101,7 +262,7 @@
 					enableScroll: true,
 					xAxis: {
 						disableGrid: true,
-						itemCount: 4, //x轴单屏显示数据的数量，默认为5个
+						itemCount: 6, //x轴单屏显示数据的数量，默认为5个
 						scrollShow: chartData.categories.length > 4 ? true : false, //新增是否显示滚动条，默认false
 						scrollAlign: 'left', //滚动条初始位置
 						scrollBackgroundColor: '#F7F7FF', //默认为 #EFEBEF
@@ -113,8 +274,8 @@
 						disableGrid: true,
 						// dashLength: 4,
 						splitNumber: 6,
-						// min: min - 1000,
-						// max: max + 1000,
+						min,
+						max,
 						// format: (val) => {
 						// 	return '￥'+val.toFixed(0) + '元'
 						// }
@@ -123,8 +284,8 @@
 					width: _self.cWidth * _self.pixelRatio,
 					height: _self.cHeight * _self.pixelRatio,
 					extra: {
-						tooltip:{
-							show:false
+						tooltip: {
+							bgColor: "transparent"
 						},
 						column: {
 							type: 'group',
@@ -152,7 +313,7 @@
 				});
 				canvaColumn.showToolTip(e, {
 					format: function(item, category) {
-						console.log(item,category)
+						console.log(item, category)
 						if (typeof item.data === 'object') {
 							return category + ' ' + item.name + ':' + item.data.value
 						} else {
@@ -222,7 +383,7 @@
 	.costNum {
 		color: #FDE3C9;
 		font-size: 30rpx;
-		padding: 68rpx 0 0 52rpx;
+		padding-top: 68rpx;
 	}
 
 	.costTotal {
@@ -230,6 +391,11 @@
 		color: #FFFFFF;
 		font-weight: bold;
 		margin-top: 22rpx;
+	}
+	
+
+	.selfMarginTop {
+		margin-top: 72rpx;
 	}
 
 	.costTotal::first-letter {
@@ -288,5 +454,67 @@
 
 	.detailPrice::first-letter {
 		font-size: 24rpx;
+	}
+
+	picker-view {
+		width: 100%;
+		height: 480rpx;
+		position: fixed;
+		bottom: 0;
+	}
+
+	.indicatorClass {
+		background-color: #FAFAFA;
+		z-index: -1;
+	}
+
+	.item {
+		width: 100%;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.pickerMask {
+		position: fixed;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		background-color: #000000;
+		opacity: 0.3;
+	}
+
+	.pickerBox {
+		position: fixed;
+		bottom: 0;
+		z-index: 99;
+		background: #FFFFFF;
+		width: 100%;
+		height: 570rpx;
+	}
+
+	.pickerTop {
+		width: calc(100% - 60rpx);
+		height: 90rpx;
+
+		margin-left: 30rpx;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		font-size: 36rpx;
+		color: #333333;
+		font-weight: 500;
+	}
+
+	.pickerCancel {
+		font-size: 32rpx;
+		color: #999999;
+	}
+
+	.pickerSure {
+		font-size: 32rpx;
+		color: #FFA044;
 	}
 </style>
