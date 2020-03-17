@@ -13,7 +13,7 @@ export function addSpace(value) {
  * 千位分隔符
  */
 export function thousandsPoints(value, unit) { //  '--'  ''  null  '333'
-  if (!value) {
+  if (!value || typeof(value)=="undefined") {
     return '--'
   }
   if (isNaN(parseFloat(value))) return value

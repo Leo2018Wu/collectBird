@@ -71,6 +71,9 @@
 		width: fit-content;
 		max-width: 300rpx;
 		margin-right: auto;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-around;
 	}
 	.renterAvatar{
 		width: 90rpx;

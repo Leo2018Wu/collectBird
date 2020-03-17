@@ -75,7 +75,7 @@
 		{
 			"path": "pages/billRecord/billRecord",
 			"style": {
-				"navigationBarTitleText": "账单"
+				"navigationBarTitleText": "租客账单"
 			}
 		},
 		{
@@ -191,6 +191,12 @@
             "path" : "pages/houseReportForm/houseReportForm",
             "style" : {
 				"navigationBarTitleText": "收支报表"
+			}
+        }
+        ,{
+            "path" : "pages/landlordManage/landlordManage",
+            "style" : {
+				"navigationBarTitleText": "房东列表"
 			}
         }
     ],

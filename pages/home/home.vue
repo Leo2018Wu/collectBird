@@ -127,7 +127,7 @@
 				imgUrls: [{
 						link: '',
 						// url: '../../static/banner1.jpg',
-						url:'https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/banner1.jpg'
+						url: 'https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/banner1.jpg'
 					},
 					{
 						link: '../houseList/houseList',
@@ -159,6 +159,11 @@
 						url: '../billManage/billManage?billType=' + 1
 					},
 					{
+						title: '房东',
+						imgUrl: '../../static/homeIcon7.png',
+						url: '../landlordManage/landlordManage'
+					},
+					{
 						title: '帮助',
 						imgUrl: '../../static/homeIcon6.png',
 						url: '../help/help'
@@ -179,7 +184,7 @@
 		onShareAppMessage(res) {
 			return {
 				title: this.$store.state.landladyInfo.userName + '邀请您体验收租神器',
-				imageUrl:'https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/share1.jpg',
+				imageUrl: 'https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/share1.jpg',
 				// imageUrl: '/static/share1.jpg',
 				path: '/pages/home/home'
 			}
@@ -416,7 +421,6 @@
 	.bannerTop {
 		height: 30%;
 		display: flex;
-		justify-content: space-between;
 		padding: 60rpx 20rpx 20rpx 20rpx;
 		flex-wrap: wrap;
 	}

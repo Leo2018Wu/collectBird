@@ -9,10 +9,11 @@
 					<view class="cost" :class="{active : index == curIndex}" v-for="(item,index) in typeList" :key="index" @click="chooseType(index)">{{item}}</view>
 				</view>
 			</view>
-			<view class="costNum" v-if="curIndex != 2">共{{curIndex == 0 ? '收入' :'支出'}}{{curIndex == 1 ? curCost[0].payBillCount : curCost[0].amountBillCount}}笔,
+			<view class="costNum" v-if="curIndex != 2">共{{curIndex == 0 ? '收入' :'支出'}} <span v-if="curCost">{{curIndex == 1 ? curCost[0].payBillCount : curCost[0].amountBillCount}}</span> <span v-if="!curCost">--</span>笔,
 				合计</view>
 			<view class="costNum" v-if="curIndex == 2">合计</view>
-			<view class="costTotal">￥{{curIndex == 1 ? curCost[0].totalPay : (curIndex == 0 ? curCost[0].totalAmount : curCost[0].monthIncome)}}</view>
+			<view class="costTotal" v-if="curCost">￥{{curIndex == 1 ? curCost[0].totalPay : (curIndex == 0 ? curCost[0].totalAmount : curCost[0].monthIncome) | thousandsPoints}}</view>
+			<view class="costTotal1" v-if="!curCost">--</view>
 		</view>
 		<view class="section1">
 			<view class="chartsTitle">{{curIndex == 0 ? '收入对比' : (curIndex == 1 ? '支出对比' : '净利润对比')}}</view>
@@ -22,7 +23,7 @@
 			<view class="chartsTitle selfMargin">{{curIndex == 0 ? '收入明细' : (curIndex == 1 ? '支出明细' : '净利润明细')}}</view>
 			<view class="costDetail" v-for="(item,index) in houseDataList" :key="index">
 				<view>{{item.buildingNo}}号 {{item.houseNo}}</view>
-				<view class="detailPrice">￥{{curIndex == 1 ? item.totalPay : (curIndex == 0 ? item.totalAmount : item.monthIncome)}}</view>
+				<view class="detailPrice">￥{{curIndex == 1 ? item.totalPay : (curIndex == 0 ? item.totalAmount : item.monthIncome)  | thousandsPoints}}</view>
 			</view>
 		</view>
 		<view class="pickerMask" v-if="isShowPicker" @click="pickerCancel" @catchtouchmove="true"></view>
@@ -52,6 +53,7 @@
 
 	export default {
 		data() {
+
 			const date = new Date()
 			const years = []
 			const year = date.getFullYear()
@@ -71,7 +73,7 @@
 				curYear: year,
 				monthValue: [year - 2018, month - 1],
 				isShowPicker: false,
-				curIndex: 0,
+				curIndex: null,
 				typeList: ['收入', '支出', '净利润'],
 				communityId: '',
 				cWidth: '',
@@ -81,8 +83,8 @@
 					"categories": [],
 					"series": [{
 						// "name": curIndex == 0 ? "支出(元)" :(curIndex == 1 ? "收入(元)" : "净利润(元)"),
-						"name": '支出(元)',
-						color: '#FFDEBC',
+						"name": '',
+						color: '#FFFFFF',
 						textColor: '#FFDEBC',
 						"data": []
 					}]
@@ -95,13 +97,14 @@
 					"communityId": "c23aa04f-a75f-4a89-9ab6-1de781d0652a", // 小区id
 					"year": "2020", // 年
 					"month": "3", // 月
-					"countType": "3" // 统计类型 1-收入 2-支出 3-利润
+					"countType": "1" // 统计类型 1-收入 2-支出 3-利润
 				}
 			}
 		},
 		computed: {
 			curCost() {
 				if (this.communityData.length != 0) {
+					console.log('wozaozhe')
 					console.log(this.communityData.filter(item => item.month == this.curMonth))
 					if (this.communityData.filter(item => item.month == this.curMonth).length == 0) {
 						return [{
@@ -113,6 +116,7 @@
 							monthIncome: 0
 						}]
 					} else {
+						console.log('wozaozhe1')
 						return this.communityData.filter(item => item.month == this.curMonth)
 					}
 				}
@@ -144,22 +148,59 @@
 				this.choosedDate = this.curYear + '年' + this.curMonth + '月';
 				this.getHouseData()
 				this.isShowPicker = false
+				let myIndex
+				_self.chartData.categories.forEach((item, index) => {
+					if (_self.curMonth == item.substr(3, 1) && _self.curYear.toString().substr(2, 2) == item.substr(0, 2)) {
+						myIndex = index
+					}
+				})
+				let minVal, maxVal
+				if (_self.chartData.series[0].data.length <= 1) {
+					minVal = _self.chartData.series[0].data
+					maxVal = _self.chartData.series[0].data
+				} else {
+					const arr = _self.chartData.series[0].data.map(p => {
+						return p.value
+					})
+					maxVal = Math.max.apply(Math, arr) * 1.1
+					minVal = Math.min.apply(Math, arr) * 0.8
+				}
+				_self.chartData.series[0].data.forEach((p, idx) => {
+					if (idx == myIndex) {
+						_self.chartData.series[0].data[idx].color = "#F09A42"
+					} else {
+						_self.chartData.series[0].data[idx].color = "#FFDEBC"
+					}
+				})
+				console.log(minVal, maxVal)
+				let data = {
+					series: _self.chartData.series,
+					yAxis: {
+						data: {
+							min: minVal,
+							max: maxVal
+						}
+					}
+				}
+
+				canvaColumn.updateData(data)
 			},
 			showPicker() {
 				this.isShowPicker = true
 			},
 			bindChange: function(e) {
-				console.log(e)
 				const val = e.detail.value
 				this.curMonth = this.months[val[1]];
 				this.curYear = this.years[val[0]]
 			},
 			chooseType(index) {
+				uni.showLoading({
+					title: '报表绘制中...'
+				})
 				if (index == _self.curIndex) return
 				_self.curIndex = index;
 				_self.chartData.series[0].data = []
-				_self.communityData.forEach((item, index) => {
-					console.log(new Date().getMonth() + 1)
+				_self.communityData.map((item, index) => {
 					let temp
 					if (item.month == (new Date().getMonth() + 1)) {
 						temp = {
@@ -174,85 +215,50 @@
 							color: '#FFDEBC'
 						}
 					}
+					console.log(temp)
 					_self.chartData.series[0].data.push(temp)
 				})
 				let minVal, maxVal
-				if (_self.chartData.series[0].data.length <= 1) {
-					minVal = _self.chartData.series[0].data
-					maxVal = _self.chartData.series[0].data
+				if (_self.chartData.series[0].data.length == 1) {
+					minVal = _self.chartData.series[0].data[0].value
+					maxVal = _self.chartData.series[0].data[0].value
 				} else {
-					minVal = _self.chartData.series[0].data.sort(function(a, b) {
-						console.log(a, b)
-						return a.value - b.value;
+					const arr = _self.chartData.series[0].data.map(p => {
+						return p.value
 					})
-					maxVal = _self.chartData.series[0].data.sort(function(a, b) {
-						return b.value - a.value;
-					})
+					maxVal = Math.max.apply(Math, arr)
+					minVal = Math.min.apply(Math, arr)
 				}
-				setTimeout(() => {
-					_self.showColumn("canvasColumn", _self.chartData, (parseInt(minVal[0].value) * 0.8), (parseInt(maxVal[0].value) *
-						1.1));
-				}, 2000)
+				_self.showColumn("canvasColumn", _self.chartData, (minVal * 0.8), (maxVal * 1.1));
+				canvaColumn.addEventListener('renderComplete', () => {
+					uni.hideLoading()
+				});
 			},
 			getReportData() {
-
 				_self.$request.post('/report/reportQueryByCommunity', {
 					"id": _self.$store.state.landladyInfo.id,
 					"communityId": _self.communityId,
-					// "communityId": "5e84032f-e346-4e6e-abb6-7af22ec99465",
-					// "id": "403cd7b8-a848-410b-af01-0b3f47226912"
+					// "id": '18437cc7-8b20-47e0-9f0e-225c3832608d',
+					// "communityId": 'd94c0ea4-92fe-46d5-af47-accffa93cbf7',
 				}).then((res) => {
-					console.log(res)
 					_self.communityData = res.data.data;
+					if(_self.communityData.length == 0)return
 					res.data.data.forEach((item, index) => {
-						console.log(new Date().getMonth() + 1)
-						let temp
-						if (item.month == (new Date().getMonth() + 1)) {
-							temp = {
-								value: parseInt(item.totalPay),
-								color: '#F09A42'
-							}
-						} else {
-							temp = {
-								value: parseInt(item.totalPay),
-								color: '#FFDEBC'
-							}
-						}
-						console.log(temp)
-						_self.chartData.categories.push(item.year.substr(2,2) + '年' + item.month + '月')
-						_self.chartData.series[0].data.push(temp)
+						_self.chartData.categories.push(item.year.substr(2, 2) + '年' + item.month + '月')
 					})
-					let minVal, maxVal
-					if (_self.chartData.series[0].data.length <= 1) {
-						minVal = _self.chartData.series[0].data
-						maxVal = _self.chartData.series[0].data
-					} else {
-						minVal = _self.chartData.series[0].data.sort(function(a, b) {
-							console.log(a, b)
-							return a.value - b.value;
-						})
-						maxVal = _self.chartData.series[0].data.sort(function(a, b) {
-							return b.value - a.value;
-						})
-					}
-					console.log(minVal)
-					setTimeout(() => {
-						_self.showColumn("canvasColumn", _self.chartData, (parseInt(minVal[0].value) * 0.8), (parseInt(maxVal[0].value) *
-							1.1));
-					}, 2000)
+					_self.chooseType(0)
 				})
-
-
 			},
 			showColumn(canvasId, chartData, min, max) {
-				console.log(_self.chartData, min)
+				console.log(chartData)
 				canvaColumn = new uCharts({
 					$this: _self,
 					canvasId: canvasId,
 					type: 'column',
 					legend: {
-						show: true
+						show: true,
 					},
+					padding: [15, 30, 0, 15],
 					fontSize: 11,
 					background: '#FFFFFF',
 					pixelRatio: _self.pixelRatio,
@@ -392,7 +398,13 @@
 		font-weight: bold;
 		margin-top: 22rpx;
 	}
-	
+	.costTotal1{
+		font-size: 60rpx;
+		color: #FFFFFF;
+		font-weight: bold;
+		margin-top: 22rpx;
+	}
+
 
 	.selfMarginTop {
 		margin-top: 72rpx;
