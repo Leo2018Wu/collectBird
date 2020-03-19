@@ -2,7 +2,7 @@
 	<view class="system">
 		<mescroll-uni :down="downOption" @down="downCallback" :up="upOption" @up="upCallback" :fixed="false" @init="init">
 			<view v-if="messageType == 3">
-				<view class="msgContainer" v-for="(item, index) in msgList" :key="index">
+				<view class="msgContainer" v-for="(item, index) in msgList" :key="index" @click="showDetail(item.messageContent,item.id,item.addresseeId)">
 					<view class="dateDivide">{{item.showDate}}</view>
 					<view class="messageBox whiteBg">
 						<view class="tip">{{item.noticeType == 1 ? '更新' : (item.noticeType == 2 ? '活动' : '通知')}}</view>
@@ -11,7 +11,7 @@
 							<view class="showDetailBtn">查看详情</view>
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 						</view>
-						<view class="msgContent twoClamp">
+						<view class="msgContent textOverFlow">
 							{{item.messageContent}}
 						</view>
 					</view>
@@ -23,21 +23,22 @@
 					<view class="messageBox2 whiteBg">
 						<view style="padding: 0 26rpx;">
 							<view class="msgTop">
-								<view class="msgTopName">租客到期提醒</view>
-								<view v-if="item.isRead == 0" class="msgTip" :class="[{status0 :item.jsonData.remindType == 9}]">{{item.jsonData.remindType == 2 ? '即将到期' : '已到期'}}</view>
+								<view class="msgTopName">{{item.specialType == 1 ? '租客到期提醒' : '邀请入住提醒'}}</view>
+								<view v-if="item.isRead == 0 && item.specialType != 2" class="msgTip" :class="[{status0 :item.jsonData.remindType == 9}]">{{item.jsonData.remindType == 2 ? '即将到期' : '已到期'}}</view>
 								<view v-if="item.isRead == 1" class="msgTip status1" >已处理</view>
 								<view v-if="item.isRead == 0" class="tenantBtn" @click="goRenter(item.id,item.addresseeId,item.jsonData)">去处理</view>
-								<view v-if="item.isRead != 0" class="tenantBtn" @click="goRenter(item.id,item.addresseeId,item.jsonData)">去看看</view>
+								<view v-if="item.isRead != 0" class="tenantBtn" @click="goRenter(item.id,item.addresseeId,item.jsonData)">{{item.specialType == 1 ? '去看看' : '去处理'}}</view>
 								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 							</view>
-							<view class="tenantLocation">{{item.jsonData.roomNo}}</view>
-							<view class="rentCycle">租期：{{item.jsonData.startDate}} ~ {{item.jsonData.endDate}}</view>
+							<view v-if="item.specialType == 1" class="tenantLocation textOverFlow">{{item.jsonData.roomNo}}</view>
+							<view v-else class="tenantLocation textOverFlow">{{item.messageContent}}</view>
+							<view class="rentCycle" v-if="item.specialType == 1">租期：{{item.jsonData.startDate}} ~ {{item.jsonData.endDate}}</view>
 						</view>
 					</view>
 				</view>
 			</view>
 			<view v-if="messageType == 1">
-				<view class="msgContainer" v-for="(item, index) in [0,1,2]" :key="index">
+				<!-- <view class="msgContainer" v-for="(item, index) in [0,1,2]" :key="index">
 					<view class="messageBox1 whiteBg">
 						<view style="padding: 0 26rpx;">
 							<view class="msgTop">
@@ -52,7 +53,7 @@
 						<view v-if="index == 1" class="operatBtn">去确认</view>
 						<view v-else class="operatBtn grayBtn">已确认</view>
 					</view>
-				</view>
+				</view> -->
 			</view>
 		</mescroll-uni>
 	</view>
@@ -109,6 +110,11 @@
 			})
 		},
 		methods: {
+			showDetail(content,id,addresseeId){
+				uni.navigateTo({
+					url:'../sysMsgDetail/sysMsgDetail?content='+content+'&addresseeId='+addresseeId+'&msgId='+id
+				})
+			},
 			goRenter(id,addresseeId,data){
 				console.log(data)
 				let communityInfo = {}
@@ -156,7 +162,7 @@
 					let curArr = _this.messageType == 1 ? response.data.data.billList.list : (_this.messageType == 2 ? response.data.data
 						.tenantList.list : response.data.data.systemList.list)
 					curArr.forEach((item, index) => {
-						if(_this.messageType == 2){
+						if(_this.messageType == 2 && item.specialType != 2){
 							item.jsonData.startDate = item.jsonData.startDate.split('T')[0]
 							item.jsonData.endDate = item.jsonData.endDate.split('T')[0]
 						}
@@ -274,7 +280,7 @@
 
 	.msgTopName {
 		color: #333333;
-		font-size: 28rpx;
+		font-size: 32rpx;
 		font-weight: bold;
 		margin-right: 12rpx;
 	}
@@ -297,6 +303,7 @@
 		font-size: 28rpx;
 		color: #BBBBBB;
 		margin-right: 10rpx;
+		margin-left: auto;
 	}
 
 	.msgPrice span {
@@ -319,7 +326,9 @@
 		margin-bottom: 20rpx;
 	}
 	.tenantLocation{
-		margin: 36rpx 0 16rpx 0;
+		margin: 32rpx 0 16rpx 0;
+		color: #666666;
+		font-size: 30rpx;
 	}
 
 	.rentCycle {
@@ -335,7 +344,7 @@
 		width: 100%;
 		text-align: center;
 		line-height: 80rpx;
-		border-top: 2rpx solid #DDDDDD;
+		border-top: 1rpx solid #DDDDDD;
 		color: #FF9A22;
 		font-size: 30rpx;
 		font-weight: bold;

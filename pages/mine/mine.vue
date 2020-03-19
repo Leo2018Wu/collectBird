@@ -110,7 +110,7 @@
 				</view>
 			</view>
 		</view>
-		<button class="shareBanner" hover-class="btnHoverClass" open-type="share"></button>
+		<button class="shareBanner" @click="shareFirend"></button>
 		<!-- 填写邀请码弹窗 -->
 		<view class="modal" v-show="invitationCodeFlag" @click="cancle"></view>
 		<view class="modalBox" v-show="invitationCodeFlag">
@@ -202,15 +202,12 @@
 				}
 			});
 		},
-		onShareAppMessage(res) {
-			return {
-				title: this.$store.state.landladyInfo.userName + '邀请您体验收租神器',
-				imageUrl:'https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/share1.jpg',
-				// imageUrl: '/static/share1.jpg',
-				path: '/pages/home/home'
-			}
-		},
 		methods: {
+			shareFirend(){
+				uni.navigateTo({
+					url:"../shareFriend/shareFriend"
+				})
+			},
 			returntCancel() {
 				this.showMessageModal = false
 			},

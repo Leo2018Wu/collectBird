@@ -559,7 +559,6 @@
 		text-align: right;
 		float: right;
 		margin-top: 10rpx;
-		line-height: 34rpx;
 	}
 
 	.secProfit cover-view {

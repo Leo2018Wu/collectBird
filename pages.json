@@ -176,9 +176,7 @@
         ,{
             "path" : "pages/systemMessage/systemMessage",
             "style" : {
-				"navigationBarTextStyle": "black",
-				"navigationBarTitleText": "系统消息",
-				"navigationBarBackgroundColor": "#FFFFFF"
+				"navigationBarTitleText": "系统消息"
 			}
         }
         ,{
@@ -197,6 +195,20 @@
             "path" : "pages/landlordManage/landlordManage",
             "style" : {
 				"navigationBarTitleText": "房东列表"
+			}
+        }
+        ,{
+            "path" : "pages/shareFriend/shareFriend",
+            "style" : {
+				"navigationBarTextStyle": "black",
+				"navigationBarTitleText": "邀请新用户轻松拿返佣",
+				"navigationBarBackgroundColor": "#FFFFFF"
+			}
+        }
+        ,{
+            "path" : "pages/sysMsgDetail/sysMsgDetail",
+            "style" : {
+				"navigationBarTitleText": "更新详情"
 			}
         }
     ],

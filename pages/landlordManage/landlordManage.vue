@@ -1,12 +1,13 @@
 <template>
-	<view class="landlordManage">
-		<scroll-view scroll-y="true" class="indexes" scroll-with-animation :scroll-into-view="'myItem'+curItem"
+	<view class="landlordManage" v-if="init">
+		<scroll-view scroll-y="true" v-if="landlordList.length != 0" class="indexes" scroll-with-animation :scroll-into-view="'myItem'+curItem"
 		 enable-back-to-top>
 			<view class="landlordItem" v-for="(item,index) in landlordList" :key="index" :id="'myItem'+item.type">
+				
 				<view class="landlordLi" v-for="(p,idx) in item.data" :key="idx" @click="showLandlordInfo(p.id)">
-					<view class="itemTip" v-show="p.overdueDays > 0">账单逾期</view>
+					<view class="itemTip" v-if="p.overdueDays > 0">账单逾期</view>
 					<!-- <view class="itemTip" v-if="p.overdueDays < 0">{{ p.overdueDays }}天后交租</view> -->
-					<view class="itemTip" v-show="p.overdueDays == 0">当天交租</view>
+					<view class="itemTip" v-if="p.overdueDays == 0">当天交租</view>
 					<view class="fullName">
 						<view class="surnName">{{item.type ? p.surnName : '#'}}</view>
 						<view class="lastNmae">{{item.type ? p.lastName : p.ownerName}}</view>
@@ -16,6 +17,10 @@
 				</view>
 			</view>
 		</scroll-view>
+		<view class="emptyView" v-else>
+			<image class="noLandlord" src="../../static/noLandlord.png" mode="aspectFit"></image>
+			<view>尚未绑定房东</view>
+		</view>
 		<view class="sideBar">
 			<view class="sideWord" :class="{active : curIndex == index}" v-for="(item,index) in wordList" :key="index" :id="index"
 			 @touchstart="getCur" @touchend="setCur">{{item}}</view>
@@ -32,6 +37,7 @@
 	export default {
 		data() {
 			return {
+				init:false,
 				boxTop: '',
 				barTop: '',
 				curIndex: null,
@@ -43,8 +49,10 @@
 		computed: {
 			...mapState(['landladyInfo'])
 		},
-		onLoad() {
+		onShow() {
 			this.getLandlordList()
+		},
+		onLoad() {
 			for (let i = 0; i < 26; i++) {
 				this.wordList[i] = String.fromCharCode(65 + i);
 			}
@@ -65,13 +73,18 @@
 				})
 			},
 			getLandlordList() {
-				console.log('nihao')
 				let _this = this;
 				this.$request.post('/owner/ownerList', {
 					id: this.landladyInfo.id
 				}).then((res) => {
-					console.log(res)
-					res.data.data.forEach((item) => {
+					_this.landlordList = [],
+					_this.init = true;
+					if(res.data.data.firstWordList[0] == "#"){
+						let arr_delete = res.data.data.firstWordList.shift()
+						res.data.data.firstWordList.push(arr_delete)
+						_this.wordList = res.data.data.firstWordList
+					}
+					res.data.data.ownerList.forEach((item,index) => {
 						item.startDate = item.startDate.split(' ')[0];
 						item.endDate = item.endDate.split(' ')[0];
 						item.surnName = item.ownerName.substr(0, 1);
@@ -80,11 +93,10 @@
 					const group = function(arr = [], key) {
 						return key ? arr.reduce((t, v) => (!t[v[key]] && (t[v[key]] = []), t[v[key]].push(v), t), {}) : {};
 					}
-					const myArr = group(res.data.data, "firstWord")
+					const myArr = group(res.data.data.ownerList, "firstWord")
 					let temp, temp1
 					for (let key in myArr) {
-						console.log('dsdsadasd', key)
-						if (key) {
+						if (key != "#") {
 							temp = {
 								type: key,
 								data: myArr[key]
@@ -99,8 +111,9 @@
 							_this.landlordList.push(temp)
 						}
 					}
-					_this.landlordList.push(temp1)
-					console.log(_this.landlordList)
+					if (typeof temp1 != 'undefined') {
+						_this.landlordList.push(temp1)
+					}
 				})
 			},
 			chooseWord(item, index) {
@@ -131,10 +144,10 @@
 		font-size: 28rpx;
 		color: #999999;
 		padding: 0rpx 0 14rpx 32rpx;
-		position: relative;
 	}
 
 	.landlordLi {
+		position: relative;
 		padding: 20rpx 0 14rpx 0;
 	}
 
@@ -213,5 +226,16 @@
 		width: 32rpx;
 		height: 32rpx;
 		line-height: 32rpx;
+	}
+	.emptyView{
+		margin: 334rpx auto 0 auto;
+		text-align: center;
+		color: #BBBBBB;
+		font-size: 28rpx;
+	}
+	.noLandlord{
+		width: 128rpx;
+		height: 191rpx;
+		margin-bottom: 30rpx;
 	}
 </style>

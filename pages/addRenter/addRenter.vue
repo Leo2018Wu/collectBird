@@ -1141,4 +1141,5 @@
 		color: #999999;
 		border-bottom: 2rpx solid #EBEBEB;
 	}
+	
 </style>

@@ -31,6 +31,13 @@
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 					</template>
 				</evan-form-item>
+				<view class="keepDateName">租期</view>
+				<view class="keepDateList">
+					<view class="keepDateLi" :class="{ keepDateLiActive: currentLiIndex == index }" v-for="(item, index) in keepDateList"
+					 :key="index" @click="chooseLi(index)">
+						{{ item }}
+					</view>
+				</view>
 				<evan-form-item label="到租日期" prop="startDate" :fontBold="true">
 					<template v-slot:main>
 						<picker class="form-input" mode="date" data-type="end" :value="endDate" :start="startDate" @change="bindDateChange">{{ endDate }}</picker>
@@ -72,9 +79,11 @@
 		</view>
 		<view class="section3 whiteBg">
 			<view class="remarkTitle">备注</view>
-			<textarea class="secTip textOverFlow" v-model="remarks"
-			 placeholder-class="textPlaceholder"></textarea></view>
-		<view class="sureBtn" @click="save">保存</view>
+			<textarea class="secTip textOverFlow" v-model="remarks" placeholder-class="textPlaceholder"></textarea>
+		</view>
+		<cover-view class="btnBoxMy">
+			<cover-view class="sureBtn" @click="save">保存</cover-view>
+		</cover-view>
 	</view>
 </template>
 
@@ -92,9 +101,11 @@
 		data() {
 			const currentDate = this.$getDate();
 			return {
-				ownerId:null,
+				currentLiIndex: null,
+				ownerId: null,
 				remarks: '',
 				list: [],
+				keepDateList: ['半年', '1年', '2年', '其他'],
 				chooseIndex: null,
 				listShow: false,
 				endDate: '',
@@ -171,11 +182,11 @@
 				}
 			}
 		},
-		onShow(){
-			if(this.isEdit){
-				setTimeout(()=>{
+		onShow() {
+			if (this.isEdit) {
+				setTimeout(() => {
 					this.getOwnerInfo(this.ownerId)
-				},1000)
+				}, 1000)
 			}
 		},
 		onLoad(options) {
@@ -185,7 +196,9 @@
 				uni.setNavigationBarTitle({
 					title: '业主信息'
 				})
-				
+			}
+			if(!this.isEdit){
+				this.chooseLi(1)
 			}
 			this.houseId = options.houseId
 			this.getRentCycleList()
@@ -196,7 +209,48 @@
 			this.getEndDate()
 		},
 		methods: {
-
+			chooseLi(index,isEdit){
+				if(isEdit){
+					this.currentLiIndex = index == 6 ? 0 : (index == 12 ? 1 : (index == 24 ? 2 : 3))
+				}else{
+					this.currentLiIndex = index;
+					this.endDate = this.getKeepDate(index)
+				}
+			},
+			getKeepDate(index) {
+				let keepDate;
+				let _this = this;
+				switch (index) {
+					case 0:
+						keepDate = moment(this.date)
+							.add(6, 'month')
+							// .subtract(1, 'days');
+						break;
+					case 1:
+						keepDate = moment(this.date)
+							.add(12, 'month')
+							// .subtract(1, 'days');
+						break;
+					case 2:
+						keepDate = moment(this.date)
+							.add(24, 'month')
+							// .subtract(1, 'days');
+						break;
+					case 3:
+						uni.showToast({
+							title: '请自己选择租期',
+							icon: 'none'
+						});
+						break;
+					default:
+						break;
+				}
+				if (index != 3) {
+					return this.$getDate(keepDate);
+				} else {
+					return this.date;
+				}
+			},
 			getPhone(e) {
 				let _this = this
 				let value = e.detail.value;
@@ -213,7 +267,7 @@
 				let myDate
 				myDate = moment(this.date)
 					.add(12, 'month')
-					// .subtract(1, 'days');
+				// .subtract(1, 'days');
 				this.endDate = this.$getDate(myDate)
 			},
 			getRentCycleList() {
@@ -252,8 +306,9 @@
 					let data = res.data.data
 					this.info1.name = data.ownerName;
 					this.info1.tel = data.ownerPhone;
-					this.date = data.startDate.substr(0,10);
-					this.endDate = data.endDate.substr(0,10);
+					this.date = data.startDate.substr(0, 10);
+					this.endDate = data.endDate.substr(0, 10);
+					this.chooseLi(data.rentMonthNum,true)
 					this.info2.rentUnitPrice = data.rentPrice;
 					this.info2.deposit = data.depositAmount;
 					this.remarks = data.remarks;
@@ -279,7 +334,7 @@
 					"depositAmount": this.info2.deposit,
 					"remarks": this.remarks
 				}
-				if(this.isEdit){
+				if (this.isEdit) {
 					par.id = this.ownerId
 				}
 				let postUrl = this.isEdit ? '/owner/update' : '/owner/bindOwner';
@@ -295,9 +350,9 @@
 											title: _this.isEdit ? '编辑业主成功' : '绑定业主成功',
 											duration: 1500
 										})
-										setTimeout(()=>{
+										setTimeout(() => {
 											uni.navigateBack()
-										},2000)
+										}, 2000)
 									}
 								})
 							}
@@ -338,6 +393,7 @@
 		width: 100%;
 		background-color: #FAFAFA;
 		padding-top: 30rpx;
+		padding-bottom: 140rpx;
 	}
 
 	.whiteBg {
@@ -366,7 +422,7 @@
 	.secTip {
 		width: 100%;
 		height: 180rpx;
-		padding-bottom:20rpx;
+		padding-bottom: 20rpx;
 		font-size: 34rpx;
 		color: #333333;
 		margin-top: 17rpx;
@@ -380,20 +436,67 @@
 
 	.sureBtn {
 		width: 257rpx;
-		height: 74rpx;
-		line-height: 74rpx;
+		height: 82rpx;
+		line-height: 82rpx;
 		text-align: center;
-		border-radius: 37rpx;
+		border-radius: 40rpx;
 		color: #FFFFFF;
-		background: linear-gradient(-90deg, rgba(243, 183, 73, 1) 0%, rgba(240, 154, 66, 1) 100%);
-		font-size: 32rpx;
-		margin: 124rpx auto 72rpx auto;
+		background: #FFA044;
+		font-size: 34rpx;
+		display: inline-block;
+		vertical-align: middle;
 	}
-	.remarkTitle{
+
+	.remarkTitle {
 		margin-top: 17rpx;
 		padding: 28rpx 0;
 		font-size: 34rpx;
 		color: #999999;
 		border-bottom: 2rpx solid #EBEBEB;
+	}
+	.btnBoxMy {
+		width: 100%;
+		/* padding: 0 85rpx; */
+		height: 128rpx;
+		line-height: 128rpx;
+		text-align: center;
+		background-color: #FFFFFF;
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		box-shadow: 0px -5px 16px 0px rgba(0, 0, 0, 0.04);
+	}
+	.keepDateList {
+		/* height: 93rpx; */
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		border-bottom: 3rpx solid #EBEBEB80;
+		padding-bottom: 32rpx;
+	}
+	.keepDateLi {
+		width: calc((100% - 69rpx) / 4);
+		height: 60rpx;
+		text-align: center;
+		line-height: 60rpx;
+		border-radius: 10rpx;
+		margin-right: 23rpx;
+		color: #666666;
+		border: 1rpx solid #D2D2D2;
+	}
+	
+	.keepDateLiActive {
+		border: 1rpx solid #FFA344;
+		color: #FFA344;
+	}
+	
+	.keepDateLi:last-of-type {
+		margin-right: unset;
+	}
+	.keepDateName{
+		font-size: 34rpx;
+		color: #333333;
+		font-weight: bold;
+		padding: 30rpx 0;
 	}
 </style>

@@ -12,9 +12,9 @@
 						<span v-if="!item.unReadNum">暂无消息</span>
 						<view class="hasNewMessage"  v-else>
 							<view class="textOverFlow newMessage">
-								{{index == 0 ? billNewMessage : (index == 1 ? tenantNewMessage : sysNewMessage)}}
+								<span v-if="index == 2">{{sysNewMessage.noticeType == 1 ? '【更新】' : (item.noticeType == 2 ? '【活动】' : '【通知】')}}</span>{{index == 0 ? billNewMessage.messageContent : (index == 1 ? tenantNewMessage.messageContent : sysNewMessage.messageContent)}}
 							</view>
-							<span class="unReadNum">{{item.unReadNum}}</span>
+							<span v-if="item.unReadNum>0" class="unReadNum">{{item.unReadNum}}</span>
 						</view>
 					</view>
 				</view>
@@ -68,26 +68,27 @@
 					addresseeId: id
 				}).then((res) => {
 					let result = res.data.data
-					console.log(result)
-					uni.setTabBarBadge({
-						index: 1,
-						text: parseInt(result.billUnreadCount) + parseInt(result.tenantUnreadCount) + parseInt(result.systemUnreadCount) +
-							'',
-					})
+					let num = parseInt(result.billUnreadCount) + parseInt(result.tenantUnreadCount) + parseInt(result.systemUnreadCount)
+					if(num > 0){
+						uni.setTabBarBadge({
+							index: 1,
+							text: num + '',
+						})
+					}
 					this.msgList.forEach((item, index) => {
 						if (index == 0) {
 							if(result.billUnreadCount != '0'){
-								this.billNewMessage = result.billList.list[0].messageContent
+								this.billNewMessage = result.billList.list[0]
 							}
 							item.unReadNum = result.billUnreadCount
 						} else if (index == 1) {
 							if(result.tenantUnreadCount != '0'){
-								this.tenantNewMessage = result.tenantList.list[0].messageContent
+								this.tenantNewMessage = result.tenantList.list[0]
 							}
 							item.unReadNum = result.tenantUnreadCount
 						} else {
 							if(result.systemUnreadCount != '0'){
-								this.sysNewMessage = result.systemList.list[0].messageContent
+								this.sysNewMessage = result.systemList.list[0]
 							}
 							item.unReadNum = result.systemUnreadCount
 						}

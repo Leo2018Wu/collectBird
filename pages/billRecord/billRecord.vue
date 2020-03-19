@@ -4,6 +4,7 @@
 			<renter-info-bar :userInfo="userInfo" v-on:emitUserId="getEmit"></renter-info-bar>
 		</view>
 		<view class="landlordItem" v-if="ownerId" @click="showLandLordInfo(ownerInfo.id,ownerInfo.houseId)">
+			<image class="infoLink" src="../../static/right_arrow.png" mode="aspectFit"></image>
 			<view class="landlordLi">
 				<view class="fullName">
 					<view class="surnName">{{ownerInfo.firstWord ? ownerInfo.surnName : '#'}}</view>
@@ -365,5 +366,13 @@
 
 	.local {
 		padding: 0 0 4rpx 78rpx;
+	}
+	.infoLink{
+		position: absolute;
+		width: 26rpx;
+		height: 26rpx;
+		right: 32rpx;
+		top: 50%;
+		transform: translateY(-50%);
 	}
 </style>

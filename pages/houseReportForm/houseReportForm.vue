@@ -9,7 +9,8 @@
 					<view class="cost" :class="{active : index == curIndex}" v-for="(item,index) in typeList" :key="index" @click="chooseType(index)">{{item}}</view>
 				</view>
 			</view>
-			<view class="costNum" v-if="curIndex != 2">共{{curIndex == 0 ? '收入' :'支出'}} <span v-if="curCost">{{curIndex == 1 ? curCost[0].payBillCount : curCost[0].amountBillCount}}</span> <span v-if="!curCost">--</span>笔,
+			<view class="costNum" v-if="curIndex != 2">共{{curIndex == 0 ? '收入' :'支出'}} <span v-if="curCost">{{curIndex == 1 ? curCost[0].payBillCount : curCost[0].amountBillCount}}</span>
+				<span v-if="!curCost">--</span>笔,
 				合计</view>
 			<view class="costNum" v-if="curIndex == 2">合计</view>
 			<view class="costTotal" v-if="curCost">￥{{curIndex == 1 ? curCost[0].totalPay : (curIndex == 0 ? curCost[0].totalAmount : curCost[0].monthIncome) | thousandsPoints}}</view>
@@ -86,7 +87,11 @@
 						"name": '',
 						color: '#FFFFFF',
 						textColor: '#FFDEBC',
-						"data": []
+						"data": [],
+						format: (val) => {
+							var reg = /\d{1,3}(?=(\d{3})+$)/g;
+							return (val + '').replace(reg, '$&,');
+						}
 					}]
 				},
 				communityData: [],
@@ -104,8 +109,6 @@
 		computed: {
 			curCost() {
 				if (this.communityData.length != 0) {
-					console.log('wozaozhe')
-					console.log(this.communityData.filter(item => item.month == this.curMonth))
 					if (this.communityData.filter(item => item.month == this.curMonth).length == 0) {
 						return [{
 							billCount: 0,
@@ -156,8 +159,8 @@
 				})
 				let minVal, maxVal
 				if (_self.chartData.series[0].data.length <= 1) {
-					minVal = _self.chartData.series[0].data
-					maxVal = _self.chartData.series[0].data
+					minVal = Number(_self.chartData.series[0].data[0].value) * 0.8
+					maxVal = Number(_self.chartData.series[0].data[0].value) * 1.1
 				} else {
 					const arr = _self.chartData.series[0].data.map(p => {
 						return p.value
@@ -176,10 +179,8 @@
 				let data = {
 					series: _self.chartData.series,
 					yAxis: {
-						data: {
-							min: minVal,
-							max: maxVal
-						}
+						min: minVal,
+						max: maxVal
 					}
 				}
 
@@ -190,6 +191,7 @@
 			},
 			bindChange: function(e) {
 				const val = e.detail.value
+				this.monthValue = val
 				this.curMonth = this.months[val[1]];
 				this.curYear = this.years[val[0]]
 			},
@@ -220,8 +222,8 @@
 				})
 				let minVal, maxVal
 				if (_self.chartData.series[0].data.length == 1) {
-					minVal = _self.chartData.series[0].data[0].value
-					maxVal = _self.chartData.series[0].data[0].value
+					minVal = Number(_self.chartData.series[0].data[0].value)
+					maxVal = Number(_self.chartData.series[0].data[0].value)
 				} else {
 					const arr = _self.chartData.series[0].data.map(p => {
 						return p.value
@@ -242,7 +244,7 @@
 					// "communityId": 'd94c0ea4-92fe-46d5-af47-accffa93cbf7',
 				}).then((res) => {
 					_self.communityData = res.data.data;
-					if(_self.communityData.length == 0)return
+					if (_self.communityData.length == 0) return
 					res.data.data.forEach((item, index) => {
 						_self.chartData.categories.push(item.year.substr(2, 2) + '年' + item.month + '月')
 					})
@@ -278,7 +280,6 @@
 					yAxis: {
 						disabled: true,
 						disableGrid: true,
-						// dashLength: 4,
 						splitNumber: 6,
 						min,
 						max,
@@ -398,7 +399,8 @@
 		font-weight: bold;
 		margin-top: 22rpx;
 	}
-	.costTotal1{
+
+	.costTotal1 {
 		font-size: 60rpx;
 		color: #FFFFFF;
 		font-weight: bold;
