@@ -18,8 +18,8 @@
 			<view class="billBaritem" @click="changeIndex(index)" v-for="(item, index) in arr" :key="index" :class="{ active: currentIndex == index }">{{ item }}</view>
 		</view>
 		<view class="billList">
-			<mescroll-uni :down="downOption" @down="downCallback" :up="upOption" @up="upCallback" :fixed="false" @init="init">
-				<!-- <mescroll-empty v-if="selectList.length==0"></mescroll-empty> -->
+			<!-- <mescroll-empty v-if="billListInfo.length==0" v-on:emptyNavi="returnEmit"></mescroll-empty> -->
+			<mescroll-uni :down="downOption" @down="downCallback" :up="upOption" @up="upCallback" :fixed="false" @init="init" v-on:emptyclick="emptyclick">
 				<view v-for="(item, idx) in billListInfo" :key="idx" @click="showBill(item)">
 					<view class="myBillItem">
 						<view class="itemFlex itemTop">
@@ -96,7 +96,8 @@
 					noMoreSize: 5, // 配置列表的总数量要大于等于5条才显示'-- END --'的提示
 					empty: {
 						use: true,
-						tip: '暂无相关数据'
+						tip: '暂无相关数据',
+						// helpText:'如何查看账单?'
 					}
 				}
 			};
@@ -106,20 +107,6 @@
 				let list = this.para.billType == 0 ? ['已逾期', '未收款', '已收款', '全部'] : ['已逾期', '未付款', '已付款', '全部'];
 				return list
 			},
-			// selectList() {
-			// 	const overdueList = function(item) {
-			// 		return item.overdueDays > 0
-			// 	}
-			// 	const normalList = function(item) {
-			// 		return item.overdueDays <= 0
-			// 	}
-			// 	const fullList = function(item) {
-			// 		return item
-			// 	}
-			// 	let par = this.currentIndex == 0 ? overdueList : (this.currentIndex == 1 ? normalList : fullList)
-			// 	let arr = this.billListInfo.filter(par)
-			// 	return arr
-			// }
 		},
 		onShow() {
 			this.getMoney();
@@ -133,6 +120,11 @@
 			}
 		},
 		methods: {
+			emptyclick(){
+				uni.navigateTo({
+					url: '../helpDetail/helpDetail?title=' + '如何查看账单？' + '&index=' + 3 + '&idx=' + 0
+				})
+			},
 			updateData() {
 				console.log('wwww');
 				this.downCallback(this.mescroll);

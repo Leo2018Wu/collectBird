@@ -23,7 +23,7 @@
 			</view>
 		</view>
 		<view class="section3">
-			<mescroll-uni :down="downOption" @down="downCallback" :up="upOption" @up="upCallback" :fixed="false" @init="init">
+			<mescroll-uni :down="downOption" @down="downCallback" :up="upOption" @up="upCallback" :fixed="false" @init="init" v-on:emptyclick="emptyclick">
 				<view class="houseSkuBox" v-for="(item, index) in houseInfoList" :key="index" @click="goDetail(item.id, item.landlordId)">
 					<new-house-sku :item="item"></new-house-sku>
 				</view>
@@ -79,7 +79,8 @@
 					empty: {
 						use: true,
 						icon:'/static/houseEmpty.png',
-						tip: '暂无房源'
+						tip: '暂无房源，',
+						helpText:'查看如何添加房源?'
 					}
 				}
 			};
@@ -88,6 +89,7 @@
 			...mapState(['login', 'landladyInfo'])
 		},
 		onShow() {
+			console.log('wojinlaile',this.$store)
 			let _this = this;
 			if(this.$store.state.landladyInfo.id){
 				this.getWords();
@@ -103,6 +105,11 @@
 			}
 		},
 		methods: {
+			emptyclick(){
+				uni.navigateTo({
+					url: '../helpDetail/helpDetail?title=' + '如何查看账单？' + '&index=' + 0 + '&idx=' + 0
+				})
+			},
 			childByValue(value) {
 				console.log(value, '弹不弹登录提示')
 				if (value == false) {

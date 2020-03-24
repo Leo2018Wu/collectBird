@@ -114,6 +114,15 @@
 				}, {
 					text1: '租客支持退租、续租',
 					text2: '支持均摊电费'
+				}, {
+					text1: '新增收支报表，便于横向比对',
+					text2: '新增记事入口，记录收租琐事'
+				}, {
+					text1: '新增房东列表，查看房东信息',
+					text2: '更新帮助手册，便于检索帮助'
+				}, {
+					text1: '关注收租鸟服务号，及时接收相关信息',
+					text2: ''
 				}],
 				mouthIncome: '0', //本月净收入
 				billDuein: '0', //本月账单待收
@@ -164,6 +173,11 @@
 						url: '../landlordManage/landlordManage'
 					},
 					{
+						title: '记事',
+						imgUrl: '../../static/homeIcon8.png',
+						url: '../memo/memo'
+					},
+					{
 						title: '帮助',
 						imgUrl: '../../static/homeIcon6.png',
 						url: '../help/help'
@@ -177,9 +191,14 @@
 		},
 		onLoad() {},
 		onShow(option) {
-			this.checkLoginStatus().then(res => {
-				this.loginFlag = res;
-			});
+			if(this.$store.state.landladyInfo.id){
+				this.getMoneyInfo();
+				this.getMessageTotal(_this.$store.state.landladyInfo.id)
+			}else{
+				this.checkLoginStatus().then(res => {
+					this.loginFlag = res;
+				});
+			}
 		},
 		onShareAppMessage(res) {
 			return {
@@ -324,6 +343,7 @@
 											self.gender = '未知';
 										}
 										let userInfo = {
+											unionId:res.data.data.unionid,
 											openId: res.data.data.openid,
 											userName: infoRes.userInfo.nickName,
 											userImg: infoRes.userInfo.avatarUrl,

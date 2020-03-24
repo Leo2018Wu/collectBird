@@ -11,7 +11,8 @@ const store = new Vuex.Store({
 		landladyInfo: {},	// 登录信息
 		tenantId:null,
 		tempRoomInfo: {},
-		chooseLocationInfo: {}
+		chooseLocationInfo: {},
+		shareImgPath:""
 	},
 	mutations: {
 		landladyInfo(state, data) {
@@ -40,6 +41,9 @@ const store = new Vuex.Store({
 		},
 		tempRenterId(state,data){
 			state.tenantId = data
+		},
+		shareImgPath(state, data){
+			state.shareImgPath = data
 		}
 	}
 })

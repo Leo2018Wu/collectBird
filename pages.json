@@ -211,6 +211,18 @@
 				"navigationBarTitleText": "更新详情"
 			}
         }
+        ,{
+            "path" : "pages/memo/memo",
+            "style" : {
+				"navigationBarTitleText": "记事"
+			}
+        }
+        ,{
+            "path" : "pages/addMemo/addMemo",
+            "style" : {
+				"navigationBarTitleText": "新建记事"
+			}
+        }
     ],
 	"permission": {
 		"scope.userLocation": {

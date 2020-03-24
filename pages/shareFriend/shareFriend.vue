@@ -8,10 +8,7 @@
 			<view class="actDate">活动时间</view>
 			<view class="detail">即日起至：2020年10月1日</view>
 			<view class="actDate">活动说明</view>
-			<view class="detail">每位用户都有自己独有的邀请码，邀请用户入
-				驻并填写你的邀请码，新用户付费之后，您将
-				获得最高30%的现金返佣，或者价值50%金额
-				的有效期延长。</view>
+			<view class="detail">每位用户都有自己独有的邀请码，邀请用户入驻并填写你的邀请码，新用户付费之后，您将获得最高30%的现金返佣，或者价值50%金额的有效期延长。</view>
 			<view class="btnBox">
 				<view class="setImg" @click="saveImg">生成分享图</view>
 				<button class="shareBtn" open-type="share" hover-class="btnHoverClass">分享好友</button>
@@ -49,14 +46,11 @@
 			}
 		},
 		onLoad() {
-			let _this = this
-			uni.getUserInfo({
-			  success: function(res) {
-			    console.log(res)
-				_this.initPostersConfig(res.userInfo.avatarUrl);
-			  }
-			})
-			
+			if(this.$store.state.shareImgPath){
+				this.tempPath = this.$store.state.shareImgPath
+			}else{
+				this.initPostersConfig(this.landladyInfo.userImg);
+			}
 			
 		},
 		methods: {
@@ -117,7 +111,8 @@
 					width: 375,
 					height: 637,
 					background: '#ffffff',
-					views: [{
+					views: [
+						{
 							type: 'image',
 							width: 375,
 							height: 637,
@@ -148,16 +143,17 @@
 						},
 						{
 							type: 'text',
-							width: 203,
+							width: 305,
 							height: 20,
-							left: 86,
+							left: 375/2,
 							top: 305,
+							textAlign:'center',
 							fontSize: 18,
 							bolder: true,
 							breakWord: true,
 							content: this.landladyInfo.userName + '邀请您体验收租鸟',
 							color: '#333333',
-							MaxLineNumber: 1
+							MaxLineNumber: 2
 						},
 					]
 				};
@@ -166,6 +162,7 @@
 			onSuccessCreatePosters(res) {
 				console.log(res.path);
 				this.tempPath = res.path;
+				this.$store.commit('shareImgPath', res.path)
 			},
 			onPostersError(res) {
 				console.log('错误', res)

@@ -246,7 +246,7 @@
 	.infoBar {
 		width: 100%;
 		padding: 30rpx 0 40rpx 30rpx;
-		background: linear-gradient(264deg, rgba(244, 183, 74, 1) 0%, rgba(240, 153, 66, 1) 100%);
+		background: linear-gradient(264deg,rgba(240, 153, 66, 1) 0%, rgba(244, 183, 74, 1) 100% );
 		box-shadow: 0px 15rpx 22rpx 2rpx rgba(240, 159, 68, 0.25);
 		color: #FFFFFF;
 		font-size: 28rpx;

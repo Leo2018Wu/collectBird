@@ -357,6 +357,7 @@ export default {
             // this.ctx.beginPath();
             // this.ctx.stroke();
             let _setStyle = () => {
+				console.log(textAlign)
                 // this.ctx.save();
                 this.ctx.closePath();
                 this.ctx.beginPath();

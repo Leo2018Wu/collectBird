@@ -610,12 +610,12 @@
 
 	.eleBar {
 		font-size: 30rpx;
-		color: #333333;
+		color: #999999;
 	}
 
 	.waterBar {
 		font-size: 30rpx;
-		color: #333333;
+		color: #999999;
 		margin-right: auto;
 	}
 

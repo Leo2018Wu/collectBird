@@ -15,7 +15,7 @@
 		</view>
 		<view class="emptyList" v-if="renterList.length == 0 && loadEnd">
 			<image class="noRenterIcon" src="../../static/renterListEmpty.png" mode="aspectFit"></image>
-			<view>暂无租客</view>
+			<view>暂无租客，<span @click="showHelp">查看如何添加租客?</span></view>
 		</view>
 		<view v-else class="section" :class="{secFirst : index == 0}" v-for="(item,index) in renterList" :key="index">
 			<view class="sectionBar" @click="showRenterList(index)">
@@ -65,6 +65,11 @@
 			this.getTopNum(landordId)
 		},
 		methods: {
+			showHelp(){
+				uni.navigateTo({
+					url: '../helpDetail/helpDetail?title=' + '如何添加租客？' + '&index=' + 1 + '&idx=' + 0
+				})
+			},
 			getTopNum(id) {
 				this.$request.post('/roomUser/tenantNum', {
 					id
@@ -300,6 +305,19 @@
 		text-align: center;
 		color: #BBBBBB;
 		font-size: 28rpx;
+	}
+	.emptyList span {
+		position: relative;
+	}
+	
+	.emptyList span::after {
+		position: absolute;
+		content: '';
+		width: 100%;
+		height: 1rpx;
+		background-color: #BBBBBB;
+		bottom: 0;
+		left: 0;
 	}
 	.noRenterIcon{
 		width: 136rpx;

@@ -9,8 +9,8 @@ import MescrollEmpty from '@/components/mescroll-uni/components/mescroll-empty.v
 	<view class="mescroll-empty" :class="{ 'empty-fixed': option.fixed }" :style="{ 'z-index': option.zIndex, top: option.top }">
 	<!-- <view class="mescroll-empty" :class="{ 'empty-fixed': option.fixed }" :style="{ 'z-index': option.zIndex, top: 160rpx }"> -->
 		<image v-if="icon" class="empty-icon" :src="icon" mode="widthFix" />
-		<view v-if="tip" class="empty-tip">{{ tip }}</view>
-		<view v-if="option.btnText" class="empty-btn" @click="emptyClick">{{ option.btnText }}</view>
+		<view v-if="tip" class="empty-tip">{{ tip }} <span @click="emptyClick">{{helpText}}</span> </view>
+		<!-- <view v-if="option.btnText" class="empty-btn" @click="emptyClick">{{ option.btnText }}</view> -->
 	</view>
 </template>
 
@@ -36,6 +36,9 @@ import MescrollEmpty from '@/components/mescroll-uni/components/mescroll-empty.v
 			// 文本提示
 			tip() {
 				return this.option.tip == null ? GlobalOption.up.empty.tip : this.option.tip; // 此处不使用短路求值, 用于支持传空串不显示文本提示
+			},
+			helpText(){
+				return this.option.helpText == null ? GlobalOption.up.empty.helpText : this.option.helpText; // 此处不使用短路求值, 用于支持传空串不显示文本提示
 			}
 		},
 		methods: {
@@ -75,6 +78,19 @@ import MescrollEmpty from '@/components/mescroll-uni/components/mescroll-empty.v
 		margin-top: 20rpx;
 		font-size: 28rpx;
 		color: #C5C5C5;
+		
+	}
+	.empty-tip span{
+		position: relative;
+	}
+	.empty-tip span::after {
+		position: absolute;
+		content: '';
+		width: 100%;
+		height: 2rpx;
+		background-color: #C5C5C5;
+		bottom: 0;
+		left: 0;
 	}
 
 	.mescroll-empty .empty-btn {

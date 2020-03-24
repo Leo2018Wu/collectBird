@@ -103,10 +103,10 @@
 		line-height: 90rpx;
 	}
 	.btnBox .modalCancel{
-		color: #BABABA;
+		color: #FFA044;
 	}
 	.btnBox .modalSure{
-		color: #FFA044;
+		color: #BABABA;
 	}
 	.btnDivide{
 		width: 2rpx;

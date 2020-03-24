@@ -105,7 +105,7 @@
 				ownerId: null,
 				remarks: '',
 				list: [],
-				keepDateList: ['半年', '1年', '2年', '其他'],
+				keepDateList: ['3年', '5年', '8年', '其他'],
 				chooseIndex: null,
 				listShow: false,
 				endDate: '',
@@ -197,9 +197,6 @@
 					title: '业主信息'
 				})
 			}
-			if(!this.isEdit){
-				this.chooseLi(1)
-			}
 			this.houseId = options.houseId
 			this.getRentCycleList()
 			this.$nextTick(() => {
@@ -211,7 +208,7 @@
 		methods: {
 			chooseLi(index,isEdit){
 				if(isEdit){
-					this.currentLiIndex = index == 6 ? 0 : (index == 12 ? 1 : (index == 24 ? 2 : 3))
+					this.currentLiIndex = index == 36 ? 0 : (index == 60 ? 1 : (index == 96 ? 2 : 3))
 				}else{
 					this.currentLiIndex = index;
 					this.endDate = this.getKeepDate(index)
@@ -223,17 +220,17 @@
 				switch (index) {
 					case 0:
 						keepDate = moment(this.date)
-							.add(6, 'month')
+							.add(3, 'years')
 							// .subtract(1, 'days');
 						break;
 					case 1:
 						keepDate = moment(this.date)
-							.add(12, 'month')
+							.add(5, 'years')
 							// .subtract(1, 'days');
 						break;
 					case 2:
 						keepDate = moment(this.date)
-							.add(24, 'month')
+							.add(8, 'years')
 							// .subtract(1, 'days');
 						break;
 					case 3:
@@ -265,8 +262,9 @@
 			},
 			getEndDate() {
 				let myDate
+				this.currentLiIndex = 1
 				myDate = moment(this.date)
-					.add(12, 'month')
+					.add(5, 'years')
 				// .subtract(1, 'days');
 				this.endDate = this.$getDate(myDate)
 			},

@@ -3,6 +3,7 @@
 		<view class="topContent">
 			<view class="coverBlock">
 				<view class="vipBg">
+					<image class="posiBg" src="../../static/buyCrown.png" mode="aspectFill"></image>
 					<view class="vipBgContainer" v-if="landladyInfo.userStatus == '1'">
 						<image src="../../static/beVip.png" mode="aspectFit"></image>
 						<view class="vipTip">开通会员</view>
@@ -24,16 +25,16 @@
 			<view class="topContainer">
 				<view class="myContainer">
 					<view class="">
-						<image class="myPhoto" :src="userImg"></image>
+						<image class="myPhoto" :src="landladyInfo.userImg"></image>
 					</view>
-					<view v-if="show"><button class="login" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true">登录</button></view>
+					<view v-if="!landladyInfo.userImg"><button class="login" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true">登录</button></view>
 					<view class="detail" v-else>
 						<view class="detailTop">
 							<view class="myName">{{ userName }}</view>
-							<view class="myLevel">
+							<!-- <view class="myLevel">
 								<image class="levelIcon" src="../../static/queen.png"></image>
 								<view class="levelText">LV{{ level }}</view>
-							</view>
+							</view> -->
 						</view>
 						<view class="detailBottom">我的邀请码: {{ inviCode }}</view>
 					</view>
@@ -190,17 +191,28 @@
 			this.caclTrialDate()
 		},
 		onShow(options) {
-			this.checkLoginStatus().then(res => {
-				console.log(res);
-				if (res) {
-					this.show = true;
-				} else {
-					this.show = false;
-					// this.getMineMsg({
-					// 	openId: this.$store.state.userOpenId
-					// });
+			let data = this.$store.state.landladyInfo
+			if(data.id){
+				let userInfo = {
+					openId: data.openId,
+					userImg: data.userImg,
+					userName: data.userName,
+					userSex: data.userSex
 				}
-			});
+				this.getMineMsg(userInfo)
+			}else{
+				this.checkLoginStatus().then(res => {
+					console.log(res);
+					if (res) {
+						this.show = true;
+					} else {
+						this.show = false;
+						// this.getMineMsg({
+						// 	openId: this.$store.state.userOpenId
+						// });
+					}
+				});
+			}
 		},
 		methods: {
 			shareFirend(){
@@ -553,17 +565,25 @@
 	}
 
 	.vipBg {
-		background: url(../../static/vipBg.png);
-		background-size: 100% 100%;
+		background-color: #4a4a4a;
 		width: 690rpx;
 		height: 92rpx;
 		position: absolute;
 		z-index: 99;
 		left: 50%;
 		transform: translateX(-50%);
-		bottom: 0;
+		bottom: -10rpx;
 		padding: 20rpx 65rpx 0 65rpx;
-
+		position: relative;
+		border-radius: 20rpx;
+	}
+	.posiBg{
+		position: absolute;
+		width: 130rpx;
+		height: 126rpx;
+		top:0;
+		right:146rpx;
+		opacity: 0.07;
 	}
 
 	.vipBgContainer {

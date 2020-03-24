@@ -62,6 +62,7 @@ export default {
 													self.gender = '未知';
 												}
 												let userInfo = {
+													unionId:res.data.data.unionid,
 													openId: res.data.data.openid,
 													userName: infoRes.userInfo.nickName,
 													userImg: infoRes.userInfo.avatarUrl,

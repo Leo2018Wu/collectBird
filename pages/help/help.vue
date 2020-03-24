@@ -48,6 +48,11 @@
 						detail: ['如何添加租客？', '如何查看租客列表？']
 					},
 					{
+						iconUrl: '../../static/helpIcon5.png',
+						queType: "房东相关",
+						detail: ['为什么要绑定房东？', '如何绑定房东？']
+					},
+					{
 						iconUrl: '../../static/helpIcon2.png',
 						queType: "账单相关",
 						detail: ['如何查看账单？', '账单如何生成？']
