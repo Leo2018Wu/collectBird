@@ -202,7 +202,8 @@
             "style" : {
 				"navigationBarTextStyle": "black",
 				"navigationBarTitleText": "邀请新用户轻松拿返佣",
-				"navigationBarBackgroundColor": "#FFFFFF"
+				"navigationBarBackgroundColor": "#FFFFFF",
+				"disableScroll": true
 			}
         }
         ,{

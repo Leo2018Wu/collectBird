@@ -114,9 +114,7 @@
 				console.log(value, '弹不弹登录提示')
 				if (value == false) {
 					this.loginFlag = false;
-					uni.navigateTo({
-						url: '../home/home'
-					});
+					this.addCommunity()
 				}
 			},
 			updateData() {
@@ -143,7 +141,8 @@
 				let _this = this;
 				this.$request
 					.post('/community/getFirstWordArray', {
-						landlordId: this.$store.state.landladyInfo.id
+						landlordId: this.$store.state.landladyInfo.id,
+						
 					})
 					.then(res => {
 						_this.wordList = res.data.data;
@@ -164,6 +163,7 @@
 				let _this = this;
 				_this.para.pageNum = pageNum;
 				_this.para.landlordId = _this.$store.state.landladyInfo.id
+				// _this.para.landlordId = ""
 				try {
 					const response = await _this.$request.post('/community/myCommunity', _this.para);
 					let arr = [];

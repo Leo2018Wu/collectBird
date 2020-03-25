@@ -2,9 +2,9 @@
 	<view class="addMemo">
 		<tip-modal v-if="isShowTipModal" v-on:emitCancel="returnCancel" v-on:emitSure="returnSure" :title="'提示'" :describition="'是否确认删除该条记事'"></tip-modal>
 		<view class="curDate">{{curDate}}</view>
-		<input class="secTip textOverFlow" v-model="title" placeholder="标题" placeholder-class="textPlaceholder"></input>
+		<input class="secTip textOverFlow" v-model="title" placeholder="标题" placeholder-style="color:#C8C9CB" placeholder-class="text-placeholder"></input>
 		<view class="divide"></view>
-		<textarea class="secTip1" v-model="content" placeholder="记事" placeholder-class="textPlaceholder1"></textarea>
+		<textarea class="secTip1" v-model="content" placeholder="记事" placeholder-style="color:#C8C9CB" placeholder-class="textPlaceholder1"></textarea>
 		<view class="btnBox" v-if="!memoId">
 			<view class="saveBtn" @click="save">保存</view>
 		</view>
@@ -103,6 +103,7 @@
 				this.$request.post(postUrl, par).then((res)=>{
 					if(res.data.code == "200"){
 						uni.showToast({
+							title:_this.memoId ? '编辑成功' : '保存成功',
 							duration:1500
 						})
 						setTimeout(()=>{
@@ -132,11 +133,12 @@
 		height: fit-content;
 		font-size: 42rpx;
 		padding-bottom: 32rpx;
+		font-weight: bold;
 	}
-
-	.textPlaceholder {
+	
+	.text-placeholder {
 		font-size: 42rpx;
-		color: #C8C9CB;
+		color: #e7e7e7;
 	}
 
 	.divide {
@@ -155,7 +157,7 @@
 
 	.textPlaceholder1 {
 		font-size: 34rpx;
-		color: #C8C9CB;
+		color: #e7e7e7;
 	}
 	.btnBox,.btnBox1{
 		width: calc(100% - 172rpx);

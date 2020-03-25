@@ -4,12 +4,12 @@
 			<view class="headBar">
 				<view class="headBarItem">
 					在租租客
-					<span>{{inRentTenantNum}}</span>
+					<span>{{inRentTenantNum ? inRentTenantNum : 0 }}</span>
 				</view>
 				<view class="headBarItemLine"></view>
 				<view class="headBarItem">
 					即将到期
-					<span>{{aboutToExpire}}</span>
+					<span>{{aboutToExpire ? aboutToExpire : 0}}</span>
 				</view>
 			</view>
 		</view>

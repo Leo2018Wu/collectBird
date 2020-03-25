@@ -8,15 +8,18 @@
 				<view class="memoDate">{{item.createTime}}</view>
 			</view>
 		</mescroll-uni>
+		<is-login v-show="loginFlag" :childLoginFlag="loginFlag" v-on:childByValue="childByValue"></is-login>
 		<image @click="addMemo" class="memoBtn" src="../../static/memoBtn.png" mode="aspectFit"></image>
 	</view>
 </template>
 
 <script>
+	import isLogin from '../../components/isLogin.vue';
 	import MescrollUni from '../../components/mescroll-uni/mescroll-uni.vue';
 	export default {
 		components: {
-			MescrollUni
+			MescrollUni,
+			isLogin,
 		},
 		data() {
 			return {
@@ -48,6 +51,7 @@
 				},
 				mescroll: {},
 				memoList: [],
+				loginFlag:false,
 			}
 		},
 		onShow() {
@@ -55,15 +59,28 @@
 			this.downCallback(this.mescroll);
 		},
 		methods: {
+			childByValue(value) {
+				console.log(value, '弹不弹登录提示')
+				if (value == false) {
+					this.loginFlag = false;
+					this.addMemo()
+				}
+			},
 			showDetail(id){
+				
 				uni.navigateTo({
 					url:'../addMemo/addMemo?memoId='+id
 				})
 			},
 			addMemo(){
-				uni.navigateTo({
-					url:'../addMemo/addMemo'
-				})
+				if (this.$store.state.isloginStatus) {
+					uni.navigateTo({
+						url:'../addMemo/addMemo'
+					})
+				}else{
+					this.loginFlag = true;
+				}
+				
 			},
 			init(e) {
 				this.mescroll = e;

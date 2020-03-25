@@ -1,15 +1,13 @@
 <script>
+	import Vue from 'vue'
 	export default {
 		onLaunch: function() {
 			let _this = this;
-			// uni.getSetting({
-			// 	success(res) {
-			// 		console.log(res)
-			// 		if (res.authSetting['scope.userInfo']) {
-			// 			_this.$store.commit('isloginStatus',true)
-			// 		}
-			// 	}
-			// })
+			uni.getSystemInfo({
+				success: (res) => {
+					Vue.prototype.screenWidth = res.screenWidth
+				}
+			})
 		},
 
 		onShow: function() {

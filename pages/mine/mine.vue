@@ -25,7 +25,8 @@
 			<view class="topContainer">
 				<view class="myContainer">
 					<view class="">
-						<image class="myPhoto" :src="landladyInfo.userImg"></image>
+						<image v-if="!landladyInfo.userImg" class="myPhoto" :src="userImg"></image>
+						<image v-else  class="myPhoto" :src="landladyInfo.userImg"></image>
 					</view>
 					<view v-if="!landladyInfo.userImg"><button class="login" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true">登录</button></view>
 					<view class="detail" v-else>

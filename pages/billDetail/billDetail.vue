@@ -11,11 +11,13 @@
 					<span v-if="billType == 1 && unIncome != 0 && !fromShare">-</span><span>{{ billInfo.totalAmount ? billInfo.totalAmount : '0' }}</span>
 				</view>
 			</view>
-			<view v-if="fromShare"  class="houseAddr">{{titleContent}}</view>
+			<view v-if="fromShare" class="houseAddr">{{titleContent}}</view>
 			<view v-else>
 				<view v-if="billType == 0" class="houseAddr">{{ houseAddrInfo.communityName }}-{{ houseAddrInfo.houseNo }}-{{ houseAddrInfo.roomNo }}
-					<span @click="editBill">修改</span></view>
-				<view v-else class="houseAddr">{{ ownerInfo.communityName }}-{{ ownerInfo.houseNo }} <span @click="editBill">修改</span></view>
+					<span v-if="billInfo.billStatus != 4" class="rentPromotion">催租</span><span :class="{myLeft: billInfo.billStatus == 4}"
+					 class="editMybill" @click="editBill">修改</span></view>
+				<view v-else class="houseAddr">{{ ownerInfo.communityName }}-{{ ownerInfo.houseNo }} <span v-if="billInfo.billStatus != 4"
+					 class="rentPromotion">催租</span> <span :class="{myLeft: billInfo.billStatus == 4}" class="editMybill" @click="editBill">修改</span></view>
 			</view>
 		</view>
 		<view class="section1">
@@ -79,10 +81,11 @@
 			</view>
 		</view>
 
-		
+
 		<view class="remarks">
 			<view class="remarksDivide">备注</view>
-		{{ billInfo.remarks ? billInfo.remarks  : ''}}</view>
+			{{ billInfo.remarks ? billInfo.remarks  : ''}}
+		</view>
 		<!-- <view v-if="billType == 0"> -->
 		<view class="section3" v-if="billInfo.billStatus == 4 && !fromShare">
 			<view class="sendBillBox">
@@ -93,19 +96,19 @@
 		<view class="section2" v-else>
 			<view v-if="!fromShare" class="leftBtnBox">
 				<!-- <view> -->
-					<view class="sendBillBox" @click="deleteBill">
-						<image class="sendIcon" src="../../static/delete_btn.png" mode="aspectFit"></image>
-						<!-- <view>删除</view> -->
-					</view>
-					<view v-if="billType == 0" class="sendBillBox" @click="openMeterRead">
-						<image class="sendIcon" src="../../static/eleWater.png" mode="aspectFit"></image>
-						<!-- <view>抄表</view> -->
-					</view>
-					<button class="sendBillBox" open-type="share" hover-class="btnHoverClass">
-						<image class="sendIcon" src="../../static/sendBill.png" mode="aspectFit"></image>
-						<!-- <span>发送账单</span> -->
-					</button>
+				<view class="sendBillBox" @click="deleteBill">
+					<image class="sendIcon" src="../../static/delete_btn.png" mode="aspectFit"></image>
+					<!-- <view>删除</view> -->
 				</view>
+				<view v-if="billType == 0" class="sendBillBox" @click="openMeterRead">
+					<image class="sendIcon" src="../../static/eleWater.png" mode="aspectFit"></image>
+					<!-- <view>抄表</view> -->
+				</view>
+				<button class="sendBillBox" open-type="share" hover-class="btnHoverClass">
+					<image class="sendIcon" src="../../static/sendBill.png" mode="aspectFit"></image>
+					<!-- <span>发送账单</span> -->
+				</button>
+			</view>
 			<!-- </view> -->
 			<view class="" v-if="billType == 1 && !fromShare">
 				<view class="sureBtn" v-if="billInfo.billStatus != 4" @click="checkMoney">交租</view>
@@ -187,8 +190,8 @@
 				payRentDate: '',
 				arrivalDate: '',
 				quantity: '',
-				fromShare:false,
-				titleContent:''
+				fromShare: false,
+				titleContent: ''
 			};
 		},
 		onShow() {
@@ -196,10 +199,10 @@
 		},
 		onLoad(option) {
 			console.log(this)
-			if(option.fromShare){
+			if (option.fromShare) {
 				this.fromShare = option.fromShare
 			}
-			if(option.titleContent){
+			if (option.titleContent) {
 				this.titleContent = option.titleContent
 			}
 			if (option.billType) {
@@ -213,18 +216,19 @@
 				this.getOwnerInfo(option.ownerId)
 			}
 		},
-		onShareAppMessage(){
+		onShareAppMessage() {
 			let titleContent = this.billType == 0 ? this.houseAddrInfo.communityName + '-' + this.houseAddrInfo.houseNo + '-' +
 				this.houseAddrInfo.roomNo : this.ownerInfo.communityName + '-' + this.ownerInfo.houseNo
 			return {
-				title:'您有一笔租金账单待支付',
-				imageUrl:'https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/shareBill.jpg',
+				title: '您有一笔租金账单待支付',
+				imageUrl: 'https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/shareBill.jpg',
 				// imageUrl:'/static/shareBill.jpg',
-				path:'/pages/billDetail/billDetail?billType='+1+'&billId='+this.billId+'&fromShare='+true+'&titleContent='+titleContent
+				path: '/pages/billDetail/billDetail?billType=' + 1 + '&billId=' + this.billId + '&fromShare=' + true +
+					'&titleContent=' + titleContent
 			}
 		},
 		methods: {
-			
+
 			editBill() {
 				let titleContent = this.billType == 0 ? this.houseAddrInfo.communityName + '-' + this.houseAddrInfo.houseNo + '-' +
 					this.houseAddrInfo.roomNo : this.ownerInfo.communityName + '-' + this.ownerInfo.houseNo
@@ -381,7 +385,7 @@
 				let _this = this;
 				let par = this.billInfo
 				par.items.push(this.electricityInfo)
-				if(JSON.stringify(this.commEleCos) != "{}"){
+				if (JSON.stringify(this.commEleCos) != "{}") {
 					par.items.push(this.commEleCost)
 				}
 				par.billStatus = 4
@@ -450,8 +454,12 @@
 		font-size: 30rpx;
 		margin-top: 10rpx;
 		display: flex;
-		justify-content: space-between;
+		justify-content: flex-start;
 		align-items: center;
+	}
+
+	.houseAddr .rentPromotion {
+		margin: 0 10rpx 0 auto;
 	}
 
 	.houseAddr span {
@@ -462,6 +470,10 @@
 		color: #FFFFFF;
 		text-align: center;
 		line-height: 58rpx;
+	}
+
+	.myLeft {
+		margin-left: auto;
 	}
 
 	.section1 {
@@ -625,7 +637,7 @@
 		/* min-height: 93rpx; */
 		height: fit-content;
 		/* line-height: 93rpx; */
-		padding:0 0 28rpx 30rpx;
+		padding: 0 0 28rpx 30rpx;
 		color: #999999;
 		font-size: 30rpx;
 		background-color: #ffffff;
@@ -694,7 +706,8 @@
 		text-align: center;
 		font-size: 28rpx;
 	}
-	.sendBillBox span{
+
+	.sendBillBox span {
 		display: block;
 	}
 
@@ -848,12 +861,11 @@
 	}
 
 	/* end */
-	.remarksDivide{
+	.remarksDivide {
 		padding: 28rpx 0;
 		font-size: 34rpx;
 		color: #999999;
 		border-bottom: 2rpx solid #EBEBEB;
 		margin-bottom: 28rpx;
 	}
-	
 </style>

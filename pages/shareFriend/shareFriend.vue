@@ -1,7 +1,8 @@
 <template>
 	<view class="shareFriend">
-		<posters-layer :postersData="postersData" @success="onSuccessCreatePosters" @error="onPostersError">
-		</posters-layer>
+		<canvas canvas-id="myCanvas"></canvas>
+		<!-- <posters-layer :postersData="postersData" @success="onSuccessCreatePosters" @error="onPostersError">
+		</posters-layer> -->
 		<image class="bannerImg" src="../../static/shareBanner.jpg" mode="aspectFit"></image>
 		<view class="content">
 			<view class="titleBar">活动规则</view>
@@ -10,7 +11,8 @@
 			<view class="actDate">活动说明</view>
 			<view class="detail">每位用户都有自己独有的邀请码，邀请用户入驻并填写你的邀请码，新用户付费之后，您将获得最高30%的现金返佣，或者价值50%金额的有效期延长。</view>
 			<view class="btnBox">
-				<view class="setImg" @click="saveImg">生成分享图</view>
+				<!-- <view class="setImg" @click="saveImg">生成分享图</view> -->
+				<view class="setImg" @click="saveImg1">生成分享图</view>
 				<button class="shareBtn" open-type="share" hover-class="btnHoverClass">分享好友</button>
 			</view>
 		</view>
@@ -29,6 +31,8 @@
 			return {
 				postersData: {},
 				tempPath: '',
+				ctx: {},
+				bgUrl: "https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/shareFriend.jpg",
 			};
 		},
 		components: {
@@ -46,24 +50,96 @@
 			}
 		},
 		onLoad() {
-			if(this.$store.state.shareImgPath){
+			this.ctx = uni.createCanvasContext('myCanvas')
+			if (this.$store.state.shareImgPath) {
 				this.tempPath = this.$store.state.shareImgPath
-			}else{
-				this.initPostersConfig(this.landladyInfo.userImg);
 			}
-			
+
 		},
 		methods: {
-			saveImg() {
+			saveImg1() {
 				let _this = this;
-				if (!this.tempPath) {
-					uni.showToast({
-						title: '海报正在绘制，请稍后重试',
-						icon: 'none',
-						duration: 2000,
+				uni.showLoading({
+					title:"海报正在绘制..."
+				})
+				_this.ctx = uni.createCanvasContext('myCanvas')
+				_this.getImageInfo(_this.bgUrl).then(imgInfo => {
+					console.log(imgInfo.localPath)
+					_this.ctx.drawImage(imgInfo.localPath, 0, 0, 375, 637)
+					_this.ctx.save(); // 保存
+					_this.ctx.setFontSize(18)
+					_this.ctx.setTextAlign('center')
+					// _this.drawWrapText(_this.ctx, "璐璐邀请您体验收租鸟", 18, 322, 375)
+					_this.ctx.fillText(_this.landladyInfo.userName+'邀请您体验收租鸟', 375 / 2, 322)
+					_this.ctx.fillText(_this.landladyInfo.userName+'邀请您体验收租鸟', 375 / 2 - 0.3, 322)
+					var x = 151,
+						y = 211,
+						size = 73;
+					_this.ctx.restore();
+					_this.ctx.save(); // 保存
+					_this.ctx.arc((size / 2 + x), (size / 2 + y), (size / 2) + 2, 0, Math.PI * 2, false);
+					_this.ctx.setFillStyle('#FFFFFF');
+					_this.ctx.fill()
+					_this.ctx.restore();
+					_this.ctx.beginPath(); // 开始绘制
+					_this.ctx.arc(size / 2 + x, size / 2 + y, size / 2, 0, Math.PI * 2, false);
+					_this.ctx.clip();
+					_this.getImageInfo(_this.landladyInfo.userImg).then(res => {
+						_this.ctx.restore();
+						_this.ctx.drawImage(res.localPath, x, y, size, size);
+						_this.ctx.draw(true,()=>{
+							_this.saveImageToLocal()
+						});
 					})
-					return;
-				}
+				})
+			},
+			saveImageToLocal(){
+				uni.canvasToTempFilePath({
+				    x: 0,
+				    y: 0,
+				    width:375,
+				    height:637,
+				    canvasId: 'myCanvas',
+				    success: res => {
+				        if (res.errMsg === 'canvasToTempFilePath:ok') {
+							this.tempPath = res.tempFilePath
+				            this.saveImgMobile()
+				        }
+				    }
+				}, this);
+			},
+			getImageInfo(url) {
+				return new Promise((resolve, reject) => {
+					/* 获得要在画布上绘制的图片 */
+					const objExp = new RegExp(/^http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/);
+					if (objExp.test(url)) {
+						uni.getImageInfo({
+							src: url,
+							complete: res => {
+								if (res.errMsg === 'getImageInfo:ok') {
+									const img = {
+										localPath: res.path
+									};
+									resolve(img);
+								} else {
+									reject(new Error('getImageInfo fail'));
+								}
+							}
+						});
+					}
+				})
+
+			},
+			saveImgMobile() {
+				let _this = this;
+				// if (!this.tempPath) {
+				// 	uni.showToast({
+				// 		title: '海报正在绘制，请稍后重试',
+				// 		icon: 'none',
+				// 		duration: 2000,
+				// 	})
+				// 	return;
+				// }
 				uni.saveImageToPhotosAlbum({
 					filePath: _this.tempPath,
 					success: function() {
@@ -102,8 +178,21 @@
 							});
 
 						}
+					},
+					complete() {
+						uni.hideLoading()
 					}
 				});
+			},
+			saveImg() {
+				if (!this.tempPath) {
+					uni.showLoading({
+						title: '海报正在绘制...'
+					})
+					this.initPostersConfig(this.landladyInfo.userImg);
+				} else {
+					this.saveImgMobile()
+				}
 			},
 			initPostersConfig(avaUrl) {
 				const config = {
@@ -111,8 +200,7 @@
 					width: 375,
 					height: 637,
 					background: '#ffffff',
-					views: [
-						{
+					views: [{
 							type: 'image',
 							width: 375,
 							height: 637,
@@ -139,15 +227,15 @@
 							radius: 36.5,
 							// 封面图，测试的时候填上
 							// url: 'https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/share1.jpg'
-							url:avaUrl ? avaUrl : 'https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/share1.jpg'
+							url: avaUrl ? avaUrl : 'https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/share1.jpg'
 						},
 						{
 							type: 'text',
 							width: 305,
 							height: 20,
-							left: 375/2,
+							left: 375 / 2,
 							top: 305,
-							textAlign:'center',
+							textAlign: 'center',
 							fontSize: 18,
 							bolder: true,
 							breakWord: true,
@@ -163,6 +251,7 @@
 				console.log(res.path);
 				this.tempPath = res.path;
 				this.$store.commit('shareImgPath', res.path)
+				this.saveImg()
 			},
 			onPostersError(res) {
 				console.log('错误', res)
@@ -258,5 +347,13 @@
 		background-color: #FFA044;
 		color: #FFFFFF;
 		border-radius: 40rpx;
+	}
+	canvas {
+		width: 750rpx;
+		height: 1274rpx;
+		position: fixed;
+		top: 5000rpx;
+		left: 0;
+		z-index: -1;
 	}
 </style>

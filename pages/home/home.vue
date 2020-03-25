@@ -69,10 +69,10 @@
 				</view>
 				<view class="loginTxt">授权登录体验完整功能</view>
 				<view class="loginImg">
-					<view class="notLogin" @click="cancleLogin">
+					<!-- <view class="notLogin" @click="cancleLogin">
 						<image src="../../static/notLogin.png" mode=""></image>
-					</view>
-					<button class="loginButton" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true"></button>
+					</view> -->
+					<button class="loginButton"  open-type="getUserInfo" @getuserinfo="getUserInfo">授权微信登录</button>
 				</view>
 			</view>
 		</view>
@@ -239,9 +239,9 @@
 				})
 			},
 			switchPage(url) {
-				if(!this.$store.state.landladyInfo.id){
-					return
-				}
+				// if(!this.$store.state.landladyInfo.id){
+				// 	return
+				// }
 				uni.navigateTo({
 					url
 				})
@@ -355,6 +355,7 @@
 								fail: function(res) {
 									uni.showToast({
 										title: '微信授权不成功！',
+										icon:'none',
 										duration: 2000
 									});
 								}
@@ -518,11 +519,11 @@
 	}
 
 	.deleteImg {
-		width: 38rpx;
-		height: 38rpx;
+		width: 25rpx;
+		height: 25rpx;
 		position: absolute;
-		top: 15rpx;
-		right: 15rpx;
+		top: 200rpx;
+		right: 20rpx;
 		z-index: 9000;
 	}
 
@@ -558,18 +559,14 @@
 	}
 
 	.loginButton {
-		width: 185rpx !important;
-		height: 70rpx !important;
-		background-image: url(../../static/login.png);
-		background-size: 100% 100%;
-		margin-left: 37rpx;
-		border: none !important;
-		outline: none !important;
-		border-radius: 30rpx;
-	}
-
-	button::after {
-		border: none;
+		width: 414rpx !important;
+		height: 80rpx !important;
+		background-color: #F19033;
+		margin: 0 auto;
+		line-height: 80rpx;
+		color: #FFFFFF;
+		border-radius: 40rpx;
+		font-size: 30rpx;
 	}
 
 	/* 轮播图 */
