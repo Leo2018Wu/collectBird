@@ -169,6 +169,7 @@
 		position: absolute;
 		bottom: 79px;
 		left: 106rpx;
+		font-weight: bold;
 	}
 
 	.deleteImg {

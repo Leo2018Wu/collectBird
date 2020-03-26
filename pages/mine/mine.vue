@@ -4,19 +4,19 @@
 			<view class="coverBlock">
 				<view class="vipBg">
 					<image class="posiBg" src="../../static/buyCrown.png" mode="aspectFill"></image>
-					<view class="vipBgContainer" v-if="landladyInfo.userStatus == '1'">
-						<image src="../../static/beVip.png" mode="aspectFit"></image>
-						<view class="vipTip">开通会员</view>
-						<view class="vipRight" @click="goKeepUsing">
-							<view>购买</view>
-							<image src="../../static/vipRight.png" mode="aspectFill"></image>
-						</view>
-					</view>
-					<view class="vipBgContainer" v-else>
+					<view class="vipBgContainer" v-if="landladyInfo.userStatus == '2'" >
 						<image src="../../static/isVip.png" mode="aspectFit"></image>
 						<view class="vipTip">会员</view>
 						<view class="vipRight" @click="goKeepUsing">
 							<view>续费</view>
+							<image src="../../static/vipRight.png" mode="aspectFill"></image>
+						</view>
+					</view>
+					<view class="vipBgContainer" v-else>
+						<image src="../../static/beVip.png" mode="aspectFit"></image>
+						<view class="vipTip">开通会员</view>
+						<view class="vipRight" @click="goKeepUsing">
+							<view>购买</view>
 							<image src="../../static/vipRight.png" mode="aspectFill"></image>
 						</view>
 					</view>
@@ -574,7 +574,7 @@
 		left: 50%;
 		transform: translateX(-50%);
 		bottom: -10rpx;
-		padding: 20rpx 65rpx 0 65rpx;
+		padding: 20rpx 60rpx 0 60rpx;
 		position: relative;
 		border-radius: 20rpx;
 	}
@@ -1057,8 +1057,6 @@
 	.loginButton {
 		width: 185rpx !important;
 		height: 70rpx !important;
-		background-image: url(../../static/login.png);
-		background-size: 100% 100%;
 		margin-left: 37rpx;
 		border: none !important;
 		outline: none !important;

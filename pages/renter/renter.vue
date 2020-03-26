@@ -25,10 +25,7 @@
 		<view class="section3" v-for="(item,index) in roomInfo.tenants" :key="index">
 			<renter-info-bar :userInfo="item" v-on:emitFillInfo="fillInfo" v-on:emitUserId="getEmit" :showFillBtn="roomInfo.tenantStatus == 2"></renter-info-bar>
 		</view>
-		<view class="operationBox" v-if="!isShowAddBtn &&  roomInfo.tenantStatus >= 3">
-			<view class="operationBtn keepRenting" @click="endRenting">退租</view>
-			<view class="operationBtn endRenting" @click="keepRenting">续租</view>
-		</view>
+		
 		<view class="addRenterBox1" v-if="isShowAddBtn">
 			<image class="noRenter" src="../../static/noRenter.png" mode="aspectFit"></image>
 			<view v-if="roomInfo.tenantStatus == 1">租客信息填写中，您可以选择</view>
@@ -41,6 +38,19 @@
 		<view class="addRenterBox" v-if="isShowAddBtn && roomInfo.tenantStatus == 1">
 			<view class="addRenter" @click="updateInviteStatus(0)">取消邀请</view>
 			<button class="invite" open-type="share">再次邀请</button>
+		</view>
+		<view class="operationBox" v-if="!isShowAddBtn &&  roomInfo.tenantStatus >= 3">
+			<view class="rentBtnBox" @click="endRenting">
+				<image src="../../static/endRentIcon.png" mode="aspectFit"></image>
+				<view>退租</view>
+			</view>
+			<view class="rentBtnBox" @click="keepRenting">
+				<image src="../../static/keepRentIcon.png" mode="aspectFit"></image>
+				<view>续租</view>
+			</view>
+			<view class="inviteBind">邀请账号绑定</view>
+			<!-- <view class="operationBtn keepRenting" @click="endRenting">退租</view>
+			<view class="operationBtn endRenting" @click="keepRenting">续租</view> -->
 		</view>
 		<tip-modal v-if="isShowTipModal" :oneButton="true" :title="'提示'" :describition="'有未确认账单，不能退租。'" v-on:emitCancel="returnEmit"></tip-modal>
 	</view>
@@ -407,13 +417,43 @@
 	}
 
 	.operationBox{
-		margin-top: 28rpx;
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		box-shadow:0px -5rpx 16rpx 0px rgba(0, 0, 0, 0.04);
+		height: 128rpx;
 		width: 100%;
-		padding-right: 32rpx;
+		padding: 22rpx 40rpx 20rpx 100rpx;
+		font-size: 28rpx;
 		display: flex;
-		justify-content: flex-end;
+		justify-content: flex-start;
+		align-items: center;
 	}
-	.operationBtn{
+	.rentBtnBox{
+		width: fit-content;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-around;
+		align-items: center;
+		margin-right: 84rpx;
+	}
+	.inviteBind{
+		width:317rpx;
+		height:92rpx;
+		line-height: 92rpx;
+		text-align: center;
+		background:linear-gradient(-90deg,rgba(234,185,93,1) 0%,rgba(228,158,84,1) 100%);
+		border-radius:18rpx;
+		font-size: 34rpx;
+		color: #FFFFFF;
+		margin-left: auto;
+	}
+	.rentBtnBox image{
+		width: 42rpx;
+		height: 42rpx;
+	}
+	/* .operationBtn{
 		width:112rpx;
 		height:56rpx;
 		text-align: center;
@@ -429,5 +469,5 @@
 		border:1rpx solid #999999;
 		color: #999999;
 		margin-right: 20rpx;
-	}
+	} */
 </style>

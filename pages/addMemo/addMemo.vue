@@ -1,7 +1,7 @@
 <template>
 	<view class="addMemo">
 		<tip-modal v-if="isShowTipModal" v-on:emitCancel="returnCancel" v-on:emitSure="returnSure" :title="'提示'" :describition="'是否确认删除该条记事'"></tip-modal>
-		<view class="curDate">{{curDate}}</view>
+		<view class="curDate">{{showDate ? showDate : curDate}}</view>
 		<input class="secTip textOverFlow" v-model="title" placeholder="标题" placeholder-style="color:#C8C9CB" placeholder-class="text-placeholder"></input>
 		<view class="divide"></view>
 		<textarea class="secTip1" v-model="content" placeholder="记事" placeholder-style="color:#C8C9CB" placeholder-class="textPlaceholder1"></textarea>
@@ -28,7 +28,8 @@
 				curDate: '',
 				content: '',
 				memoId:null,
-				isShowTipModal:false
+				isShowTipModal:false,
+				showDate:"",
 			}
 		},
 		onLoad(options) {
@@ -75,6 +76,7 @@
 					id
 				}).then((res)=>{
 					console.log(res)
+					_this.showDate = res.data.data.createTime;
 					_this.title = res.data.data.noteTitle;
 					_this.content = res.data.data.noteContent;
 				})

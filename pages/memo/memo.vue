@@ -5,7 +5,7 @@
 			<view class="item" v-for="(item,index) in memoList" :key="index" @click="showDetail(item.id)">
 				<view class="title">{{item.noteTitle}}</view>
 				<view class="content line-clamp2" :class="{noMarginTop:!item.noteTitle}">{{item.noteContent}}</view>
-				<view class="memoDate">{{item.createTime}}</view>
+				<view class="memoDate">{{item.updateTime}}</view>
 			</view>
 		</mescroll-uni>
 		<is-login v-show="loginFlag" :childLoginFlag="loginFlag" v-on:childByValue="childByValue"></is-login>

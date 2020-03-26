@@ -44,6 +44,9 @@
 						</view>
 					</view>
 				</view>
+				<view class="officalBox">
+					<official-account style="border: none;" bindload="bindload" v-on:binderror="binderror"></official-account>
+				</view>
 				<view class="noticeBox">
 					<image class="leftImg" src="../../static/updateIcon.png" mode="aspectFit"></image>
 					<view class="noticeContent">
@@ -208,6 +211,12 @@
 			}
 		},
 		methods: {
+			bindload(e){
+				console.log('组件加载成功',e)
+			},
+			binderror(e){
+				console.log('组件加载失败',e)
+			},
 			swiperTarget(url) {
 				uni.navigateTo({
 					url
@@ -516,6 +525,7 @@
 		position: absolute;
 		bottom: 79px;
 		left: 106rpx;
+		font-weight: bold;
 	}
 
 	.deleteImg {
@@ -765,5 +775,9 @@
 		z-index: 991;
 		top: 616rpx;
 		right: 64rpx;
+	}
+	.officalBox{
+		margin-top: 60rpx;
+		padding: 0 53rpx;
 	}
 </style>
