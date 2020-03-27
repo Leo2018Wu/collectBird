@@ -48,7 +48,7 @@
 				<image src="../../static/keepRentIcon.png" mode="aspectFit"></image>
 				<view>续租</view>
 			</view>
-			<view class="inviteBind">邀请账号绑定</view>
+			<view class="inviteBind" @click="bindOffical">邀请账号绑定</view>
 			<!-- <view class="operationBtn keepRenting" @click="endRenting">退租</view>
 			<view class="operationBtn endRenting" @click="keepRenting">续租</view> -->
 		</view>
@@ -141,6 +141,11 @@
 			return shareObject;
 		},
 		methods: {
+			bindOffical(){
+				uni.navigateTo({
+					url:'../inviteBindOffical/inviteBindOffical?tenantId='+this.tenantId
+				})
+			},
 			updateIsRead(addresseeId){
 				this.$request.post('/userMessage/updateIsRead',{
 					addresseeId,

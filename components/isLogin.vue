@@ -34,6 +34,7 @@
 				this.$emit('childByValue', false); //关键点
 			},
 			getUserInfo() {
+				this.cancleLogin()
 				console.log(11111);
 				let self = this;
 				uni.login({
@@ -77,7 +78,6 @@
 													};
 													self.getMineMsg(userInfo);
 													self.$emit('childByValue', false);
-
 												}
 											},
 											fail: function(res) {
@@ -116,7 +116,7 @@
 						_this.$store.commit('landladyInfo', res.data.data);
 						console.log(res.data.data);
 						let myMsgs = res.data.data;
-						this.$emit('childByValue', res.data.data);
+						this.$emit('successCallBack');
 						this.$emit('isShowloginBtn', false);
 					})
 					.catch(err => {

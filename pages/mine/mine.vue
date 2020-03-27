@@ -132,7 +132,7 @@
 		</view>
 		<message-modal v-if="showMessageModal" :deadNum="deadNum" v-on:emitCancel="returntCancel" v-on:emitSure="returnSure"></message-modal>
 		<!-- 授权弹窗 -->
-		<is-login v-show="loginFlag" v-on:isShowloginBtn="isShowloginBtn" :childLoginFlag="loginFlag" v-on:childByValue="childByValue"></is-login>
+		<is-login v-show="loginFlag" v-on:isShowloginBtn="isShowloginBtn" :childLoginFlag="loginFlag" v-on:successCallBack="sucCallBack" v-on:childByValue="childByValue"></is-login>
 		<!-- <view class="isloginModal" v-show="loginFlag" @click="cancleLogin"></view> -->
 		<!-- <view class="isloginBox" v-show="loginFlag">
 			<image class="bgcImg" src="../../static/authorization.png" mode=""></image>
@@ -195,6 +195,7 @@
 			let data = this.$store.state.landladyInfo
 			if(data.id){
 				let userInfo = {
+					unionId:data.unionId,
 					openId: data.openId,
 					userImg: data.userImg,
 					userName: data.userName,
@@ -246,9 +247,14 @@
 				}
 			},
 			goKeepUsing() {
-				uni.navigateTo({
-					url: '../keepUsing/keepUsing?trialDate=' + this.trialDate + '&roomLimitNum=' + this.landladyInfo.buyNum
-				})
+				if(this.$store.state.landladyInfo.id){
+					uni.navigateTo({
+						url: '../keepUsing/keepUsing?trialDate=' + this.trialDate + '&roomLimitNum=' + this.landladyInfo.buyNum
+					})
+				}else{
+					this.loginFlag = true;
+				}
+				
 			},
 			getUserInfo() {
 				console.log(11111);
@@ -286,6 +292,7 @@
 														self.gender = '未知';
 													}
 													let userInfo = {
+														unionId:res.data.data.unionid,
 														openId: res.data.data.openid,
 														userName: infoRes.userInfo.nickName,
 														userImg: infoRes.userInfo.avatarUrl,
@@ -335,6 +342,7 @@
 								_this.$store.commit('isloginStatus', true);
 								_this.show = false;
 								let userInfo = {
+									unionId:_this.$store.state.landladyInfo.unionId,
 									openId: _this.$store.state.userOpenId,
 									userName: _this.$store.state.landladyInfo.userName,
 									userImg: _this.$store.state.landladyInfo.userImg,

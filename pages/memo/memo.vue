@@ -8,7 +8,7 @@
 				<view class="memoDate">{{item.updateTime}}</view>
 			</view>
 		</mescroll-uni>
-		<is-login v-show="loginFlag" :childLoginFlag="loginFlag" v-on:childByValue="childByValue"></is-login>
+		<is-login v-show="loginFlag" :childLoginFlag="loginFlag" v-on:successCallBack="sucCallBack" v-on:childByValue="childByValue"></is-login>
 		<image @click="addMemo" class="memoBtn" src="../../static/memoBtn.png" mode="aspectFit"></image>
 	</view>
 </template>
@@ -45,13 +45,13 @@
 					noMoreSize: 5, // 配置列表的总数量要大于等于5条才显示'-- END --'的提示
 					empty: {
 						use: true,
-						icon:'/static/noMemo.png',
+						icon: '/static/noMemo.png',
 						tip: '点击按钮，开始记事吧'
 					}
 				},
 				mescroll: {},
 				memoList: [],
-				loginFlag:false,
+				loginFlag: false,
 			}
 		},
 		onShow() {
@@ -59,28 +59,28 @@
 			this.downCallback(this.mescroll);
 		},
 		methods: {
-			childByValue(value) {
-				console.log(value, '弹不弹登录提示')
-				if (value == false) {
-					this.loginFlag = false;
-					this.addMemo()
-				}
+			sucCallBack(){
+				this.para.landlordId = this.$store.state.landladyInfo.id
+				this.downCallback(this.mescroll);
 			},
-			showDetail(id){
-				
+			childByValue(value) {
+				this.loginFlag = false;
+			},
+			showDetail(id) {
+
 				uni.navigateTo({
-					url:'../addMemo/addMemo?memoId='+id
+					url: '../addMemo/addMemo?memoId=' + id
 				})
 			},
-			addMemo(){
+			addMemo() {
 				if (this.$store.state.isloginStatus) {
 					uni.navigateTo({
-						url:'../addMemo/addMemo'
+						url: '../addMemo/addMemo'
 					})
-				}else{
+				} else {
 					this.loginFlag = true;
 				}
-				
+
 			},
 			init(e) {
 				this.mescroll = e;
@@ -158,11 +158,13 @@
 		right: 0;
 		bottom: 202rpx;
 	}
-	.noMemoEmpty{
+
+	.noMemoEmpty {
 		width: 100%;
 		height: 200rpx;
 	}
-	.noMarginTop{
+
+	.noMarginTop {
 		margin-top: 0;
 	}
 </style>

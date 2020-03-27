@@ -205,75 +205,6 @@
 					},
 				})
 			},
-			getImageInfo(url) {
-				return new Promise((resolve, reject) => {
-					/* 获得要在画布上绘制的图片 */
-					const objExp = new RegExp(/^http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/);
-					if (objExp.test(url)) {
-						uni.getImageInfo({
-							src: url,
-							complete: res => {
-								if (res.errMsg === 'getImageInfo:ok') {
-									uni.saveImageToPhotosAlbum({
-										filePath: res.path,
-										success: function() {
-											console.log('save success');
-											uni.showToast({
-												title: '公众号二维码已保存！',
-												icon: 'none',
-												duration: 2000
-											})
-										},
-										fail(err) {
-											if (err.errMsg === "saveImageToPhotosAlbum:fail auth deny") {
-												console.log("打开设置窗口");
-												uni.showModal({
-													title: '获取权限',
-													content: '获取您拒绝过的相册权限',
-													success: function(res) {
-														if (res.confirm) {
-															uni.openSetting({
-																success(settingdata) {
-																	console.log(settingdata)
-																	if (settingdata.authSetting["scope.writePhotosAlbum"]) {
-																		console.log("获取权限成功，再次点击图片保存到相册")
-																	} else {
-																		console.log("获取权限失败")
-																	}
-																},
-																fail(errMsg) {
-																	console.log(errMsg)
-																}
-															})
-														} else if (res.cancel) {
-															console.log('用户点击取消');
-														}
-													}
-												});
-									
-											}
-										},
-										complete() {
-										}
-									});
-								} else {
-									reject(new Error('getImageInfo fail'));
-								}
-							}
-						});
-					}
-				})
-			
-			},
-			getQrCode(id){
-				this.$request.post('/wx/createQrcode',{
-					tenantId:id
-				}).then((res)=>{
-					console.log(res)
-					let url = 'https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket='+res.data.data.ticket
-					this.getImageInfo(url)
-				})
-			},
 			sumbit() {
 				let _this = this;
 				let par = {
@@ -307,7 +238,6 @@
 										_this.$request.post('/roomUser/inviTenant', par).then((data) => {
 											if (data.data.code == '200') {
 												_this.isSubmitSuccess = 2;
-												_this.getQrCode(data.data.data.id)
 												uni.showToast({
 													title: '填写成功',
 													duration: 1500

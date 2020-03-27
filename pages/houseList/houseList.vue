@@ -13,7 +13,7 @@
 				</view>
 			</view>
 		</view>
-		<view class="section2" >
+		<view class="section2">
 			<add-bar v-on:addCommunity="addCommunity"></add-bar>
 			<view class="serchBar">
 				<span v-if="wordList.length != 0">筛选：</span>
@@ -23,13 +23,14 @@
 			</view>
 		</view>
 		<view class="section3">
-			<mescroll-uni :down="downOption" @down="downCallback" :up="upOption" @up="upCallback" :fixed="false" @init="init" v-on:emptyclick="emptyclick">
+			<mescroll-uni :down="downOption" @down="downCallback" :up="upOption" @up="upCallback" :fixed="false" @init="init"
+			 v-on:emptyclick="emptyclick">
 				<view class="houseSkuBox" v-for="(item, index) in houseInfoList" :key="index" @click="goDetail(item.id, item.landlordId)">
 					<new-house-sku :item="item"></new-house-sku>
 				</view>
 			</mescroll-uni>
 		</view>
-		<is-login v-show="loginFlag" :childLoginFlag="loginFlag" v-on:childByValue="childByValue"></is-login>
+		<is-login v-show="loginFlag" :childLoginFlag="loginFlag" v-on:successCallBack="sucCallBack" v-on:childByValue="childByValue"></is-login>
 	</view>
 </template>
 
@@ -78,9 +79,9 @@
 					noMoreSize: 5, // 配置列表的总数量要大于等于5条才显示'-- END --'的提示
 					empty: {
 						use: true,
-						icon:'/static/houseEmpty.png',
+						icon: '/static/houseEmpty.png',
 						tip: '暂无房源，',
-						helpText:'查看如何添加房源?'
+						helpText: '查看如何添加房源?'
 					}
 				}
 			};
@@ -89,9 +90,9 @@
 			...mapState(['login', 'landladyInfo'])
 		},
 		onShow() {
-			console.log('wojinlaile',this.$store)
+			console.log('wojinlaile', this.$store)
 			let _this = this;
-			if(this.$store.state.landladyInfo.id){
+			if (this.$store.state.landladyInfo.id) {
 				this.getWords();
 				this.downCallback(this.mescroll);
 				this.$request
@@ -105,17 +106,17 @@
 			}
 		},
 		methods: {
-			emptyclick(){
+			sucCallBack(){
+				this.getWords()
+				this.downCallback(this.mescroll)
+			},
+			emptyclick() {
 				uni.navigateTo({
 					url: '../helpDetail/helpDetail?title=' + '如何查看账单？' + '&index=' + 0 + '&idx=' + 0
 				})
 			},
 			childByValue(value) {
-				console.log(value, '弹不弹登录提示')
-				if (value == false) {
-					this.loginFlag = false;
-					this.addCommunity()
-				}
+				this.loginFlag = false;
 			},
 			updateData() {
 				// this.getWords();
@@ -142,7 +143,7 @@
 				this.$request
 					.post('/community/getFirstWordArray', {
 						landlordId: this.$store.state.landladyInfo.id,
-						
+
 					})
 					.then(res => {
 						_this.wordList = res.data.data;
@@ -334,13 +335,15 @@
 		height: fit-content;
 		margin: 0 auto 18rpx auto;
 	}
-	.emptyList{
+
+	.emptyList {
 		padding-top: 290rpx;
 		text-align: center;
 		color: #BBBBBB;
 		font-size: 28rpx;
 	}
-	.noRenterIcon{
+
+	.noRenterIcon {
 		width: 136rpx;
 		height: 190rpx;
 		margin: 0 auto 14rpx auto;

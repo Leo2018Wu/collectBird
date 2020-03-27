@@ -11,13 +11,13 @@
 					<span v-if="billType == 1 && unIncome != 0 && !fromShare">-</span><span>{{ billInfo.totalAmount ? billInfo.totalAmount : '0' }}</span>
 				</view>
 			</view>
+			<tip-modal v-if="bindTip" :title="'提示'" :oneButton="true" :describition="'该租客尚未绑定账号，请先去租客页面邀请绑定'" v-on:emitCancel="hideTipModal"></tip-modal>
 			<view v-if="fromShare" class="houseAddr">{{titleContent}}</view>
 			<view v-else>
 				<view v-if="billType == 0" class="houseAddr">{{ houseAddrInfo.communityName }}-{{ houseAddrInfo.houseNo }}-{{ houseAddrInfo.roomNo }}
-					<span v-if="billInfo.billStatus != 4" class="rentPromotion">催租</span><span :class="{myLeft: billInfo.billStatus == 4}"
+					<span v-if="billInfo.billStatus != 4" class="rentPromotion" @click="rentPromot()">催租</span><span :class="{myLeft: billInfo.billStatus == 4}"
 					 class="editMybill" @click="editBill">修改</span></view>
-				<view v-else class="houseAddr">{{ ownerInfo.communityName }}-{{ ownerInfo.houseNo }} <span v-if="billInfo.billStatus != 4"
-					 class="rentPromotion">催租</span> <span :class="{myLeft: billInfo.billStatus == 4}" class="editMybill" @click="editBill">修改</span></view>
+				<view v-else class="houseAddr">{{ ownerInfo.communityName }}-{{ ownerInfo.houseNo }}<span :class="{myLeft: true}" class="editMybill" @click="editBill">修改</span></view>
 			</view>
 		</view>
 		<view class="section1">
@@ -171,6 +171,7 @@
 		},
 		data() {
 			return {
+				bindTip:false,
 				commonQuantity: '',
 				isShowSureModal1: false,
 				hasCommonEle: false,
@@ -228,7 +229,22 @@
 			}
 		},
 		methods: {
-
+			rentPromot(){
+				let _this = this;
+				if(!_this.billInfo.serviceOpenId){
+					_this.bindTip = true
+				}else{
+					console.log('已绑定，可以催租')
+					_this.$request.post('/bill/promptBill',_this.billInfo).then((res)=>{
+						if(res.data.code == "200"){
+							uni.showToast({
+								title:'催租成功',
+								duration:1500
+							})
+						}
+					})
+				}
+			},
 			editBill() {
 				let titleContent = this.billType == 0 ? this.houseAddrInfo.communityName + '-' + this.houseAddrInfo.houseNo + '-' +
 					this.houseAddrInfo.roomNo : this.ownerInfo.communityName + '-' + this.ownerInfo.houseNo
@@ -252,6 +268,7 @@
 			},
 			hideTipModal() {
 				this.isShowTipModal = false;
+				this.bindTip = false;
 			},
 			showTipModal() {
 				this.isShowTipModal = true;

@@ -192,15 +192,15 @@
 				duration: 500,
 			};
 		},
-		onLoad() {},
+		onLoad() {
+			this.checkLoginStatus().then(res => {
+				this.loginFlag = res;
+			});
+		},
 		onShow(option) {
 			if(this.$store.state.landladyInfo.id){
 				this.getMoneyInfo();
 				this.getMessageTotal(_this.$store.state.landladyInfo.id)
-			}else{
-				this.checkLoginStatus().then(res => {
-					this.loginFlag = res;
-				});
 			}
 		},
 		onShareAppMessage(res) {

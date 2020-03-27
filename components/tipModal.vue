@@ -10,7 +10,7 @@
 					<cover-view class="modalCancel" @click="cancel()">取消</cover-view>
 				</cover-view>
 				<cover-view class="btnBox1" v-else>
-					<cover-view class="modalSure1" @click="cancel()">知道了</cover-view>
+					<cover-view class="modalSure1" @click="cancel()">我知道了</cover-view>
 				</cover-view>
 			</cover-view>
 		</cover-view>
@@ -59,6 +59,9 @@
 		margin: 280rpx 0 0 105rpx;
 		padding-top: 40rpx;
 		text-align: center;
+	}
+	.modalTitle,.modalContent{
+		color: #333333 !important; 
 	}
 	.modalTitle{
 		font-size: 34rpx;

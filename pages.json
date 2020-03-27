@@ -224,6 +224,12 @@
 				"navigationBarTitleText": "新建记事"
 			}
         }
+        ,{
+            "path" : "pages/inviteBindOffical/inviteBindOffical",
+            "style" : {
+				"navigationBarTitleText": "邀请账号绑定"
+			}
+        }
     ],
 	"permission": {
 		"scope.userLocation": {
