@@ -1,14 +1,15 @@
 <template>
 	<view class="officalAccout">
 		<view class="section"></view>
-		<view class="content">
+		<view class="content" :class="{shareHeight:fromShare}">
 			<image class="divideBar" src="../../static/reportFormDivide.png" mode="aspectFit"></image>
-			<view class="miniDes">
-				邀请租客通过扫码关注收租鸟公众号可以给租客发送账单，一键催租
+			<view class="miniDes" v-if="fromShare">
+				墙裂建议关注收租鸟服务号，以便及时接受账单、提醒和其他优惠。
 			</view>
+			<view class="miniDes" v-else>邀请租客通过扫码关注收租鸟公众号可以给租客发送账单，一键催租</view>
 			<view class="qrCodeBox">
-				<view class="inner" v-if="tempUrl.length !=0">
-					<image @click="previewImage()" class="qrUrl" :src="tempUrl[0]" mode="aspectFit"></image>
+				<view class="inner">
+					<image v-if="tempUrl.length !=0" @click="previewImage()" class="qrUrl" :src="tempUrl[0]" mode="aspectFit"></image>
 				</view>
 				<canvas canvas-id="myCanvas"></canvas>
 				<!-- 	<view class="imgBox">
@@ -17,10 +18,13 @@
 					<view class="border-radius3"></view>
 					<view class="border-radius4"></view>
 				</view> -->
+				<view class="tip" v-if="!fromShare">点击二维码，然后长按发送图片</view>
 			</view>
-			<!-- <view class="tip">点击二维码，然后长按发送图片</view> -->
+			
 		</view>
-		<button class="shareBtn" open-type="share" hover-class="btnHoverClass">直接分享给租客</button>
+		<view v-if="fromShare" class="shareBtn" @click="saveImg">保存图片</view>
+		<button v-else class="shareBtn" open-type="share" hover-class="btnHoverClass">直接分享给租客</button>
+		
 	</view>
 </template>
 
@@ -28,6 +32,7 @@
 	export default {
 		data() {
 			return {
+				fromShare:'',
 				init: false,
 				tempUrl: [],
 				tenantId: "",
@@ -37,7 +42,12 @@
 			}
 		},
 		onLoad(options) {
+			console.log(options)
 			this.tenantId = options.tenantId
+			if(options.fromShare){
+				this.fromShare = options.fromShare
+			}
+			console.log(typeof this.fromShare)
 			this.getQrCode(this.tenantId)
 			uni.showLoading({
 				title: '加载中...'
@@ -47,12 +57,56 @@
 		onShareAppMessage(res) {
 			return {
 				title: this.$store.state.landladyInfo.userName + '邀请您关注收租鸟公众号',
-				imageUrl:'/static/bindShare.jpg',
+				imageUrl:'https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/bindShare.jpg',
 				// imageUrl: 'https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/share1.jpg',
-				path: '/pages/inviteBindOffical/inviteBindOffical?tenantId=' + this.tenantId
+				path: '/pages/inviteBindOffical/inviteBindOffical?tenantId=' + this.tenantId+'&fromShare='+true
 			}
 		},
 		methods: {
+			saveImg(){
+				let _this = this;
+				uni.saveImageToPhotosAlbum({
+					filePath: _this.tempUrl[0],
+					success: function() {
+						uni.showToast({
+							title: '分享图已保存，快去分享吧！',
+							icon: 'none',
+							duration: 2000
+						})
+					},
+					fail(err) {
+						if (err.errMsg === "saveImageToPhotosAlbum:fail auth deny") {
+							console.log("打开设置窗口");
+							uni.showModal({
+								title: '获取权限',
+								content: '获取您拒绝过的相册权限',
+								success: function(res) {
+									if (res.confirm) {
+										uni.openSetting({
+											success(settingdata) {
+												console.log(settingdata)
+												if (settingdata.authSetting["scope.writePhotosAlbum"]) {
+													console.log("获取权限成功，再次点击图片保存到相册")
+												} else {
+													console.log("获取权限失败")
+												}
+											},
+											fail(errMsg) {
+												console.log(errMsg)
+											}
+										})
+									} else if (res.cancel) {
+										console.log('用户点击取消');
+									}
+								}
+							});
+				
+						}
+					},
+					complete() {
+					}
+				});
+			},
 			drawImage() {
 				let _this = this;
 				_this.ctx = uni.createCanvasContext('myCanvas')
@@ -61,14 +115,14 @@
 					console.log(imgInfo, 2321312312)
 					_this.ctx.save()
 					_this.ctx.setFillStyle('#FFFFFF')
-					_this.ctx.fillRect(0, 0, 363, 213)
+					_this.ctx.fillRect(0, 0, 363, 152)
 					_this.ctx.restore()
 					_this.ctx.drawImage(imgInfo.localPath, 10,10, 323, 132)
 					_this.getImageInfo(_this.QrCodeUrl).then(res => {
 						_this.ctx.drawImage(res.localPath, 19, 19, 114, 114);
-						_this.ctx.setFontSize(15)
-						_this.ctx.setTextAlign('center')
-						_this.ctx.fillText('点击二维码，然后长按发送图片', 363/2, 186)
+						// _this.ctx.setFontSize(15)
+						// _this.ctx.setTextAlign('center')
+						// _this.ctx.fillText('点击二维码，然后长按发送图片', 363/2, 186)
 						_this.ctx.draw(true, () => {
 							uni.hideLoading()
 							_this.saveImageToLocal()
@@ -168,7 +222,7 @@
 	.content {
 		width: 686rpx;
 		padding-top: 66rpx;
-		height: 760rpx;
+		min-height: 760rpx;
 		border-radius: 30rpx;
 		position: absolute;
 		top: 56rpx;
@@ -201,7 +255,7 @@
 
 	.inner {
 		width: 100%;
-		height: 425rpx;
+		height: 284rpx;
 		position: relative;
 	}
 
@@ -257,7 +311,7 @@
 
 	.tip {
 		width: 100%;
-		margin-top: 80rpx;
+		margin-top: 46rpx;
 		color: #999999;
 		font-size: 30rpx;
 		text-align: center;
@@ -276,10 +330,13 @@
 		left: 90rpx;
 		bottom: 160rpx;
 	}
-
+	
+	.shareHeight{
+		min-height: 680rpx !important;
+	}
 	canvas {
 		width: 726rpx;
-		height: 426rpx;
+		height: 304rpx;
 		position: fixed;
 		top: 5000rpx;
 		left: 0;

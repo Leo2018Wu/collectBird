@@ -6,7 +6,7 @@
 				<cover-view class="modalContent">{{describition}}</cover-view>
 				<cover-view class="btnBox" v-if="!oneButton">
 					<cover-view class="btnDivide"></cover-view>
-					<cover-view class="modalSure" @click="sure()">删除</cover-view>
+					<cover-view class="modalSure" @click="sure()">{{leftBtn}}</cover-view>
 					<cover-view class="modalCancel" @click="cancel()">取消</cover-view>
 				</cover-view>
 				<cover-view class="btnBox1" v-else>
@@ -32,6 +32,10 @@
 			oneButton:{
 				type:Boolean,
 				default:false
+			},
+			leftBtn:{
+				type:String,
+				default:'删除'
 			}
 		},
 		data() {

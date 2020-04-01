@@ -48,10 +48,11 @@
 				<image src="../../static/keepRentIcon.png" mode="aspectFit"></image>
 				<view>续租</view>
 			</view>
-			<view class="inviteBind" @click="bindOffical">邀请账号绑定</view>
+			<view class="inviteBind" :class="{hasBind:hasBind}" @click="bindOffical">{{hasBind ? '解除' :'邀请'}}账号绑定</view>
 			<!-- <view class="operationBtn keepRenting" @click="endRenting">退租</view>
 			<view class="operationBtn endRenting" @click="keepRenting">续租</view> -->
 		</view>
+		<tip-modal v-if="isShowUnBindModal" :title="'提示'" :leftBtn="'确定'" :describition="'解除账号绑定后租客将无法接收账单提醒！'" v-on:emitSure="returnSure" v-on:emitCancel="returnEmit"></tip-modal>
 		<tip-modal v-if="isShowTipModal" :oneButton="true" :title="'提示'" :describition="'有未确认账单，不能退租。'" v-on:emitCancel="returnEmit"></tip-modal>
 	</view>
 </template>
@@ -68,6 +69,8 @@
 		},
 		data() {
 			return {
+				isShowUnBindModal:false,
+				hasBind:false,
 				addresseeId:'',
 				isWholeRent:false,
 				tenantId:null,
@@ -141,10 +144,24 @@
 			return shareObject;
 		},
 		methods: {
-			bindOffical(){
-				uni.navigateTo({
-					url:'../inviteBindOffical/inviteBindOffical?tenantId='+this.tenantId
+			returnSure(){
+				this.$request.post('/roomUser/unbindServiceOpenId',{
+					tenantId:this.tenantId
+				}).then((res)=>{
+					this.isShowUnBindModal = false;
+					uni.showToast({
+						title:'解绑成功'
+					})
 				})
+			},
+			bindOffical(){
+				if(this.hasBind){
+					this.isShowUnBindModal = true;
+				}else{
+					uni.navigateTo({
+						url:'../inviteBindOffical/inviteBindOffical?tenantId='+this.tenantId
+					})
+				}
 			},
 			updateIsRead(addresseeId){
 				this.$request.post('/userMessage/updateIsRead',{
@@ -161,6 +178,7 @@
 				})
 			},
 			returnEmit(){
+				this.isShowUnBindModal = false;
 				this.isShowTipModal = false;
 			},
 			endRenting(){
@@ -221,11 +239,15 @@
 					console.log(res)
 					// _this.commonFacBarList = res.data.data.houseConfigure.split(',')
 					_this.roomInfo = res.data.data
+					
 					_this.communityInfo.roomPrice = res.data.data.roomPrice
 					_this.communityInfo.name = res.data.data.communityName
-					if (_this.roomInfo.tenants && _this.roomInfo.tenants.length == 0) {
+					if (_this.roomInfo.tenants.length == 0) {
 						this.isShowAddBtn = true;
 					} else {
+						if(_this.roomInfo.tenants[0].serviceOpenId){
+							_this. hasBind = true
+						}
 						this.isShowAddBtn = false;
 					}
 				})
@@ -453,6 +475,9 @@
 		font-size: 34rpx;
 		color: #FFFFFF;
 		margin-left: auto;
+	}
+	.hasBind{
+		background: #CFCFCF;
 	}
 	.rentBtnBox image{
 		width: 42rpx;

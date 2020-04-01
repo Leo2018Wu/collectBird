@@ -25,6 +25,7 @@
 				<view class="bannerTop">
 					<view v-for="(item,index) in homeList" @click="switchPage(item.url)" :key="index">
 						<view class="bannerItem">
+							<view v-if="item.icon && noteNum > 0" class="bannerIcon">{{noteNum ? noteNum : ""}}</view>
 							<image class="bannerImg" :src="item.imgUrl" mode="aspectFit"></image>
 						</view>
 						<span class="bannerText">{{item.title}}</span>
@@ -152,44 +153,53 @@
 				homeList: [{
 						title: '房源',
 						imgUrl: '../../static/homeIcon1.png',
-						url: '../houseList/houseList'
+						url: '../houseList/houseList',
+						icon:false
 					}, {
 						title: '租客',
 						imgUrl: '../../static/homeIcon2.png',
-						url: '../renterManage/renterManage'
+						url: '../renterManage/renterManage',
+						icon:false
 					}, {
 						title: '账单',
 						imgUrl: '../../static/homeIcon3.png',
-						url: '../billManage/billManage?billType=' + 0
+						url: '../billManage/billManage?billType=' + 0,
+						icon:false
 					}, {
 						title: '报表',
 						imgUrl: '../../static/homeIcon4.png',
-						url: '../reportForm/reportForm'
+						url: '../reportForm/reportForm',
+						icon:false
 					}, {
 						title: '房东账单',
 						imgUrl: '../../static/homeIcon5.png',
-						url: '../billManage/billManage?billType=' + 1
+						url: '../billManage/billManage?billType=' + 1,
+						icon:false
 					},
 					{
 						title: '房东',
 						imgUrl: '../../static/homeIcon7.png',
-						url: '../landlordManage/landlordManage'
+						url: '../landlordManage/landlordManage',
+						icon:false
 					},
 					{
 						title: '记事',
 						imgUrl: '../../static/homeIcon8.png',
-						url: '../memo/memo'
+						url: '../memo/memo',
+						icon:true
 					},
 					{
 						title: '帮助',
 						imgUrl: '../../static/homeIcon6.png',
-						url: '../help/help'
+						url: '../help/help',
+						icon:false
 					}
 				],
 				indicatorDots: true,
 				autoplay: true,
 				interval: 3000,
 				duration: 500,
+				noteNum:''
 			};
 		},
 		onLoad() {
@@ -199,6 +209,7 @@
 		},
 		onShow(option) {
 			if(this.$store.state.landladyInfo.id){
+				this.getNoteNum();
 				this.getMoneyInfo();
 				this.getMessageTotal(_this.$store.state.landladyInfo.id)
 			}
@@ -211,6 +222,13 @@
 			}
 		},
 		methods: {
+			getNoteNum(){
+				this.$request.post('/note/getCount',{
+					landlordId:this.$store.state.landladyInfo.id
+				}).then((res)=>{
+					this.noteNum = res.data.data
+				})
+			},
 			bindload(e){
 				console.log('组件加载成功',e)
 			},
@@ -287,6 +305,7 @@
 							_this.stepOne = true;
 						}
 						_this.$store.commit('landladyInfo', res.data.data);
+						_this.getNoteNum();
 						_this.getMoneyInfo();
 						_this.getMessageTotal(_this.$store.state.landladyInfo.id)
 					})
@@ -470,7 +489,23 @@
 		align-items: center;
 		/* margin-bottom: 40rpx; */
 	}
-
+	.bannerItem{
+		position: relative;
+	}
+	.bannerIcon{
+		box-sizing: content-box;
+		/* min-height: 36rpx; */
+		min-width: 36rpx;
+		text-align: center;
+		position: absolute;
+		top: -14rpx;
+		right: -30rpx;
+		background-color: #EA4E3D;
+		border-radius: 50%;
+		color: #FFFFFF;
+		font-size: 26rpx;
+		border: 2rpx solid #FFFFFF;
+	}
 	.bannerImg {
 		max-width: 88rpx;
 		max-height: 88rpx;

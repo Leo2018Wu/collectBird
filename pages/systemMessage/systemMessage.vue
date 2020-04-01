@@ -1,6 +1,10 @@
 <template>
 	<view class="system">
-		<mescroll-uni :down="downOption" @down="downCallback" :up="upOption" @up="upCallback" :fixed="false" @init="init">
+		<view v-if="msgList.length != 0" :class="{myPadding:msgList.length == 0}"></view>
+		<mescroll-empty v-if="msgList.length == 0 && messageType ==1" :option="optEmpty1"></mescroll-empty>
+		<mescroll-empty v-if="msgList.length == 0 && messageType ==2" :option="optEmpty2"></mescroll-empty>
+		<mescroll-empty v-if="msgList.length == 0 && messageType ==3" :option="optEmpty3"></mescroll-empty>
+		<mescroll-uni  :down="downOption" @down="downCallback" :up="upOption" @up="upCallback" :fixed="false" @init="init">
 			<view v-if="messageType == 3">
 				<view class="msgContainer" v-for="(item, index) in msgList" :key="index" @click="showDetail(item.messageContent,item.id,item.addresseeId)">
 					<view class="dateDivide">{{item.showDate}}</view>
@@ -38,35 +42,38 @@
 				</view>
 			</view>
 			<view v-if="messageType == 1">
-				<!-- <view class="msgContainer" v-for="(item, index) in [0,1,2]" :key="index">
+				<view class="msgContainer" v-for="(item, index) in msgList" :key="index">
 					<view class="messageBox1 whiteBg">
 						<view style="padding: 0 26rpx;">
 							<view class="msgTop">
-								<view class="msgTopName">账单状态</view>
-								<view class="msgTip" :class="{grayTip : index == 1}">{{index == 1 ? '已确认' :'未确认'}}</view>
-								<view class="msgPrice"><span>1200</span>元</view>
+								<view class="msgTopName">{{item.messageTitle}}</view>
+								<view class="msgTip" :class="{grayTip : item.isRead == 1}">{{item.isRead == 1 ? '已确认' :'未确认'}}</view>
+								<view class="msgPrice"><span>{{item.messageData.totalAmount}}</span>元</view>
 							</view>
-							<view class="billTime">2020年02月05日生成</view>
-							<view class="billLocation">李明-新德公寓-3号302 <span>卧A</span></view>
-							<view class="rentCycle">收租周期：2020-01-18 ~ 2020-02-18</view>
+							<view class="billTime">{{item.showDate[0]}}年{{item.showDate[1]}}月{{item.showDate[2]}}日生成</view>
+							<view class="billLocation">{{item.messageData.roomNo}}</view>
+							<view class="rentCycle">收租周期：{{item.messageData.startDate}} ~ {{item.messageData.endDate}}</view>
 						</view>
-						<view v-if="index == 1" class="operatBtn">去确认</view>
+						<view v-if="item.isRead == 0" class="operatBtn" @click="checkBill(item.addresseeId,item.id,item.messageData)">去确认</view>
 						<view v-else class="operatBtn grayBtn">已确认</view>
 					</view>
-				</view> -->
+				</view>
 			</view>
 		</mescroll-uni>
+		
 	</view>
 </template>
 
 <script>
+	import MescrollEmpty from '@/components/mescroll-uni/components/mescroll-empty.vue';
 	import MescrollUni from '../../components/mescroll-uni/mescroll-uni.vue';
 	import {
 		dateDiff
 	} from '../../util/index.js'
 	export default {
 		components: {
-			MescrollUni
+			MescrollUni,
+			MescrollEmpty
 		},
 		data() {
 			return {
@@ -91,10 +98,25 @@
 					},
 					noMoreSize: 5, // 配置列表的总数量要大于等于5条才显示'-- END --'的提示
 					empty: {
-						use: true,
-						// icon:'/static/houseEmpty.png',
-						tip: '暂无消息'
+						use: false,
+						// icon:'/static/noBillMsg.png',
+						// tip: '暂无账单消息'
 					}
+				},
+				optEmpty1: {
+					use: true,
+					icon:'/static/noBillMsg.png',
+					tip: '暂无账单消息'
+				},
+				optEmpty2: {
+					use: true,
+					icon:'/static/noRenterMsg.png',
+					tip: '暂无租客消息'
+				},
+				optEmpty3: {
+					use: true,
+					icon:'/static/noSysMsg.png',
+					tip: '暂无系统消息'
 				},
 				mescroll: {},
 				msgList: [],
@@ -110,6 +132,12 @@
 			})
 		},
 		methods: {
+			checkBill(addresseeId,id,jsonData){
+				console.log(jsonData)
+				uni.navigateTo({
+					url: '../billDetail/billDetail?billId=' + jsonData.billId + '&tenantId=' + jsonData.tenantId+'&messageId='+id+'&addresseeId='+addresseeId
+				})
+			},
 			showDetail(content,id,addresseeId){
 				uni.navigateTo({
 					url:'../sysMsgDetail/sysMsgDetail?content='+content+'&addresseeId='+addresseeId+'&msgId='+id
@@ -166,10 +194,17 @@
 							item.jsonData.startDate = item.jsonData.startDate.split('T')[0]
 							item.jsonData.endDate = item.jsonData.endDate.split('T')[0]
 						}
-						item.showDate = dateDiff(Date.parse(new Date((item.createTime).replace(/\-/g, '/'))))
+						if(_this.messageType == 1){
+							item.messageData = JSON.parse(item.messageData)
+							item.showDate = (item.createTime.split(" ")[0].toString()).split('-')
+							item.messageData.startDate = item.messageData.startDate.split('T')[0]
+							item.messageData.endDate = item.messageData.endDate.split('T')[0]
+							console.log(item.messageData)
+						}else{
+							item.showDate = dateDiff(Date.parse(new Date((item.createTime).replace(/\-/g, '/'))))
+						}
 						arr.push(item)
 					})
-					console.log(arr)
 					return arr;
 				} catch (e) {
 					console.log(e);
@@ -365,5 +400,8 @@
 	.status1{
 		border: 1rpx solid #bbbbbb;
 		color: #bbbbbb;
+	}
+	.myPadding{
+		padding-top: 120rpx;
 	}
 </style>

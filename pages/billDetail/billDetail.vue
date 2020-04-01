@@ -3,11 +3,11 @@
 		<view class="section0">
 			<view class="profitContainer">
 				<view class="profitBox">
-					<view class="profitBar">{{billType == 0 ? '应收' : '应付'}}(元)</view>
+					<view class="profitBar">{{billType == 1 || fromShare ? '应付' : '应收'}}(元)</view>
 					<span v-if="billType == 1 && unIncome != 0 && !fromShare">-</span><span>{{ billInfo.totalAmount}}</span>
 				</view>
 				<view v-if="billInfo.billStatus == 4" class="profitBox">
-					<view class="profitBar">{{billType == 0 ? '实收' : '实付'}}(元)</view>
+					<view class="profitBar">{{billType == 1 || fromShare  ? '实付' : '实收'}}(元)</view>
 					<span v-if="billType == 1 && unIncome != 0 && !fromShare">-</span><span>{{ billInfo.totalAmount ? billInfo.totalAmount : '0' }}</span>
 				</view>
 			</view>
@@ -22,11 +22,14 @@
 		</view>
 		<view class="section1">
 			<view class="billStatus">
-				<image v-if="billInfo.billStatus == 4 && billType == 0" class="billStatusBg" src="../../static/hasCheck.png" mode="aspectFit"></image>
-				<image v-if="billInfo.billStatus == 4 && billType == 1" class="billStatusBg" src="../../static/hasCheck1.png" mode="aspectFit"></image>
+				<image v-if="fromShare" class="billStatusBg" src="../../static/hasCheck1.png" mode="aspectFit"></image>
+				<view v-else>
+					<image v-if="billInfo.billStatus == 4 && billType == 0" class="billStatusBg" src="../../static/hasCheck.png" mode="aspectFit"></image>
+					<image v-if="billInfo.billStatus == 4 && billType == 1" class="billStatusBg" src="../../static/hasCheck1.png" mode="aspectFit"></image>
+				</view>
 				<span class="billTitle">账单状态</span>
-				<span v-if="billInfo.billStatus != 4" class="statusDes0">{{billType == 0 ? '未到账' : '未交租'}}</span>
-				<span v-if="billInfo.billStatus == 4" class="statusDes1">{{billType == 0 ? '已到账' : '已交租'}}</span>
+				<span v-if="billInfo.billStatus != 4" class="statusDes0">{{billType == 1 || fromShare ? '未交租' : '未到账'}}</span>
+				<span v-if="billInfo.billStatus == 4" class="statusDes1">{{billType == 1 || fromShare ? '已交租' : '已到账'}}</span>
 			</view>
 			<view class="billDateBox">
 				<view class="billDateLi">
@@ -56,7 +59,7 @@
 					<span v-if="billType == 1 && unIncome != 0 && !fromShare">-</span><span class="billDate">{{ !billInfo.depositAmount ? 0 : billInfo.depositAmount }}</span>
 				</view>
 			</view>
-			<view v-if="billType == 0 || fromShare">
+			<view v-if="billType == 0">
 				<view class="costDetail">费用明细</view>
 				<view class="waterBox">
 					<view class="waterOuter eleOuter">
@@ -93,9 +96,8 @@
 				<view>发送账单</view>
 			</view>
 		</view>
-		<view class="section2" v-else>
+		<view class="section2">
 			<view v-if="!fromShare" class="leftBtnBox">
-				<!-- <view> -->
 				<view class="sendBillBox" @click="deleteBill">
 					<image class="sendIcon" src="../../static/delete_btn.png" mode="aspectFit"></image>
 					<!-- <view>删除</view> -->
@@ -109,12 +111,15 @@
 					<!-- <span>发送账单</span> -->
 				</button>
 			</view>
-			<!-- </view> -->
-			<view class="" v-if="billType == 1 && !fromShare">
+			<view class="" v-if="billType == 1 || fromShare">
 				<view class="sureBtn" v-if="billInfo.billStatus != 4" @click="checkMoney">交租</view>
-				<view class="sureBtn" v-if="billInfo.billStatus == 4">已交租</view>
+				<view class="sureBtn" v-else @click="remindOwner">{{fromShare ? '告知房东已交租' : '已交租' }}</view>
 			</view>
-			<view v-if="billType == 0  && !fromShare" class="sureBtn" @click="checkMoney">到账</view>
+			<view v-if="billType == 0 && !fromShare">
+				<view v-if="billInfo.billStatus !=4" class="sureBtn" @click="checkMoney">到账</view>
+				<view v-else class="sureBtn">已到账</view>
+			</view>
+			
 		</view>
 
 		<tip-modal v-if="isShowTipModal" :title="'删除账单'" :describition="'是否确认删除账单?'" v-on:emitCancel="hideTipModal"
@@ -192,14 +197,17 @@
 				arrivalDate: '',
 				quantity: '',
 				fromShare: false,
-				titleContent: ''
+				titleContent: '',
 			};
 		},
 		onShow() {
 			this.getBillDetail(this.billId);
+			
 		},
 		onLoad(option) {
-			console.log(this)
+			if(option.messageId){
+				this.updateMsg(option.addresseeId,option.messageId)
+			}
 			if (option.fromShare) {
 				this.fromShare = option.fromShare
 			}
@@ -223,12 +231,31 @@
 			return {
 				title: '您有一笔租金账单待支付',
 				imageUrl: 'https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/shareBill.jpg',
-				// imageUrl:'/static/shareBill.jpg',
-				path: '/pages/billDetail/billDetail?billType=' + 1 + '&billId=' + this.billId + '&fromShare=' + true +
+				path: '/pages/billDetail/billDetail?billType=' +  this.billType + '&billId=' + this.billId + '&fromShare=' + true +
 					'&titleContent=' + titleContent
 			}
 		},
 		methods: {
+			updateMsg(addresseeId,msgId){
+				this.$request.post('/userMessage/updateIsRead',{
+					id:msgId,
+					addresseeId
+				}).then((res)=>{
+					
+				})
+			},
+			remindOwner(){
+				if(!this.fromShare)return
+				this.$request.post('/bill/payRentBill',this.billInfo).then((res)=>{
+					if(res.data.code == 200){
+						uni.showToast({
+							title:'已向房东推送交租消息',
+							icon:'none',
+							duration:1500
+						})
+					}
+				})
+			},
 			rentPromot(){
 				let _this = this;
 				if(!_this.billInfo.serviceOpenId){
@@ -239,6 +266,13 @@
 						if(res.data.code == "200"){
 							uni.showToast({
 								title:'催租成功',
+								duration:1500
+							})
+							_this.getBillDetail(_this.billId);
+						}else{
+							uni.showToast({
+								title:res.data.msg,
+								icon:'none',
 								duration:1500
 							})
 						}
@@ -365,7 +399,7 @@
 			checkMoney() {
 				console.log('你好')
 				let _this = this;
-				if (this.billType == 1 && !this.fromShare) {
+				if (this.billType == 1) {
 					this.ll()
 				}
 				if (_this.electricityInfo.itemName == '1') {
@@ -401,9 +435,11 @@
 			ll() {
 				let _this = this;
 				let par = this.billInfo
-				par.items.push(this.electricityInfo)
-				if (JSON.stringify(this.commEleCos) != "{}") {
-					par.items.push(this.commEleCost)
+				if(this.billType != 1){
+					par.items.push(this.electricityInfo)
+					if (JSON.stringify(this.commEleCos) != "{}") {
+						par.items.push(this.commEleCost)
+					}
 				}
 				par.billStatus = 4
 				_this.$request
@@ -690,8 +726,10 @@
 	}
 
 	.sureBtn {
-		width: 218rpx;
+		min-width: 218rpx;
+		width: fit-content;
 		height: 92rpx;
+		padding: 0 20rpx;
 		background: linear-gradient(-90deg, rgba(243, 183, 73, 1) 0%, rgba(240, 154, 66, 1) 100%);
 		border-radius: 18rpx;
 		color: #ffffff;

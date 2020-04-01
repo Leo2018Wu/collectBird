@@ -20,6 +20,9 @@
 				</view>
 			</view>
 		</view>
+		<view class="officalBox">
+			<official-account style="border: none;" bindload="bindload" v-on:binderror="binderror"></official-account>
+		</view>
 
 	</view>
 </template>
@@ -118,6 +121,12 @@
 		align-items: center;
 		justify-content: flex-start;
 		margin-top: 30rpx;
+	}
+	.officalBox{
+		width: 690rpx;
+		position: fixed;
+		bottom: 30rpx;
+		left: 30rpx;
 	}
 
 	.content {
