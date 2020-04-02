@@ -77,6 +77,10 @@
 							index: 1,
 							text: num + '',
 						})
+					}else{
+						uni.removeTabBarBadge({
+							index:1
+						})
 					}
 					this.msgList.forEach((item, index) => {
 						if (index == 0) {

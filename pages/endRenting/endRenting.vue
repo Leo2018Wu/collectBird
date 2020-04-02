@@ -60,7 +60,8 @@
 			</view>
 			<view class="remarks">
 				<view class="remarksDivide">备注</view>
-			{{ endRentingInfo.remarks ? endRentingInfo.remarks  : ''}}</view>
+				{{ endRentingInfo.remarks ? endRentingInfo.remarks  : ''}}
+			</view>
 		</view>
 		<view class="section3" v-if="endRentingInfo.billStatus == 4">
 			<view class="sendBillBox">
@@ -91,13 +92,13 @@
 					<cover-view class="modalContent">度数：{{ quantity ? quantity : 0 }}<span>度</span>({{ electricityInfo.currentNum ? electricityInfo.currentNum : '0' }}~{{
 									electricityInfo.prevNum ? electricityInfo.prevNum : '0'
 								}}）</cover-view>
-					<cover-view class="modalContent">抄表日期： {{ electricityInfo.noteDate ? electricityInfo.noteDate.substr(0,10) : '暂无抄表日期' }}</cover-view>
+					<cover-view class="modalContent">抄表日期： {{ electricityInfo.noteDate ? electricityInfo.noteDate : '暂无抄表日期' }}</cover-view>
 					<cover-view class="btnBox">
 						<cover-view class="modalSure" @click="gotIt()">知道了</cover-view>
 					</cover-view>
 				</cover-view>
 			</cover-view>
-			
+
 			<cover-view v-if="isShowSureModal1" class="modalMask" @click="gotIt()" @catchtouchmove='true'>
 				<cover-view class="modelContainer">
 					<cover-view class="modalSureTitle">均摊电费详情</cover-view>
@@ -106,7 +107,7 @@
 									commEleCost.prevNum ? commEleCost.prevNum : '0'
 								}}）</cover-view>
 					<cover-view class="modalContent">均摊人数： {{ billInfo.tenantNum }}</cover-view>
-					<cover-view class="modalContent">抄表日期： {{ commEleCost.noteDate ? commEleCost.noteDate.substr(0,10) : '暂无抄表日期' }}</cover-view>
+					<cover-view class="modalContent">抄表日期： {{ commEleCost.noteDate ? commEleCost.noteDate : '暂无抄表日期' }}</cover-view>
 					<cover-view class="btnBox">
 						<cover-view class="modalSure" @click="gotIt()">知道了</cover-view>
 					</cover-view>
@@ -121,8 +122,8 @@
 		data() {
 			const date = this.$getDate()
 			return {
-				remarks:'',
-				isShowSureModal1:false,
+				remarks: '',
+				isShowSureModal1: false,
 				houseAddr: '',
 				arrivalDate: date,
 				tenantId: null,
@@ -135,55 +136,65 @@
 			}
 		},
 		onLoad(options) {
-			if(options.tenantId){
+			if (options.tenantId) {
 				this.tenantId = options.tenantId
-				this.getEndRentInfo(options.tenantId)
+				// this.tenantId = 'de9d29f2-9255-41b3-9e40-0c4f0422acec'
+				this.getEndRentInfo(this.tenantId)
 			}
-			if(options.billId){
+			if (options.billId) {
 				this.billId = options.billId
 				this.getBill(options.billId)
 			}
 			this.houseAddr = options.houseAddr
-			
+
 		},
 		methods: {
-			updateData(billId){
-				console.log('你好',)
+			updateData(billId) {
+				console.log('你好', )
 				this.getBill(billId);
 			},
 			editBill() {
 				uni.navigateTo({
-					url: '../editBill/editBill?billId=' + this.endRentingInfo.id + '&billType=' + this.endRentingInfo.billType + '&titleContent=' +
+					url: '../editBill/editBill?billId=' + this.endRentingInfo.id + '&billType=' + this.endRentingInfo.billType +
+						'&titleContent=' +
 						this.houseAddr
 				})
 			},
-			getBill(id){
+			getBill(id) {
 				let _this = this;
-				_this.$request.post('/bill/findById',{
+				_this.$request.post('/bill/findById', {
 					id
-				}).then((res)=>{
+				}).then((res) => {
 					_this.init = true;
 					_this.endRentingInfo = res.data.data;
 					_this.endRentingInfo.payRentDate = res.data.data.payRentDate.split(' ')[0];
-					_this.remarks =  res.data.data.remarks;
-					_this.endRentingInfo.items.forEach((item, index) => {
-						if (item.itemName == 1) {
-							_this.electricityInfo = _this.endRentingInfo.items[index];
-						} else if (item.itemName == 2) {
-							_this.hasCommonEle = true;
-							_this.commEleCost = _this.endRentingInfo.items[index];
-						}
-						if (Number(_this.electricityInfo.currentNum) > Number(_this.electricityInfo.prevNum)) {
-							_this.quantity = (+_this.electricityInfo.currentNum) - (+_this.electricityInfo.prevNum)
-						} else {
-							_this.quantity = ''
-						}
-						if (Number(_this.commEleCost.currentNum) > Number(_this.commEleCost.prevNum)) {
-							_this.commonQuantity = (+_this.commEleCost.currentNum) - (+_this.commEleCost.prevNum)
-						} else {
-							_this.commonQuantity = ''
-						}
-					})
+					_this.remarks = res.data.data.remarks;
+					if (_this.endRentingInfo.items) {
+						_this.endRentingInfo.items.forEach((item, index) => {
+							if (item.itemName == 1) {
+								_this.electricityInfo = _this.billInfo.items[index];
+								if(_this.electricityInfo.noteDate){
+									_this.electricityInfo.noteDate = _this.electricityInfo.noteDate.split(" ")[0]
+								}
+							} else if (item.itemName == 2) {
+								_this.hasCommonEle = true;
+								_this.commEleCost = _this.endRentingInfo.items[index];
+								if(_this.commEleCost.noteDate){
+									_this.commEleCost.noteDate = _this.commEleCost.noteDate.split(" ")[0]
+								}
+							}
+							if (Number(_this.electricityInfo.currentNum) > Number(_this.electricityInfo.prevNum)) {
+								_this.quantity = (+_this.electricityInfo.currentNum) - (+_this.electricityInfo.prevNum)
+							} else {
+								_this.quantity = ''
+							}
+							if (Number(_this.commEleCost.currentNum) > Number(_this.commEleCost.prevNum)) {
+								_this.commonQuantity = (+_this.commEleCost.currentNum) - (+_this.commEleCost.prevNum)
+							} else {
+								_this.commonQuantity = ''
+							}
+						})
+					}
 				})
 			},
 			checkMoney() {
@@ -204,7 +215,7 @@
 					}
 				})
 			},
-			showSureModal1(){
+			showSureModal1() {
 				this.isShowSureModal1 = true
 			},
 			showSureModal() {
@@ -568,21 +579,21 @@
 	}
 
 	/* end */
-	.remarksDivide{
+	.remarksDivide {
 		padding: 28rpx 0;
 		font-size: 34rpx;
 		color: #999999;
 		border-bottom: 2rpx solid #EBEBEB;
 		margin-bottom: 28rpx;
 	}
-	
+
 	.remarks {
 		/* width: calc(100% - 34rpx); */
 		margin-top: 14rpx;
 		/* min-height: 93rpx; */
 		height: fit-content;
 		/* line-height: 93rpx; */
-		padding:0 0 28rpx 30rpx;
+		padding: 0 0 28rpx 30rpx;
 		color: #999999;
 		font-size: 30rpx;
 		background-color: #ffffff;

@@ -43,6 +43,9 @@
 			};
 		},
 		methods: {
+			// filterHouse(type){
+			// 	this.$emit('myFilter',type)
+			// },
 			myClick(){
 				this.$emit('myClick',this.item)
 			}

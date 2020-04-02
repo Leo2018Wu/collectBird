@@ -94,14 +94,9 @@
 				this.getCommuny(this.houseId)
 			},
 			returnClick(e) {
-				console.log('你好啊', e)
 				uni.navigateTo({
 					url: '../addCommunity/addCommunity?communityInfo=' + JSON.stringify(e)
 				})
-			},
-			addRoom(item) {
-				console.log('dsdasdasdasdasdas')
-				console.log('你好', item)
 			},
 			addHouse() {
 				uni.navigateTo({

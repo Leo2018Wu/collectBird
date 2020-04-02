@@ -229,9 +229,7 @@
 									duration:1500
 								})
 								setTimeout(()=>{
-									uni.navigateBack({
-										delta: 1
-									});
+									uni.navigateBack();
 								},1500)
 							}
 						});

@@ -17,15 +17,16 @@
 				<view v-if="billType == 0" class="houseAddr">{{ houseAddrInfo.communityName }}-{{ houseAddrInfo.houseNo }}-{{ houseAddrInfo.roomNo }}
 					<span v-if="billInfo.billStatus != 4" class="rentPromotion" @click="rentPromot()">催租</span><span :class="{myLeft: billInfo.billStatus == 4}"
 					 class="editMybill" @click="editBill">修改</span></view>
-				<view v-else class="houseAddr">{{ ownerInfo.communityName }}-{{ ownerInfo.houseNo }}<span :class="{myLeft: true}" class="editMybill" @click="editBill">修改</span></view>
+				<view v-else class="houseAddr">{{ ownerInfo.communityName }}-{{ ownerInfo.houseNo }}<span :class="{myLeft: true}"
+					 class="editMybill" @click="editBill">修改</span></view>
 			</view>
 		</view>
 		<view class="section1">
 			<view class="billStatus">
-				<image v-if="fromShare" class="billStatusBg" src="../../static/hasCheck1.png" mode="aspectFit"></image>
+				<image v-if="!fromShare && billInfo.billStatus == 4 && billType == 0" class="billStatusBg" src="../../static/hasCheck.png"
+				 mode="aspectFit"></image>
 				<view v-else>
-					<image v-if="billInfo.billStatus == 4 && billType == 0" class="billStatusBg" src="../../static/hasCheck.png" mode="aspectFit"></image>
-					<image v-if="billInfo.billStatus == 4 && billType == 1" class="billStatusBg" src="../../static/hasCheck1.png" mode="aspectFit"></image>
+					<image v-if="billInfo.billStatus == 4" class="billStatusBg" src="../../static/hasCheck1.png" mode="aspectFit"></image>
 				</view>
 				<span class="billTitle">账单状态</span>
 				<span v-if="billInfo.billStatus != 4" class="statusDes0">{{billType == 1 || fromShare ? '未交租' : '未到账'}}</span>
@@ -111,17 +112,23 @@
 					<!-- <span>发送账单</span> -->
 				</button>
 			</view>
-			<view class="" v-if="billType == 1 || fromShare">
-				<view class="sureBtn" v-if="billInfo.billStatus != 4" @click="checkMoney">交租</view>
-				<view class="sureBtn" v-else @click="remindOwner">{{fromShare ? '告知房东已交租' : '已交租' }}</view>
+			<view v-if="fromShare">
+				<view v-if="billInfo.billStatus != 4" class="sureBtn" @click="remindOwner">告知房东已交租</view>
+				<view v-if="billInfo.billStatus == 4" class="sureBtn" :class="{grayBack: billInfo.billStatus == 4}">已交租</view>
 			</view>
-			<view v-if="billType == 0 && !fromShare">
-				<view v-if="billInfo.billStatus !=4" class="sureBtn" @click="checkMoney">到账</view>
-				<view v-else class="sureBtn">已到账</view>
+			<view v-else>
+				<view v-if="billType == 1">
+					<view class="sureBtn" v-if="billInfo.billStatus != 4" @click="checkMoney">交租</view>
+					<view class="sureBtn" v-else>已交租</view>
+				</view>
+				<view v-if="billType == 0">
+					<view v-if="billInfo.billStatus !=4" class="sureBtn" @click="checkMoney">到账</view>
+					<view v-else class="sureBtn">已到账</view>
+				</view>
 			</view>
-			
 		</view>
-
+		<tip-modal v-if="isShowPromotedModal" :oneButton="true" :title="'提示'" :describition="'今日已催租，当天只能催租一次。'"
+		 v-on:emitCancel="hideTipModal"></tip-modal>
 		<tip-modal v-if="isShowTipModal" :title="'删除账单'" :describition="'是否确认删除账单?'" v-on:emitCancel="hideTipModal"
 		 v-on:emitSure="returnSure"></tip-modal>
 		<cover-view v-if="isShowSureModal" class="modalMask" @click="gotIt()" @catchtouchmove='true'>
@@ -131,7 +138,7 @@
 				<cover-view class="modalContent">度数：{{ quantity }}<span>度</span>({{ electricityInfo.currentNum ? electricityInfo.currentNum : '0' }}~{{
 								electricityInfo.prevNum ? electricityInfo.prevNum : '0'
 							}}）</cover-view>
-				<cover-view class="modalContent">抄表日期： {{ electricityInfo.noteDate ? electricityInfo.noteDate.substr(0,10) : '暂无抄表日期' }}</cover-view>
+				<cover-view class="modalContent">抄表日期： {{ electricityInfo.noteDate ? electricityInfo.noteDate : '暂无抄表日期' }}</cover-view>
 				<cover-view class="btnBox">
 					<cover-view class="modalSure" @click="gotIt()">知道了</cover-view>
 				</cover-view>
@@ -146,7 +153,7 @@
 								commEleCost.prevNum ? commEleCost.prevNum : '0'
 							}}）</cover-view>
 				<cover-view class="modalContent">均摊人数： {{ billInfo.tenantNum }}</cover-view>
-				<cover-view class="modalContent">抄表日期： {{ commEleCost.noteDate ? commEleCost.noteDate.substr(0,10) : '暂无抄表日期' }}</cover-view>
+				<cover-view class="modalContent">抄表日期： {{ commEleCost.noteDate ? commEleCost.noteDate : '暂无抄表日期' }}</cover-view>
 				<cover-view class="btnBox">
 					<cover-view class="modalSure" @click="gotIt()">知道了</cover-view>
 				</cover-view>
@@ -176,7 +183,7 @@
 		},
 		data() {
 			return {
-				bindTip:false,
+				bindTip: false,
 				commonQuantity: '',
 				isShowSureModal1: false,
 				hasCommonEle: false,
@@ -198,15 +205,17 @@
 				quantity: '',
 				fromShare: false,
 				titleContent: '',
+				isShowPromotedModal: false,
+				tenantId: '',
+				ownerId: ''
 			};
 		},
 		onShow() {
 			this.getBillDetail(this.billId);
-			
 		},
 		onLoad(option) {
-			if(option.messageId){
-				this.updateMsg(option.addresseeId,option.messageId)
+			if (option.messageId) {
+				this.updateMsg(option.addresseeId, option.messageId)
 			}
 			if (option.fromShare) {
 				this.fromShare = option.fromShare
@@ -219,9 +228,11 @@
 			}
 			this.billId = option.billId;
 			if (option.tenantId) {
+				this.tenantId = option.tenantId
 				this.getAddr(option.tenantId);
 			}
 			if (option.ownerId) {
+				this.ownerId = option.ownerId
 				this.getOwnerInfo(option.ownerId)
 			}
 		},
@@ -231,50 +242,47 @@
 			return {
 				title: '您有一笔租金账单待支付',
 				imageUrl: 'https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/shareBill.jpg',
-				path: '/pages/billDetail/billDetail?billType=' +  this.billType + '&billId=' + this.billId + '&fromShare=' + true +
+				path: '/pages/billDetail/billDetail?billType=' + this.billType + '&billId=' + this.billId + '&fromShare=' + true +
 					'&titleContent=' + titleContent
 			}
 		},
 		methods: {
-			updateMsg(addresseeId,msgId){
-				this.$request.post('/userMessage/updateIsRead',{
-					id:msgId,
+			updateMsg(addresseeId, msgId) {
+				this.$request.post('/userMessage/updateIsRead', {
+					id: msgId,
 					addresseeId
-				}).then((res)=>{
-					
+				}).then((res) => {
+
 				})
 			},
-			remindOwner(){
-				if(!this.fromShare)return
-				this.$request.post('/bill/payRentBill',this.billInfo).then((res)=>{
-					if(res.data.code == 200){
+			remindOwner() {
+				if (!this.fromShare) return
+				this.$request.post('/bill/payRentBill', this.billInfo).then((res) => {
+					if (res.data.code == 200) {
+						this.billInfo.billStatus = 4;
 						uni.showToast({
-							title:'已向房东推送交租消息',
-							icon:'none',
-							duration:1500
+							title: '已向房东推送交租消息',
+							icon: 'none',
+							duration: 1500
 						})
 					}
 				})
 			},
-			rentPromot(){
+			rentPromot() {
 				let _this = this;
-				if(!_this.billInfo.serviceOpenId){
+				if (!_this.billInfo.serviceOpenId) {
 					_this.bindTip = true
-				}else{
+				} else {
 					console.log('已绑定，可以催租')
-					_this.$request.post('/bill/promptBill',_this.billInfo).then((res)=>{
-						if(res.data.code == "200"){
+					_this.$request.post('/bill/promptBill', _this.billInfo).then((res) => {
+						if (res.data.code == 200) {
 							uni.showToast({
-								title:'催租成功',
-								duration:1500
+								title: '催租成功',
+								duration: 1500
 							})
 							_this.getBillDetail(_this.billId);
-						}else{
-							uni.showToast({
-								title:res.data.msg,
-								icon:'none',
-								duration:1500
-							})
+						} else if (res.data.code == 803) {
+							_this.isShowPromotedModal = true;
 						}
 					})
 				}
@@ -302,6 +310,7 @@
 			},
 			hideTipModal() {
 				this.isShowTipModal = false;
+				this.isShowPromotedModal = false;
 				this.bindTip = false;
 			},
 			showTipModal() {
@@ -338,16 +347,20 @@
 						id
 					})
 					.then(res => {
-						console.log(res)
 						_this.billInfo = res.data.data;
-						console.log(_this.billInfo);
 						let tempArr = []
 						_this.billInfo.items.forEach((item, index) => {
 							if (item.itemName == '1') {
 								_this.electricityInfo = _this.billInfo.items[index];
+								if (_this.electricityInfo.noteDate) {
+									_this.electricityInfo.noteDate = _this.electricityInfo.noteDate.split(" ")[0]
+								}
 							} else if (item.itemName == '2') {
 								_this.hasCommonEle = true;
 								_this.commEleCost = _this.billInfo.items[index];
+								if (_this.commEleCost.noteDate) {
+									_this.commEleCost.noteDate = _this.commEleCost.noteDate.split(" ")[0]
+								}
 							} else {
 								tempArr.push(item)
 							}
@@ -435,7 +448,7 @@
 			ll() {
 				let _this = this;
 				let par = this.billInfo
-				if(this.billType != 1){
+				if (this.billType != 1) {
 					par.items.push(this.electricityInfo)
 					if (JSON.stringify(this.commEleCos) != "{}") {
 						par.items.push(this.commEleCost)
@@ -922,5 +935,8 @@
 		color: #999999;
 		border-bottom: 2rpx solid #EBEBEB;
 		margin-bottom: 28rpx;
+	}
+	.grayBack{
+		background: #CFCFCF !important;
 	}
 </style>

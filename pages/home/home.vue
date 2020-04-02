@@ -211,7 +211,7 @@
 			if(this.$store.state.landladyInfo.id){
 				this.getNoteNum();
 				this.getMoneyInfo();
-				this.getMessageTotal(_this.$store.state.landladyInfo.id)
+				this.getMessageTotal(this.$store.state.landladyInfo.id)
 			}
 		},
 		onShareAppMessage(res) {
@@ -322,6 +322,10 @@
 							index: 1,
 							text: num + '',
 						})
+					}else{
+						uni.removeTabBarBadge({
+							index:1
+						})
 					}
 				})
 			},
@@ -332,7 +336,6 @@
 						id: _this.$store.state.landladyInfo.id
 					})
 					.then(res => {
-						console.log(res);
 						let data = res.data.data;
 						_this.mouthIncome = data.monthIncome;
 						_this.billReceived = data.monthAllIncome;
@@ -346,7 +349,6 @@
 				uni.login({
 					provider: 'weixin',
 					success: function(loginRes) {
-						console.log(loginRes, '1111');
 						self.$store.commit('openCode', loginRes.code);
 						// 获取用户信息
 						self.$request.post('/wx/login', {

@@ -28,15 +28,15 @@
 						<view style="padding: 0 26rpx;">
 							<view class="msgTop">
 								<view class="msgTopName">{{item.specialType == 1 ? '租客到期提醒' : '邀请入住提醒'}}</view>
-								<view v-if="item.isRead == 0 && item.specialType != 2" class="msgTip" :class="[{status0 :item.jsonData.remindType == 9}]">{{item.jsonData.remindType == 2 ? '即将到期' : '已到期'}}</view>
+								<view v-if="item.isRead == 0 && item.specialType != 2" class="msgTip" :class="[{status0 :item.messageData.remindType == 9}]">{{item.messageData.remindType == 2 ? '即将到期' : '已到期'}}</view>
 								<view v-if="item.isRead == 1" class="msgTip status1" >已处理</view>
-								<view v-if="item.isRead == 0" class="tenantBtn" @click="goRenter(item.id,item.addresseeId,item.jsonData)">去处理</view>
-								<view v-if="item.isRead != 0" class="tenantBtn" @click="goRenter(item.id,item.addresseeId,item.jsonData)">{{item.specialType == 1 ? '去看看' : '去处理'}}</view>
+								<view v-if="item.isRead == 0" class="tenantBtn" @click="goRenter(item.id,item.addresseeId,item.messageData)">去处理</view>
+								<view v-if="item.isRead != 0" class="tenantBtn" @click="goRenter(item.id,item.addresseeId,item.messageData)">{{item.specialType == 1 ? '去看看' : '去处理'}}</view>
 								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 							</view>
-							<view v-if="item.specialType == 1" class="tenantLocation textOverFlow">{{item.jsonData.roomNo}}</view>
+							<view v-if="item.specialType == 1" class="tenantLocation textOverFlow">{{item.messageData.roomNo}}</view>
 							<view v-else class="tenantLocation textOverFlow">{{item.messageContent}}</view>
-							<view class="rentCycle" v-if="item.specialType == 1">租期：{{item.jsonData.startDate}} ~ {{item.jsonData.endDate}}</view>
+							<view class="rentCycle" v-if="item.specialType == 1">租期：{{item.messageData.startDate}} ~ {{item.messageData.endDate}}</view>
 						</view>
 					</view>
 				</view>
@@ -47,14 +47,14 @@
 						<view style="padding: 0 26rpx;">
 							<view class="msgTop">
 								<view class="msgTopName">{{item.messageTitle}}</view>
-								<view class="msgTip" :class="{grayTip : item.isRead == 1}">{{item.isRead == 1 ? '已确认' :'未确认'}}</view>
+								<view class="msgTip" :class="{grayTip : item.billStatus == 4}">{{item.billStatus == 4 ? '已确认' :'未确认'}}</view>
 								<view class="msgPrice"><span>{{item.messageData.totalAmount}}</span>元</view>
 							</view>
 							<view class="billTime">{{item.showDate[0]}}年{{item.showDate[1]}}月{{item.showDate[2]}}日生成</view>
 							<view class="billLocation">{{item.messageData.roomNo}}</view>
 							<view class="rentCycle">收租周期：{{item.messageData.startDate}} ~ {{item.messageData.endDate}}</view>
 						</view>
-						<view v-if="item.isRead == 0" class="operatBtn" @click="checkBill(item.addresseeId,item.id,item.messageData)">去确认</view>
+						<view v-if="item.billStatus != 4" class="operatBtn" @click="checkBill(item.addresseeId,item.id,item.messageData)">去确认</view>
 						<view v-else class="operatBtn grayBtn">已确认</view>
 					</view>
 				</view>
@@ -132,10 +132,10 @@
 			})
 		},
 		methods: {
-			checkBill(addresseeId,id,jsonData){
-				console.log(jsonData)
+			checkBill(addresseeId,id,messageData){
+				console.log(messageData)
 				uni.navigateTo({
-					url: '../billDetail/billDetail?billId=' + jsonData.billId + '&tenantId=' + jsonData.tenantId+'&messageId='+id+'&addresseeId='+addresseeId
+					url: '../billDetail/billDetail?billId=' + messageData.billId + '&tenantId=' + messageData.tenantId+'&messageId='+id+'&addresseeId='+addresseeId
 				})
 			},
 			showDetail(content,id,addresseeId){
@@ -190,12 +190,12 @@
 					let curArr = _this.messageType == 1 ? response.data.data.billList.list : (_this.messageType == 2 ? response.data.data
 						.tenantList.list : response.data.data.systemList.list)
 					curArr.forEach((item, index) => {
+						item.messageData = JSON.parse(item.messageData)
 						if(_this.messageType == 2 && item.specialType != 2){
-							item.jsonData.startDate = item.jsonData.startDate.split('T')[0]
-							item.jsonData.endDate = item.jsonData.endDate.split('T')[0]
+							item.messageData.startDate = item.messageData.startDate.split('T')[0]
+							item.messageData.endDate = item.messageData.endDate.split('T')[0]
 						}
 						if(_this.messageType == 1){
-							item.messageData = JSON.parse(item.messageData)
 							item.showDate = (item.createTime.split(" ")[0].toString()).split('-')
 							item.messageData.startDate = item.messageData.startDate.split('T')[0]
 							item.messageData.endDate = item.messageData.endDate.split('T')[0]

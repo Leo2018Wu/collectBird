@@ -130,11 +130,6 @@
 			let _this = this
 			_this.updateInviteStatus(1)
 			var shareObject
-			// let par = {
-			// 	roomId:this.roomId,
-			// 	landLordId:this.$store.state.landladyInfo.id,
-			// 	landLordName:this.$store.state.landladyInfo.userName
-			// }
 			let data = this.$store.state.landladyInfo
 			shareObject = {
 				title: _this.$store.state.landladyInfo.userName + '邀请你填写入住信息',
@@ -149,6 +144,7 @@
 					tenantId:this.tenantId
 				}).then((res)=>{
 					this.isShowUnBindModal = false;
+					this.hasBind = false;
 					uni.showToast({
 						title:'解绑成功'
 					})
@@ -253,7 +249,6 @@
 				})
 			},
 			showBill() {
-				console.log('我点击了',this.roomInfo)
 				if(this.roomInfo.billStatus == 5){
 					let houseAddr = this.communityInfo.name +'-'+ this.communityInfo.houseNo+'-' + this.communityInfo.roomNo
 					uni.navigateTo({

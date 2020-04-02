@@ -4,7 +4,7 @@
 			<view class="coverBlock">
 				<view class="vipBg">
 					<image class="posiBg" src="../../static/buyCrown.png" mode="aspectFill"></image>
-					<view class="vipBgContainer" v-if="landladyInfo.userStatus == '2'" >
+					<view class="vipBgContainer" v-if="landladyInfo.userStatus == '2'">
 						<image src="../../static/isVip.png" mode="aspectFit"></image>
 						<view class="vipTip">会员</view>
 						<view class="vipRight" @click="goKeepUsing">
@@ -26,16 +26,13 @@
 				<view class="myContainer">
 					<view class="">
 						<image v-if="!landladyInfo.userImg" class="myPhoto" :src="userImg"></image>
-						<image v-else  class="myPhoto" :src="landladyInfo.userImg"></image>
+						<image v-else class="myPhoto" :src="landladyInfo.userImg"></image>
 					</view>
-					<view v-if="!landladyInfo.userImg"><button class="login" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true">登录</button></view>
+					<view v-if="!landladyInfo.userImg"><button class="login" open-type="getUserInfo" @getuserinfo="getUserInfo"
+						 withCredentials="true">登录</button></view>
 					<view class="detail" v-else>
 						<view class="detailTop">
 							<view class="myName">{{ userName }}</view>
-							<!-- <view class="myLevel">
-								<image class="levelIcon" src="../../static/queen.png"></image>
-								<view class="levelText">LV{{ level }}</view>
-							</view> -->
 						</view>
 						<view class="detailBottom">我的邀请码: {{ inviCode }}</view>
 					</view>
@@ -75,15 +72,6 @@
 					<view class="getTelNum" v-if="landladyInfo.phoneNumber">{{ phoneNumber }}</view>
 				</view>
 			</view>
-			<!-- 		<view class="jumpPortalitem" @click="openInviteFriends">
-				<view class="leftPart">
-					<image class="jumpPortalImg" src="../../static/myIcon5.png" mode=""></image>
-					<button class="jumpPortalText" hover-class="btnHoverClass" open-type="share">邀请好友</button>
-				</view>
-				<view class="rightPart">
-					<image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image>
-				</view>
-			</view> -->
 			<view class="jumpPortalitem" @click="openFeedBack">
 				<view class="leftPart">
 					<image class="jumpPortalImg" src="../../static/myIcon2.png" mode=""></image>
@@ -132,17 +120,8 @@
 		</view>
 		<message-modal v-if="showMessageModal" :deadNum="deadNum" v-on:emitCancel="returntCancel" v-on:emitSure="returnSure"></message-modal>
 		<!-- 授权弹窗 -->
-		<is-login v-show="loginFlag" v-on:isShowloginBtn="isShowloginBtn" :childLoginFlag="loginFlag" v-on:successCallBack="sucCallBack" v-on:childByValue="childByValue"></is-login>
-		<!-- <view class="isloginModal" v-show="loginFlag" @click="cancleLogin"></view> -->
-		<!-- <view class="isloginBox" v-show="loginFlag">
-			<image class="bgcImg" src="../../static/authorization.png" mode=""></image>
-			<view class="deleteImg" @click="cancleLogin"><image src="../../static/delete.png" mode=""></image></view>
-			<view class="loginTxt">授权登录体验完整功能</view>
-			<view class="loginImg">
-				<view class="notLogin" @click="cancleLogin"><image src="../../static/notLogin.png" mode=""></image></view>
-				<button class="loginButton" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true"></button>
-			</view>
-		</view> -->
+		<is-login v-show="loginFlag" v-on:isShowloginBtn="isShowloginBtn" :childLoginFlag="loginFlag" v-on:successCallBack="sucCallBack"
+		 v-on:childByValue="childByValue"></is-login>
 	</view>
 </template>
 
@@ -172,7 +151,6 @@
 				loginFlag: false, //登录弹窗
 				userImg: '../../static/tourist.png', //用户头像
 				userName: '', //用户昵称
-				// gender: '', //用户性别
 				show: true, //是否显示点击登录
 				roomNum: '50', // 房间容量暂时写死
 				inviCode: '', // 我的邀请码
@@ -189,20 +167,22 @@
 			...mapState(['landladyInfo'])
 		},
 		onLoad(options) {
-			this.caclTrialDate()
+			if(this.landladyInfo.id){
+				this.caclTrialDate()
+			}
 		},
 		onShow(options) {
 			let data = this.$store.state.landladyInfo
-			if(data.id){
+			if (data.id) {
 				let userInfo = {
-					unionId:data.unionId,
+					unionId: data.unionId,
 					openId: data.openId,
 					userImg: data.userImg,
 					userName: data.userName,
 					userSex: data.userSex
 				}
 				this.getMineMsg(userInfo)
-			}else{
+			} else {
 				this.checkLoginStatus().then(res => {
 					console.log(res);
 					if (res) {
@@ -217,9 +197,9 @@
 			}
 		},
 		methods: {
-			shareFirend(){
+			shareFirend() {
 				uni.navigateTo({
-					url:"../shareFriend/shareFriend"
+					url: "../shareFriend/shareFriend"
 				})
 			},
 			returntCancel() {
@@ -230,7 +210,6 @@
 				this.showMessageModal = false
 			},
 			caclTrialDate() {
-				console.log('Nihhao')
 				let date, sDate1, sDate2, dateSpan, iDays
 				console.log(date, this.trialDate)
 				date = this.$getDate()
@@ -247,14 +226,14 @@
 				}
 			},
 			goKeepUsing() {
-				if(this.$store.state.landladyInfo.id){
+				if (this.$store.state.landladyInfo.id) {
 					uni.navigateTo({
 						url: '../keepUsing/keepUsing?trialDate=' + this.trialDate + '&roomLimitNum=' + this.landladyInfo.buyNum
 					})
-				}else{
+				} else {
 					this.loginFlag = true;
 				}
-				
+
 			},
 			getUserInfo() {
 				console.log(11111);
@@ -292,7 +271,7 @@
 														self.gender = '未知';
 													}
 													let userInfo = {
-														unionId:res.data.data.unionid,
+														unionId: res.data.data.unionid,
 														openId: res.data.data.openid,
 														userName: infoRes.userInfo.nickName,
 														userImg: infoRes.userInfo.avatarUrl,
@@ -342,7 +321,7 @@
 								_this.$store.commit('isloginStatus', true);
 								_this.show = false;
 								let userInfo = {
-									unionId:_this.$store.state.landladyInfo.unionId,
+									unionId: _this.$store.state.landladyInfo.unionId,
 									openId: _this.$store.state.userOpenId,
 									userName: _this.$store.state.landladyInfo.userName,
 									userImg: _this.$store.state.landladyInfo.userImg,
@@ -361,19 +340,15 @@
 				console.log(value);
 				this.show = value;
 			},
+			sucCallBack() {
+				let data = this.$store.state.landladyInfo;
+				this.userName = data.userName;
+				this.userImg = data.userImg;
+				this.usedInviCode = data.usedInviCode;
+				this.inviCode = data.inviCode;
+			},
 			childByValue(value) {
-				let _this = this;
-				console.log('进入父组件获取到子组件传来数据', value);
-				_this.loginFlag = false;
-				if (value) {
-					_this.userName = value.userName;
-					_this.userImg = value.userImg;
-					_this.usedInviCode = value.usedInviCode;
-					_this.level = value.level;
-					_this.inviCode = value.inviCode;
-					_this.trialDate = value.trialDate;
-					_this.remainDay = value.remainDay;
-				}
+				this.loginFlag = false;
 			},
 
 			// 获取手机号方法
@@ -586,12 +561,13 @@
 		position: relative;
 		border-radius: 20rpx;
 	}
-	.posiBg{
+
+	.posiBg {
 		position: absolute;
 		width: 130rpx;
 		height: 126rpx;
-		top:0;
-		right:146rpx;
+		top: 0;
+		right: 146rpx;
 		opacity: 0.07;
 	}
 
@@ -1101,5 +1077,4 @@
 		background-size: 100% 100%;
 		position: relative;
 	}
-
 </style>

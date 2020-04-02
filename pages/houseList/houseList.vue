@@ -90,19 +90,10 @@
 			...mapState(['login', 'landladyInfo'])
 		},
 		onShow() {
-			console.log('wojinlaile', this.$store)
 			let _this = this;
 			if (this.$store.state.landladyInfo.id) {
 				this.getWords();
 				this.downCallback(this.mescroll);
-				this.$request
-					.post('user/findByOpenId', {
-						openId: this.$store.state.userOpenId
-					})
-					.then(res => {
-						_this.$store.commit('landladyInfo', res.data.data);
-					})
-					.catch(err => {});
 			}
 		},
 		methods: {
@@ -118,18 +109,12 @@
 			childByValue(value) {
 				this.loginFlag = false;
 			},
-			updateData() {
-				// this.getWords();
-				// this.downCallback(this.mescroll);
-			},
 			addCommunity() {
 				if (this.$store.state.isloginStatus) {
 					uni.navigateTo({
 						url: '../addCommunity/addCommunity'
 					});
 				} else {
-					console.log('是否登录', this.$store.state.isloginStatus);
-					console.log(this.loginFlag);
 					this.loginFlag = true;
 				}
 			},
@@ -143,7 +128,6 @@
 				this.$request
 					.post('/community/getFirstWordArray', {
 						landlordId: this.$store.state.landladyInfo.id,
-
 					})
 					.then(res => {
 						_this.wordList = res.data.data;

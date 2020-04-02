@@ -249,11 +249,6 @@
 													duration: 1500
 												})
 											}
-											// setTimeout(() => {
-											// 	uni.reLaunch({
-											// 		url: '../home/home'
-											// 	})
-											// }, 2100)
 										})
 									}
 								})
