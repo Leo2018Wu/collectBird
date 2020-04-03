@@ -23,14 +23,28 @@
 		</view>
 		<view class="section1">
 			<view class="billStatus">
-				<image v-if="!fromShare && billInfo.billStatus == 4 && billType == 0" class="billStatusBg" src="../../static/hasCheck.png"
+				<!-- <image v-if="!fromShare && billInfo.billStatus == 4 && billType == 0" class="billStatusBg" src="../../static/hasCheck.png"
 				 mode="aspectFit"></image>
 				<view v-else>
-					<image v-if="billInfo.billStatus == 4" class="billStatusBg" src="../../static/hasCheck1.png" mode="aspectFit"></image>
+					<image v-if="billInfo.billStatus >= 2" class="billStatusBg" src="../../static/hasCheck1.png" mode="aspectFit"></image>
+				</view> -->
+				<view v-if="!fromShare">
+					<image v-if="billInfo.billStatus == 4 && billType == 0" class="billStatusBg" src="../../static/hasCheck.png" mode="aspectFit"></image>
+					<image v-if="billInfo.billStatus == 4 && billType == 1" class="billStatusBg" src="../../static/hasCheck1.png" mode="aspectFit"></image>
+				</view>
+				<view v-else>
+					<image v-if="billInfo.billStatus >= 2" class="billStatusBg" src="../../static/hasCheck1.png" mode="aspectFit"></image>
 				</view>
 				<span class="billTitle">账单状态</span>
-				<span v-if="billInfo.billStatus != 4" class="statusDes0">{{billType == 1 || fromShare ? '未交租' : '未到账'}}</span>
-				<span v-if="billInfo.billStatus == 4" class="statusDes1">{{billType == 1 || fromShare ? '已交租' : '已到账'}}</span>
+				<view v-if="!fromShare">
+					<span v-if="billInfo.billStatus != 4" class="statusDes0">{{billType == 1? '未交租' : '未到账'}}</span>
+					<span v-if="billInfo.billStatus == 4" class="statusDes1">{{billType == 1? '已交租' : '已到账'}}</span>
+				</view>
+				<view v-else>
+					<span v-if="billInfo.billStatus >=2" class="statusDes1">已交租</span>
+					<span v-if="billInfo.billStatus < 2" class="statusDes0">未交租</span>
+				</view>
+				
 			</view>
 			<view class="billDateBox">
 				<view class="billDateLi">
@@ -113,8 +127,8 @@
 				</button>
 			</view>
 			<view v-if="fromShare">
-				<view v-if="billInfo.billStatus != 4" class="sureBtn" @click="remindOwner">告知房东已交租</view>
-				<view v-if="billInfo.billStatus == 4" class="sureBtn" :class="{grayBack: billInfo.billStatus == 4}">已交租</view>
+				<view v-if="billInfo.billStatus < 2" class="sureBtn" @click="remindOwner">告知房东已交租</view>
+				<view v-if="billInfo.billStatus >= 2" class="sureBtn" :class="{grayBack: billInfo.billStatus >= 2}">已交租</view>
 			</view>
 			<view v-else>
 				<view v-if="billType == 1">
