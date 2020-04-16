@@ -13,9 +13,17 @@
 					<icon-bar class="iconBar" :title="'卧室'+communityInfo.roomNo" :bgColor="'#FFF2E5'" :fontColor="'#FFA344'"></icon-bar>
 				</view>
 				<view class="detailBottom">
-					<span class="housePrice">{{communityInfo.roomPrice}}元/月</span>
+					<span class="housePrice">{{communityInfo.roomPrice ? communityInfo.roomPrice : 0}}元/月</span>
 					<span class="showRecord" v-if="roomInfo.unPayBill >= 1" @click.stop="showBill()">查看账单</span>
 				</view>
+			</view>
+		</view>
+		<view class="newArea" v-if="roomInfo.rentStatus != 1">
+			<view class="areaName">招租信息</view>
+			<view class="areaBtn" v-if="roomInfo.rentStatus == 2" @click="publish">招租信息</view>
+			<view class="areaBtn1" v-if="roomInfo.rentStatus == 0" @click="publish">
+				<view>发布</view>
+				<image src="../../static/newPublish.png" mode="aspectFit"></image>
 			</view>
 		</view>
 		<view class="renterTitle">
@@ -139,6 +147,11 @@
 			return shareObject;
 		},
 		methods: {
+			publish(){
+				uni.navigateTo({
+					url:'../roomPublish/roomPublish?houseId='+this.houseId+'&roomId='+this.roomInfo.id
+				})
+			},
 			returnSure(){
 				this.$request.post('/roomUser/unbindServiceOpenId',{
 					tenantId:this.tenantId
@@ -495,4 +508,44 @@
 		color: #999999;
 		margin-right: 20rpx;
 	} */
+	.newArea{
+		padding:36rpx 0 32rpx 40rpx;
+		border-bottom: 1rpx solid #FAFAFA;
+		display: flex;
+	}
+	.newArea .areaName{
+		font-size: 32rpx;
+		font-weight: bold;
+		margin-right: auto;
+		align-self: center;
+	}
+	.areaBtn{
+		width: 150rpx;
+		height: 60rpx;
+		border-radius: 10rpx;
+		border: 1rpx solid #FFA344;
+		color: #FFA344;
+		font-size: 28rpx;
+		line-height: 60rpx;
+		text-align: center;
+		margin-right: 40rpx;
+	}
+	.areaBtn1{
+		width: 150rpx;
+		height: 60rpx;
+		border-radius: 10rpx;
+		background-color: #FFA344;
+		color: #FFFFFF;
+		font-size: 28rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin-right: 40rpx;
+	}
+	.areaBtn1 image{
+		width: 33rpx;
+		height: 28rpx;
+		margin-top: 2rpx;
+		margin-left: 4rpx;
+	}
 </style>

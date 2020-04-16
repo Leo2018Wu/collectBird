@@ -3,7 +3,7 @@
 		<view class="numberBox" :class="{noBorder:noBorder}">
 			<view class="one" @click="del"></view>
 			<view class="two" :class="{noBorder:noBorder}">
-				<input type="number" v-model="trVal" @input="getValue"/>
+				<input type="number" maxlength="3" v-model="trVal" @input="getValue"/>
 			</view>
 			<view class="three" @click="add"></view>
 		</view>

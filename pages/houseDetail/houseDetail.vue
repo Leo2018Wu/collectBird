@@ -30,15 +30,18 @@
 					</view>
 
 					<scroll-view class="roomScroll" scroll-x="true">
-						<view class="roomItem" :class="[{noRent:p.rentStatus == 0},{hasPayBill: p.unPayBill >= 1},{unFill:p.tenantStatus == 2}]" v-for="(p,idx) in item.roomList"
+						<view class="roomItem" :class="[{noRent:p.rentStatus == 0},{hasPayBill: p.unPayBill >= 1},{unFill:p.tenantStatus == 2},{waitRent:p.rentStatus == 2}]" v-for="(p,idx) in item.roomList"
 						 :key="idx" @click="goRoom(p.id,idx,index,p.tenantId)">
 							<view class="roomItemLi">
 								<view v-if="item.rentType != 0">卧<span class="roomNo">{{p.roomNo}}</span></view>
 								<view v-if="item.rentType == 0">整租</view>
 								<span v-if="p.tenantStatus == 2">待完善</span>
-								<span v-if="p.rentStatus == 0 && p.tenantStatus != 2" style="fontSize:28rpx">闲置</span>
-								<span v-if="p.unPayBill >= 1 && p.tenantStatus != 2" style="fontSize:28rpx">有账单</span>
-								<span v-if="p.rentStatus == 1 && p.unPayBill == 0 && p.tenantStatus != 2">{{p.tenantName}}</span>
+								<view v-if="p.tenantStatus != 2">
+									<span v-if="p.rentStatus == 2">招租中</span>
+									<span v-if="p.rentStatus == 0" style="fontSize:28rpx">闲置</span>
+									<span v-if="p.rentStatus == 1 && p.unPayBill >= 1" style="fontSize:28rpx">有账单</span>
+									<span v-if="p.rentStatus == 1 && p.unPayBill == 0">{{p.tenantName}}</span>
+								</view>
 							</view>
 						</view>
 					</scroll-view>
@@ -301,8 +304,11 @@
 		height: 100%;
 		display: flex;
 		flex-direction: column;
-		justify-content: space-around;
+		justify-content:space-around;
 		align-items: center;
+	}
+	.addLi{
+		justify-content:center;
 	}
 
 	.roomItem .roomNo {
@@ -326,5 +332,9 @@
 	.unFill{
 		background-color: #FFD0D1;
 		color: #EB5E61;
+	}
+	.waitRent{
+		background-color: #E7F0FF;
+		color: #5396FF;
 	}
 </style>

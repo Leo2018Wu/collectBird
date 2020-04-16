@@ -614,6 +614,7 @@
 		color: #FFFFFF;
 		border-radius: 40rpx;
 		font-size: 30rpx;
+		font-weight: bold;
 	}
 
 	/* 轮播图 */

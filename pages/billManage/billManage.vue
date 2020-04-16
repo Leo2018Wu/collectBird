@@ -24,7 +24,7 @@
 					<view class="myBillItem">
 						<view class="itemFlex itemTop">
 							<view class="myBillName">{{item.billStatus == 5 ? '退租账单' : "租金账单"}}</view>
-							<view class="topRight">￥<span v-if="(item.billStatus == 5 || para.billType == 1) && item.totalAmount != 0">-</span>{{ item.totalAmount | thousandsPoints}}<span class="reminder" v-if="item.depositAmount">(含押金)</span></view>
+							<view class="topRight">￥<span v-if="(item.billStatus == 5 || para.billType == 1) && item.totalAmount != 0">-</span>{{ item.totalAmount | thousandsPoints}}<span class="reminder" v-if="item.depositAmount && item.sortNo == 1">(含押金)</span></view>
 						</view>
 						<view class="itemFlex itemMiddle">
 							<view class="myBillDate">{{ item.payRentDate.substr(0, 10) }}</view>

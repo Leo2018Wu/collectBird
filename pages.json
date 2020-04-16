@@ -230,6 +230,18 @@
 				"navigationBarTitleText": "邀请账号绑定"
 			}
         }
+        ,{
+            "path" : "pages/roomPublish/roomPublish",
+            "style" : {
+				"navigationBarTitleText": "发布"
+			}
+        }
+        ,{
+            "path" : "pages/privacy/privacy",
+            "style" : {
+				"navigationBarTitleText": "使用协议及隐私政策"
+			}
+        }
     ],
 	"permission": {
 		"scope.userLocation": {

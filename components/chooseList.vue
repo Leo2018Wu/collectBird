@@ -1,12 +1,13 @@
 <template>
 	<view class="chooseContainer" @click="aa">
-		<cover-view class="mask"></cover-view>
-			<cover-view class="list">
+		<cover-view class="mask"  @catchtouchmove="true"></cover-view>
+			<cover-view class="list" @catchtouchmove="true">
 				<cover-view class="title">
 					{{title}}
 				</cover-view>
 				<cover-view class="chooseLi" :class="{active: currentChooseIndex == index}" v-for="(item,index) in list" :key="index" @click="chooseLi(item,index)">
-					{{item}}
+					<cover-view style="height: 100%;line-height: 98rpx;"  :class="{inline: needTip && index == 3,textLeft:needTip && index == 3}">{{item}}</cover-view>
+					<cover-view class="inline" style="color: #FFA044;font-size:26rpx;text-align:left" v-if="needTip && index == 3">(赠送2个月)</cover-view>
 					<cover-view v-if="index < list.length-1" class="divide"></cover-view>
 					<cover-image v-if="currentChooseIndex == index" src="../static/true-icon.png" mode="aspectFit"></cover-image>
 				</cover-view>
@@ -24,6 +25,10 @@
 			list:{
 				type:Array,
 				"default":[]
+			},
+			needTip:{
+				type:Boolean,
+				"default":false
 			},
 			currentChooseIndex:null
 		},
@@ -63,12 +68,16 @@
 		left: 0;
 		bottom: 0;
 		right: 0;
-		z-index: 99;
+		z-index: 999;
 	}
 	.mask{
-		position: absolute;
-		width: 100%;
-		height: 100%;
+		position: fixed;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		/* width: 100%;
+		height: 100%; */
 		background-color: #000000;
 		opacity: 0.3;
 	}
@@ -77,7 +86,7 @@
 		width: 600rpx;
 		background-color: #FFFFFF;
 		border-radius: 20rpx;
-		position: absolute;
+		position: fixed;
 		z-index: 100;
 		top: 50%;
 		left: 75rpx;
@@ -122,6 +131,18 @@
 		color: #888888;
 		position: relative;
 	}
+	.chooseLi .inline{
+		display: inline-block;
+		height: 100%;
+		line-height: 98rpx;
+		width: 50%;
+	}
+	.chooseLi .inline:first-of-type{
+		width: 54%;
+	}
+	.chooseLi .inline:last-of-type{
+		width: 46%;
+	}
 	.divide{
 		width: 100%;
 		height: 2rpx;
@@ -130,6 +151,7 @@
 		bottom: 0;
 		left: 0;
 	}
+	
 	.active{
 		background-color: #FBFBFB;
 		color: #F09A42;
@@ -144,5 +166,8 @@
 		position: absolute;
 		top: 36rpx;
 		right: 37rpx;
+	}
+	.textLeft{
+		text-align: right;
 	}
 </style>

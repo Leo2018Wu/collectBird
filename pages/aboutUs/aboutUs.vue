@@ -8,6 +8,12 @@
 				<image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image>
 			</view>
 		</view>
+		<view class="contactUs1" @click="jump">
+			<view class="left">使用协议及隐私政策</view>
+			<view class="right">
+				<image class="rightPartImg" src="../../static/right_arrow.png" mode=""></image>
+			</view>
+		</view>
 		<!-- 弹窗 -->
 		<view class="modal" v-show="flag" @click="closeModal"></view>
 		<view class="modalBox" v-show="flag">
@@ -28,6 +34,11 @@
 			}
 		},
 		methods: {
+			jump(){
+				uni.navigateTo({
+					url:'../privacy/privacy'
+				})
+			},
 			openModal(e) {
 				this.flag = true;
 			},
@@ -72,6 +83,15 @@
 		justify-content: space-between;
 		align-items: center;
 		border-top: 2rpx solid rgba(246, 246, 246, 1);
+		border-bottom: 2rpx solid rgba(246, 246, 246, 1);
+	}
+	.contactUs1{
+		width: 100%;
+		height: 80rpx;
+		padding: 52rpx 37rpx;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 		border-bottom: 2rpx solid rgba(246, 246, 246, 1);
 	}
 

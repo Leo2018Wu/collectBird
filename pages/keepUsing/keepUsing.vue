@@ -1,24 +1,24 @@
 <template>
 	<view class="keepUsing">
 		<view class="infoBar">
-			<view class="userType">您是{{userStatus}}用户</view>
-			<view class="houseMax"><span>{{userStatus == '新' ? '不限' : roomLimitNum}}</span>(容量)</view>
+			<view class="userType">您是{{userStatus == '2' ? '老' : '新' }}用户</view>
+			<view class="houseMax">房号容量：<span>{{userStatus == '2' ? roomLimitNum : '不限' }}</span>{{userStatus == '2' ? '套' : '' }}</view>
 			<view>有效期截止：{{trialDate[0]}}年{{trialDate[1]}}月{{trialDate[2]}}日</view>
 			<image class="crown" src="../../static/buyCrown.png" mode="aspectFit"></image>
-			<view class="vipTip" v-if="userStatus == '老'">
+			<view class="vipTip" v-if="userStatus == '2'">
 				<image class="vipIcon" src="../../static/vipTip.png" mode="aspectFit"></image>
 				<view>会员</view>
 			</view>
 		</view>
 		<view class="chooseBar">选择购买</view>
 		<view class="chooseItem divideBottom">
-			<view class="itemName">房号扩容</view>
+			<view class="itemName">房号{{userStatus == '1' ? '购买' : '扩容'}}</view>
 			<view class="numberBox">
-				<number-box :noBorder='true' v-on:emitVal='returnVal' :valNum="1"></number-box>
+				<number-box :noBorder='true' maxNum="999" v-on:emitVal='returnVal' :valNum="userStatus == '1' ? 1 : 0"></number-box>
 			</view>
 		</view>
-		<view class="chooseItem" v-if="userStatus == '老'">
-			<view class="itemName">时间周期</view>
+		<view class="chooseItem" v-if="userStatus == '2'">
+			<view class="itemName">续约周期</view>
 			<view class="chooseBox" @click="showList">
 				<view class="pleChoose">{{listValue ? listValue : '请选择'}}</view>
 				<image src="../../static/triangle.png" mode=""></image>
@@ -28,31 +28,27 @@
 			<view class="joinClub" @click="showQrcode">加入体验群</view>
 			<view class="contactBuy" @click="showContact">联系购买</view>
 		</view>
-		<view class="skuBox" v-if="userStatus == '老'">
+		<view class="skuBox" v-if="userStatus == '2'">
 			<view class="skuItem active">
-				<view>{{listValue == '暂不续约' || listValue == '' ? '暂不续约' : '购买'+listValue }}</view>
+				<view class="myBold" v-if="listValue == '暂不续约' || listValue == ''">暂不续约</view>
+				<view v-else class="myBold">购买<span>{{listValue.substr(0,1)}}</span>{{currentMonthNum == 12 ? '年' : '个月'}}</view>
 				<view class="itemPrice"><span>￥</span>{{totalPrice}}</view>
 				<view class="itemOldPrice">原价{{oldPrice}}元/套/月</view>
 				<view class="itemSalePrice">特价{{actualPrice}}元/套/月</view>
-				<view class="gift">赠送{{awardNum}}个月</view>
+				<view class="gift" v-if="awardNum >0">赠送{{awardNum}}个月</view>
 			</view>
 		</view>
 		<view class="skuBoxNew" v-else>
-			<view class="skuItemNew" :class="{active : currentIndex == index}" @click="chooseSku(index)" v-for="(item,index) in [2700,5400]"
+			<view class="skuItemNew" :class="{active : currentIndex == index}" @click="chooseSku(index)" v-for="(item,index) in newPriceList"
 			 :key="index">
-				<view>购买{{index+1}}年</view>
-				<view v-if="index == 0" class="itemPrice"><span>￥</span>{{totalPrice}}</view>
-				<view v-if="index == 0" class="itemOldPrice">原价{{oldPrice}}元/套/月</view>
-				<view v-if="index == 0" class="itemSalePrice">特价{{actualPrice}}元/套/月</view>
-				<view v-if="index == 0" class="gift">赠送{{awardNum}}个月</view>
-
-				<view v-if="index == 1" class="itemPrice"><span>￥</span>{{totalPriceNew}}</view>
-				<view v-if="index == 1" class="itemOldPrice">原价{{oldPrice}}元/套/月</view>
-				<view v-if="index == 1" class="itemSalePrice">特价{{actualPriceNew}}元/套/月</view>
-				<view v-if="index == 1" class="gift">赠送{{awardNumNew}}个月</view>
+				<view class="myBold">购买<span>{{item.month == 12 ? 1 : item.month}}</span>{{item.perDate}}</view>
+				<view class="itemPrice"><span>￥</span>{{item.totalPriceNew}}</view>
+				<view class="itemOldPrice">原价{{item.oldPrice}}元/套/月</view>
+				<view class="itemSalePrice">特价{{item.actualPriceNew}}元/套/月</view>
+				<view class="gift" v-if="item.awardNumNew > 0">赠送{{item.awardNumNew}}个月</view>
 			</view>
 		</view>
-		<choose-list v-if="listShow" :currentChooseIndex="chooseIndex" v-on:close="hideList" :list="list" :title="'选择时间周期'"
+		<choose-list v-if="listShow" :currentChooseIndex="chooseIndex" :needTip="true" v-on:close="hideList" :list="list" :title="'选择时间周期'"
 		 v-on:emitClick="returnEmit"></choose-list>
 		<cover-view class="modalMask" v-if="showQrCodeBox || showContactBox" @click="hideModal">
 			<cover-view class="qrCodeBox" v-if="showQrCodeBox">
@@ -71,9 +67,21 @@
 </template>
 
 <script>
+	import moment from 'moment'
 	import chooseList from '../../components/chooseList.vue'
 	import numberBox from '../../components/numberBox.vue'
-	var basePrice = 4;
+	var basePrice = 5;
+	function datedifference(sDate1, sDate2) {    //sDate1和sDate2是2006-12-18格式 
+        var dateSpan,
+            tempDate,
+            iDays;
+        sDate1 = Date.parse(sDate1);
+        sDate2 = Date.parse(sDate2);
+        dateSpan = sDate2 - sDate1;
+        dateSpan = Math.abs(dateSpan);
+        iDays = Math.floor(dateSpan / (24 * 3600 * 1000));
+        return iDays
+    };
 	export default {
 		components: {
 			numberBox,
@@ -81,8 +89,40 @@
 		},
 		data() {
 			return {
+				newPriceList:[
+					{
+						month:1,
+						perDate:'月',
+						oldPrice:basePrice,
+						actualPriceNew:basePrice,
+						totalPriceNew:5.00,
+						awardNumNew:0
+					},{
+						month:3,
+						perDate:'月',
+						oldPrice:basePrice,
+						actualPriceNew:basePrice,
+						totalPriceNew:15.00,
+						awardNumNew:0
+					},{
+						month:6,
+						perDate:'月',
+						oldPrice:basePrice,
+						actualPriceNew:basePrice,
+						totalPriceNew:30.00,
+						awardNumNew:0
+					},{
+						month:12,
+						perDate:'年',
+						oldPrice:basePrice,
+						actualPriceNew:4.29,
+						totalPriceNew:60.00,
+						awardNumNew:2
+					}
+				],
+				ttDate:'',
 				currentIndex: 0,
-				list: ['1年', '2年', '暂不续约'],
+				list: ['1个月','3个月','6个月','1年','暂不续约'],
 				listShow: false,
 				chooseIndex: null,
 				showQrCodeBox: false,
@@ -95,56 +135,59 @@
 				trialDate: [],
 				roomLimitNum: '',
 				userStatus: '',
-				currentMonthNumNew:'',
-				awardNumNew:''
 			}
 		},
 		computed: {
 			totalPrice() {
-				let monthPar = this.currentMonthNum ? this.currentMonthNum : 1;
-				let limitPar = this.houseLimitNum ? this.houseLimitNum : 1;
-				return (monthPar * basePrice * limitPar).toFixed(2)
-			},
-			totalPriceNew(){
-				let monthPar = this.currentMonthNumNew;
-				let limitPar = this.houseLimitNum ? this.houseLimitNum : 1;
-				return (monthPar * basePrice * limitPar).toFixed(2)
+				let total
+				let monthPar = this.currentMonthNum;
+				let limitPar = this.houseLimitNum;
+				if(moment(this.ttDate).isBefore(moment().format('YYYY-MM-DD'))){
+					// 若当前到期时间小于当天日期取当天日期 总价格等于单价*月数*（当前扩容数量+原来的容量）
+					total = Number((monthPar * basePrice * (parseInt(limitPar) + parseInt(this.roomLimitNum)))).toFixed(2)
+				}else{
+					//若不是 总价格等于续费价格加上扩容价格 
+					//1、续费价格(单价*之前的容量*续费时间)
+					let price1 = monthPar * basePrice * (parseInt(limitPar) + parseInt(this.roomLimitNum))
+					//2、扩容价格(每天单价*当前扩容量*（续费之后的日期 - 当前到期时间）)
+					let diffDays = datedifference(moment().format('YYYY-MM-DD'),moment(this.ttDate))
+					console.log(diffDays)
+					let price2 = Number((basePrice / 30)).toFixed(2) * diffDays * limitPar
+					total = parseFloat(price1) + parseFloat(price2)
+				}
+				return Number(total).toFixed(2)
 			},
 			actualPrice() {
 				let monthPar = this.currentMonthNum ? this.currentMonthNum : 1;
-				return ((basePrice * monthPar) / (monthPar + this.awardNum)).toFixed(2)
+				return Number(((basePrice * monthPar) / (monthPar + this.awardNum))).toFixed(2)
 			},
-			actualPriceNew(){
-				let monthPar = this.currentMonthNumNew;
-				return ((basePrice * monthPar) / (monthPar + this.awardNumNew)).toFixed(2)
+		},
+		watch:{
+			houseLimitNum:function(newVal,oldVal){
+				console.log(newVal,oldVal)
+				this.newPriceList.forEach((item)=>{
+					item.totalPriceNew = Number((item.oldPrice * item.month * this.houseLimitNum)).toFixed(2)
+				})
 			}
 		},
 		onLoad(options) {
+			this.ttDate = options.trialDate
 			this.trialDate = options.trialDate.split('-');
 			this.roomLimitNum = options.roomLimitNum;
 			console.log(basePrice)
+			console.log(this.trialDate,options.trialDate)
 			if (this.$store.state.landladyInfo.userStatus == 1) {
 				uni.setNavigationBarTitle({
 					title: '购买'
 				})
 			}
-			this.userStatus = this.$store.state.landladyInfo.userStatus == 1 ? '新' : '老'; /*1-新用户 2-老用户*/
-			if (this.userStatus == '新') {
-				console.log('你好')
-				this.currentMonthNum = 12;
-				this.currentMonthNumNew = 24;
-				this.awardNumNew = 6;
-				this.awardNum = 2;
-			}
+			this.userStatus = this.$store.state.landladyInfo.userStatus
+			// this.userStatus = this.$store.state.landladyInfo.userStatus == 1 ? '新' : '老'; /*1-新用户 2-老用户*/
+			this.returnEmit({index:4,newVal:'暂不续约'})
 		},
 		methods: {
 			chooseSku(index) {
-				console.log('sdsadsafasf')
 				this.currentIndex = index;
-				// if (index == 1) {
-				// 	this.currentMonthNum = 24;
-				// 	this.awardNum = 6;
-				// }
 			},
 			returnVal(e) {
 				this.houseLimitNum = e
@@ -155,14 +198,22 @@
 				this.listValue = e.newVal;
 				switch (e.index) {
 					case 0:
+						this.currentMonthNum = 1;
+						this.awardNum = 0;
+						break;
+					case 1:
+						this.currentMonthNum = 3;
+						this.awardNum = 0;
+						break;
+					case 2:
+						this.currentMonthNum = 6;
+						this.awardNum = 0;
+						break;
+					case 3:
 						this.currentMonthNum = 12;
 						this.awardNum = 2;
 						break;
-					case 1:
-						this.currentMonthNum = 24;
-						this.awardNum = 6;
-						break;
-					case 2:
+					case 4:
 						this.currentMonthNum = 0;
 						this.awardNum = 0;
 						break;
@@ -371,6 +422,7 @@
 	.skuBoxNew {
 		display: flex;
 		justify-content: space-between;
+		flex-wrap: wrap;
 	}
 
 	.skuItem {
@@ -394,6 +446,7 @@
 		border: 2rpx solid #E4E3E3;
 		border-radius: 5rpx;
 		position: relative;
+		margin-bottom: 50rpx;
 	}
 
 	.itemPrice {
@@ -536,5 +589,13 @@
 		width: 25rpx;
 		height: 25rpx;
 		margin-right: 10rpx;
+	}
+	.myBold{
+		color: #62615B;
+		font-weight: bold;
+	}
+	.myBold span{
+		color: #A87058;
+		font-size: 32rpx;
 	}
 </style>

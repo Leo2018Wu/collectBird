@@ -145,9 +145,6 @@
 				}
 			}
 		},
-		computed: {
-			...mapState(["tempRoomInfo"])
-		},
 		onShow() {
 			if (this.inEdit) {
 				uni.setNavigationBarTitle({

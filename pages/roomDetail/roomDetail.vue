@@ -2,25 +2,8 @@
 	<view class="">
 		<choose-list v-if="listShow" v-on:close="hideList" :currentChooseIndex="chooseIndex" :list="list" :title="'选择收租周期'" v-on:emitClick = "returnEmit"></choose-list>
 		<view class="roomDetail" v-if="!isEditRoom">
-			
-			<view class="bannerBox">
-				<span>上传图片</span>
-				<view class="changeBtn" @click="deleteImg">修改</view>
-				<image v-if="imgUrl" class="bannerImg" :src="imgUrl" mode="aspectFill"></image>
-				<image v-else class="bannerImg" src="https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/el.jpg" mode="aspectFill"></image>
-				<!-- <uImg  ref="upimg"
-				    :canUploadFile="true" 
-				    :limit="limitNum"
-				    :uploadFileUrl="uploadFileUrl" 
-				    :uImgList.sync="uImgList" 
-				    @uploadSuccess="uploadSuccess"
-					:parentPath="'community'"/> -->
-				<image class="uploadimg" src="../../static/upload1.png" mode="aspectFit" @click="chooseImg"></image>
-			</view>
-			
 			<view v-if="isWholeRent" class="communityName">{{houseInfo.communityName}}-{{houseInfo.roomNo}}-整租</view>
 			<view v-if="!isWholeRent" class="communityName">{{houseInfo.communityName}}-{{houseInfo.roomNo}}-卧室{{bedRoomNo}}</view>
-			
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form" :model="info">
 				<view class="section1">
 					<evan-form-item label="租金" prop="rentPrice" :fontBold="true">
@@ -68,28 +51,15 @@
 					</evan-form-item>
 				</view>
 			</evan-form>
-			<view class="saveBtn" @click="save">保存</view>
-		</view>
-		
-		<view class="roomDetail" v-if="isEditRoom">
-			<view class="bannerBox">
-				<span>上传图片</span>
-				<view class="changeBtn" @click="deleteImg">修改</view>
-				<image v-if="newHouseInfo.roomList[0].roomImgs" class="bannerImg" :src="newHouseInfo.roomList[0].roomImgs" mode="aspectFill"></image>
-				<image v-else class="bannerImg" src="https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/el.jpg" mode="aspectFill"></image>
-				<!-- <uImg  ref="upimg"
-				    :canUploadFile="true" 
-				    :limit="limitNum"
-				    :uploadFileUrl="uploadFileUrl" 
-				    :uImgList.sync="uImgList" 
-				    @uploadSuccess="uploadSuccess"
-					:parentPath="'community'"/> -->
-				<image class="uploadimg" src="../../static/upload1.png" mode="aspectFit" @click="chooseImg"></image>
+			<view class="operationBox">
+				<view class="saveBtn" @click="save(false)">保存</view>
+				<view class="saveBtn1" @click="showPublishInfo" v-if="newHouseInfo.roomList[0].rentStatus == 2">招租信息</view>
+				<view class="saveBtn1" v-else @click="save(true)">保存并发布</view>
 			</view>
-			
+		</view>
+		<view class="roomDetail" v-if="isEditRoom">
 			<view v-if="isWholeRent" class="communityName">{{newHouseInfo.roomList[0].communityName}}-{{newHouseInfo.houseNo}}-整租</view>
 			<view v-if="!isWholeRent" class="communityName">{{newHouseInfo.roomList[0].communityName}}-{{newHouseInfo.houseNo}}-卧室{{newHouseInfo.roomList[0].roomNo}}</view>
-			
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form" :model="info">
 				<view class="section1">
 					<evan-form-item label="租金" prop="rentPrice" :fontBold="true">
@@ -137,7 +107,14 @@
 					</evan-form-item>
 				</view>
 			</evan-form>
-			<view class="saveBtn" @click="save">保存</view>
+			<view class="operationBox" :class="{oneButton: newHouseInfo.roomList[0].rentStatus == 1}">
+				<view class="saveBtn" @click="save(false)">保存</view>
+				<view v-if="newHouseInfo.roomList[0].rentStatus != 1">
+					<view class="saveBtn1" @click="showPublishInfo" v-if="newHouseInfo.roomList[0].rentStatus == 2">招租信息</view>
+					<view class="saveBtn1" v-else @click="save(true)">保存并发布</view>
+				</view>
+			</view>
+			
 		</view>
 	</view>
 	
@@ -172,7 +149,6 @@
 				houseInfo:{},
 				newHouseInfo:{},//添加房号之后更新房屋信息
 				isEditRoom:false,
-				imgUrl:"",
 				info:{
 					rentPrice:'',
 					rentCycle:'',
@@ -213,14 +189,13 @@
 			if(options.roomNo){
 				this.bedRoomNo = options.roomNo;
 			}
-			this.getRentCycleList()
 		},
 		onShow(){
 			let _this = this
+			this.getRentCycleList()
 			setTimeout(()=>{
 				_this.getHouseInfo(this.houseInfo.houseId)
 			},800)
-			
 		},
 		methods: {
 			showList(){
@@ -282,9 +257,6 @@
 					})
 				})
 			},
-			deleteImg(){
-				this.imgUrl = "";
-			},
 			blur(){
 				this.listShow = false
 			},
@@ -296,85 +268,43 @@
 				this.info.rentCycle = e.newVal
 				// console.log(this.rentCycleList)
 			},
-			uploadImg(path){
-				let _this = this
-				return new Promise((reslove,rej) =>{
-					uni.uploadFile({
-						url:_this.$baseUrl+'/util/uploadByPath',
-						// url:"http://192.168.10.184:8889/util/uploadByPath",
-						name: "file",
-						filePath: path, // 使用files上传数组列表,上面两者都会失效
-						formData:{
-							parentPath:'room',
-							fileType:"images"
-						},
-						success:res=>{
-							console.log(res)
-							let data = JSON.parse(res.data)
-							if(data.code == '87014'){
-								uni.showToast({
-									title:'图片内容违规，请重新选择',
-									icon:'none'
-								})
-								return;
-							}
-							console.log(data)
-							if(_this.isEditRoom){
-								_this.newHouseInfo.roomList[0].roomImgs = data.data
-							}else{
-								_this.imgUrl = data.data
-							}
-							reslove(data.data)
-							uni.hideLoading()
-						},
-						fail:err=>{
-							uni.hideLoading()
-							uni.showToast({
-								title:err.errMsg
-							})
-						}
-					})
-				})
-				
-			},
-			chooseImg(){
-				let _this = this
-				uni.chooseImage({
-					count:1,
-					sizeType: ['original', 'compressed'],
-					sourceType: ['album', 'camera'],
-					success(res) {
-						_this.uploadImg(res.tempFilePaths[0])
-					}
+			showPublishInfo(){
+				uni.navigateTo({
+					url:'../roomPublish/roomPublish?houseId='+this.houseInfo.houseId+'&roomId='+this.newHouseInfo.roomList[0].id
 				})
 			},
-			save(){
-				console.log(this.rentCycleList)
+			save(isPublish){
 				// 请求参数
-				let par = {
-					houseId:this.houseInfo.houseId,
-					landlordId:this.$store.state.landladyInfo.id,
-					communityName:this.houseInfo.communityName,
-					roomNo:this.bedRoomNo,
-					roomPrice:this.info.rentPrice,
-					rentStatus:"0",
-					eleMeterReading:"0",
-					waterMeterReading:"0",
-					eleUnitPrice:this.info.elecCost,
-					waterUnitPrice:this.info.waterCost,
-					netCost:this.info.netCost,
-					depositNum:this.rentCycleList[1],
-					rentNum:this.rentCycleList[0]
-				};
-				if(this.isEditRoom){
-					par.id = this.id
-				}
+				
+				// let updatePar = {
+					// houseId:this.houseInfo.houseId,
+					// landlordId:this.$store.state.landladyInfo.id,
+					// communityName:this.houseInfo.communityName,
+					// roomNo:this.bedRoomNo,
+					// rentStatus:"0",
+				// 	roomPrice:this.info.rentPrice,
+				// 	eleMeterReading:"0",
+				// 	waterMeterReading:"0",
+				// 	eleUnitPrice:this.info.elecCost,
+				// 	waterUnitPrice:this.info.waterCost,
+				// 	netCost:this.info.netCost,
+				// 	depositNum:this.rentCycleList[1],
+				// 	rentNum:this.rentCycleList[0]
+				// };
+				let par = this.newHouseInfo.roomList[0]
+				par.roomPrice = this.info.rentPrice
+				par.eleMeterReading = '0'
+				par.waterMeterReading = '0'
+				par.eleUnitPrice = this.info.elecCost
+				par.waterUnitPrice = this.info.waterCost
+				par.netCost = this.info.netCost
+				par.depositNum = this.rentCycleList[1]
+				par.rentNum = this.rentCycleList[0]
+				// if(this.isEditRoom){
+				// 	par.id = this.id
+				// }
 				let urlPar = this.isEditRoom ? 'room/update' : '/room/addRoom'
 				let _this = this
-				if(this.imgUrl){
-					par.roomImgs = _this.imgUrl
-				}
-				console.log(par)
 				this.$refs.form.validate((res) => {
 					if (res) {
 						_this.$request.post(urlPar,par).then(data =>{
@@ -382,8 +312,13 @@
 								title:'房间保存成功',
 								duration:1500,
 								success() {
-									_this.$store.commit('tempRoomInfo',data.data.data);
-									uni.navigateBack()
+									if(isPublish){
+										uni.navigateTo({
+											url:'../roomPublish/roomPublish?houseId='+_this.houseInfo.houseId+'&roomId='+data.data.data.id
+										})
+									}else{
+										uni.navigateBack()	
+									}
 								}
 							})
 						}).catch(err =>{
@@ -402,40 +337,6 @@
 		height: 100vh;
 		background-color: #FAFAFA;
 		font-size: 30rpx;
-	}
-	.bannerBox{
-		width: 100%;
-		height: 324rpx;
-		position: relative;
-		color: #FFFFFF;
-		font-size: 30rpx;
-	}
-	.bannerBox span{
-		position: absolute;
-		bottom: 60rpx;
-		left: 50%;
-		transform: translateX(-50%);
-	}
-	.bannerImg{
-		width: 100%;
-		height: 100%;
-	}
-	.uploadimg{
-		width: 128rpx;
-		height: 107rpx;
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%,-60%);
-	}
-	.changeBtn{
-		position: absolute;
-		right: 24rpx;
-		top: 20rpx;
-		padding: 10rpx 25rpx;
-		border-radius: 29rpx;
-		background-color: rgba(255,255,255,0.1);
-		color: #FFFFFF;
 	}
 	.communityName{
 		padding: 34rpx 40rpx;
@@ -479,14 +380,33 @@
 		border-bottom: 8px transparent solid;
 		border-right: 8px transparent solid;
 	}
+	.saveBtn1{
+		color: #FFFFFF;
+		background:linear-gradient(-90deg,rgba(243,183,73,1) 0%,rgba(240,154,66,1) 100%);
+	}
 	.saveBtn{
+		color: #FFA344;
+		border: 1rpx solid #FFA344;
+		background:#FFFFFF;
+		margin-right: auto;
+	}
+	.operationBox{
+		position: fixed;
+		bottom: 100rpx;
+		width: calc(100% - 132rpx);
+		margin-left: 66rpx;
+		display: flex;
+	}
+	.operationBox .saveBtn,.operationBox .saveBtn1{
 		width: 257rpx;
 		height: 74rpx;
 		border-radius: 37rpx;
-		color: #FFFFFF;
-		background:linear-gradient(-90deg,rgba(243,183,73,1) 0%,rgba(240,154,66,1) 100%);
 		text-align: center;
 		line-height: 74rpx;
-		margin: 148rpx auto 0 auto;
+	}
+	.oneButton .saveBtn{
+		background-color: #FFA344;
+		color: #FFFFFF;
+		margin: 0 auto;
 	}
 </style>

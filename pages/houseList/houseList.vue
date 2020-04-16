@@ -54,6 +54,7 @@
 		},
 		data() {
 			return {
+				landladyInfo:{},
 				wordList: [],
 				mescroll: {},
 				loginFlag: false, //登录弹窗
@@ -87,16 +88,24 @@
 			};
 		},
 		computed: {
-			...mapState(['login', 'landladyInfo'])
+			...mapState(['login'])
 		},
 		onShow() {
 			let _this = this;
 			if (this.$store.state.landladyInfo.id) {
+				this.getInfo()
 				this.getWords();
 				this.downCallback(this.mescroll);
 			}
 		},
 		methods: {
+			getInfo(){
+				this.$request.post('/user/findByOpenId',{
+					openId:this.$store.state.landladyInfo.openId
+				}).then(res=>{
+					this.landladyInfo = res.data.data
+				})
+			},
 			sucCallBack(){
 				this.getWords()
 				this.downCallback(this.mescroll)

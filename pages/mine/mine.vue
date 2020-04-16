@@ -1045,6 +1045,7 @@
 		border: none !important;
 		outline: none !important;
 		border-radius: 30rpx;
+		font-weight: bold;
 	}
 
 	.keepUsing {
