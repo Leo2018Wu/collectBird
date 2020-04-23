@@ -14,7 +14,7 @@
 		<view class="chooseItem divideBottom">
 			<view class="itemName">房号{{userStatus == '1' ? '购买' : '扩容'}}</view>
 			<view class="numberBox">
-				<number-box :noBorder='true' maxNum="999" v-on:emitVal='returnVal' :valNum="userStatus == '1' ? 1 : 0"></number-box>
+				<number-box :noBorder='true' maxNum="999" v-on:emitVal='returnVal' :valNum="userStatus == '1' ? 1 : 10"></number-box>
 			</view>
 		</view>
 		<view class="chooseItem" v-if="userStatus == '2'">
@@ -184,6 +184,9 @@
 			this.userStatus = this.$store.state.landladyInfo.userStatus
 			// this.userStatus = this.$store.state.landladyInfo.userStatus == 1 ? '新' : '老'; /*1-新用户 2-老用户*/
 			this.returnEmit({index:4,newVal:'暂不续约'})
+		},
+		onShow() {
+			this.houseLimitNum = 10
 		},
 		methods: {
 			chooseSku(index) {

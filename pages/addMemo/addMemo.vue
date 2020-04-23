@@ -10,7 +10,7 @@
 		</view>
 		<view class="btnBox1" v-else>
 			<view class="delBtn" @click="delMemo">删除</view>
-			<view class="saveBtn" @click="save">保存</view>
+			<view class="saveBtn" @click="save(true)">保存</view>
 		</view>
 	</view>
 </template>
@@ -24,6 +24,7 @@
 		},
 		data() {
 			return {
+				isSumbited:false,
 				title: '',
 				curDate: '',
 				content: '',
@@ -41,6 +42,11 @@
 				})
 			}
 			this.curDate = moment().format("YYYY-MM-DD HH:mm:ss");
+		},
+		onUnload() {
+			if(this.content && !this.isSumbited){
+				this.save(false)
+			}
 		},
 		methods: {
 			returnCancel(){
@@ -81,7 +87,7 @@
 					_this.content = res.data.data.noteContent;
 				})
 			},
-			save() {
+			save(type) {
 				let _this = this
 				if(!_this.content){
 					uni.showToast({
@@ -104,13 +110,16 @@
 				}
 				this.$request.post(postUrl, par).then((res)=>{
 					if(res.data.code == "200"){
-						uni.showToast({
-							title:_this.memoId ? '编辑成功' : '保存成功',
-							duration:1500
-						})
-						setTimeout(()=>{
-							uni.navigateBack()
-						},2000)
+						_this.isSumbited = true
+						if(type){
+							uni.showToast({
+								title:_this.memoId ? '编辑成功' : '保存成功',
+								duration:1500
+							})
+							setTimeout(()=>{
+								uni.navigateBack()
+							},2000)
+						}
 					}
 				})
 			}
@@ -152,7 +161,8 @@
 
 	.secTip1 {
 		width: 690rpx;
-		height: 340rpx;
+		height: calc(100vh - 600rpx);
+		/* height: 340rpx; */
 		font-size: 34rpx;
 		padding-bottom: 32rpx;
 	}

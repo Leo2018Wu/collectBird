@@ -50,7 +50,7 @@
 					<view class="formOuter">
 						<evan-form-item label="上期读数" prop="commPreNum">
 							<template v-slot:main>
-								<input class="form-input inputColor" type="digit" placeholder-class="form-input-placeholder" v-model="info.commPreNum"
+								<input class="form-input inputColor" type="digit" maxlength="7"  placeholder-class="form-input-placeholder" v-model="info.commPreNum"
 								 placeholder="0.00" />
 							</template>
 							<template v-slot:tip>
@@ -59,7 +59,7 @@
 						</evan-form-item>
 						<evan-form-item label="本期读数" prop="commCurNum">
 							<template v-slot:main>
-								<input class="form-input inputColor" type="digit" placeholder-class="form-input-placeholder" @input="inputChangeHandleComm"  v-model="info.commCurNum"
+								<input class="form-input inputColor" type="digit" maxlength="7" placeholder-class="form-input-placeholder" @input="inputChangeHandleComm"  v-model="info.commCurNum"
 								 placeholder="0.00" />
 							</template>
 							<template v-slot:tip>
@@ -103,6 +103,7 @@
 </template>
 
 <script>
+	import {moneyLimit} from '../../util/index.js'
 	import numberBox from '../../components/numberBox.vue'
 	import evanFormItem from '../../components/evan-form/evan-form-item.vue';
 	import evanForm from '../../components/evan-form/evan-form.vue';
@@ -181,8 +182,8 @@
 		},
 		methods: {
 			inputChangeHandle(e) {
-				this.info.curNum = e.detail.value
-				if (+e.detail.value < +this.info.curNum) {
+				this.info.curNum = moneyLimit(e.detail.value) 
+				if (e.detail.value < this.info.preNum) {
 					uni.showToast({
 						title: '本期读数不能小于上期读数!',
 						icon: 'none'
@@ -191,8 +192,8 @@
 				} 
 			},
 			inputChangeHandleComm(e) {
-				this.info.commCurNum = e.detail.value;
-				if (+e.detail.value < +this.info.commCurNum) {
+				this.info.commCurNum = moneyLimit(e.detail.value)
+				if (+e.detail.value < +this.info.commPreNum) {
 					uni.showToast({
 						title: '本期读数不能小于上期读数!',
 						icon: 'none'
@@ -202,8 +203,13 @@
 			},
 			submit(){
 				let _this = this;
-				console.log(this.info.commCurNum)
-				
+				if(this.info.commCurNum < this.info.commPreNum || this.info.curNum < this.info.preNum){
+					uni.showToast({
+						title: '本期读数不能小于上期读数!',
+						icon: 'none'
+					});
+					return;
+				}
 				this.$refs.form.validate(res => {
 					if(res){
 						_this.billInfo.items.forEach((item,index)=>{

@@ -21,11 +21,13 @@
 					</view>
 				</view>
 			</view>
+		
 			<view class="bannerBox">
 				<view class="bannerTop">
 					<view v-for="(item,index) in homeList" @click="switchPage(item.url)" :key="index">
 						<view class="bannerItem">
 							<view v-if="item.icon && noteNum > 0" class="bannerIcon">{{noteNum ? noteNum : ""}}</view>
+							<view v-if="index == 7" class="bannerIcon1">NEW</view>
 							<image class="bannerImg" :src="item.imgUrl" mode="aspectFit"></image>
 						</view>
 						<span class="bannerText">{{item.title}}</span>
@@ -189,9 +191,9 @@
 						icon:true
 					},
 					{
-						title: '帮助',
+						title: '招租',
 						imgUrl: '../../static/homeIcon6.png',
-						url: '../help/help',
+						url: '../inviRent/inviRent',
 						icon:false
 					}
 				],
@@ -506,6 +508,23 @@
 		border-radius: 50%;
 		color: #FFFFFF;
 		font-size: 26rpx;
+		border: 2rpx solid #FFFFFF;
+	}
+	.bannerIcon1{
+		box-sizing: content-box;
+		/* min-height: 36rpx; */
+		min-width: 52rpx;
+		height: 30rpx;
+		line-height: 30rpx;
+		text-align: center;
+		position: absolute;
+		top: -14rpx;
+		right: -50rpx;
+		background-color: #EA4E3D;
+		border-radius: 6rpx;
+		color: #FFFFFF;
+		font-size: 16rpx;
+		font-weight: bold;
 		border: 2rpx solid #FFFFFF;
 	}
 	.bannerImg {

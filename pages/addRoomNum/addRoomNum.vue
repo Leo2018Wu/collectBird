@@ -60,14 +60,14 @@
 				</view>
 			</view>
 			<view v-else class="inputContainer" @click="goRoomDetail(item)" v-for="(item,index) in roomList" :key="index">
-				<view class="inputBarBox">
+				<view class="inputBarBox" :class="{marginR : tempRoomList[index].roomPrice}">
 					<input-bar :disabled="true">卧室{{item}}</input-bar>
 				</view>
+				<view v-if="!tempRoomList[index].roomPrice" class="notFinish">待完善</view>
 				<view style="display: flex; align-items: center; color: #999999;fontSize:32rpx">
 					<span>编辑</span>
 					<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 				</view>
-
 			</view>
 
 		</view>
@@ -420,16 +420,31 @@
 		height: 94rpx;
 		line-height: 94rpx;
 		display: flex;
+		justify-content: flex-start;
 		align-items: center;
 		border-bottom: 3rpx solid #EBEBEB80;
 	}
 
 	.inputBarBox {
 		/* width: 100%; */
-		width: 80%;
+		width: fit-content;
 		height: 100%;
 	}
-
+	.marginR{
+		margin-right: auto;
+	}
+	.notFinish{
+		width: fit-content;
+		height: 40rpx;
+		padding: 0 24rpx;
+		line-height: 40rpx;
+		text-align: center;
+		background-color: #FCEDEC;
+		color: #DA6765;
+		font-size: 24rpx;
+		border-radius: 20rpx;
+		margin: 0 auto 0 12rpx;
+	}
 	.inpArrow {
 		width: 30rpx;
 		height: 24rpx;

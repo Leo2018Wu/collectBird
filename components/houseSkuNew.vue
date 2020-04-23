@@ -3,15 +3,15 @@
 		<view class="contentBox" :style="{paddingLeft:paddingSelf+'rpx',paddingRight:paddingSelf+'rpx'}" @click="myClick">
 			<view>{{item.communityName}}</view>
 			<view class="bottomBox">
-				<view class="communityBox">
+				<view class="communityBox" @click.stop="resetHouse">
 					<view class="topItem"><span>{{item.houseNum}}</span>套</view>
-					<view class="bottomItem">在租房源</view>
+					<view class="bottomItem">{{btnContent1}}</view>
 				</view>
-				<view class="communityBox">
+				<view class="communityBox" @click.stop="filterInRent">
 					<view class="topItem"><span>{{item.roomNum}}</span>间</view>
 					<view class="bottomItem">在租房间</view>
 				</view>
-				<view class="communityBox">
+				<view class="communityBox" @click.stop="filterEmpty">
 					<view class="topItem"><span>{{item.idleRoom}}</span>间</view>
 					<view class="bottomItem">闲置房间</view>
 				</view>
@@ -23,6 +23,10 @@
 <script>
 	export default {
 		props:{
+			btnContent1:{
+				type:String,
+				"default":"在租房源"
+			},
 			item:{
 				type:Object,
 				"default":{
@@ -43,9 +47,15 @@
 			};
 		},
 		methods: {
-			// filterHouse(type){
-			// 	this.$emit('myFilter',type)
-			// },
+			resetHouse(){
+				this.$emit('resetHouse',this.item)
+			},
+			filterInRent(){
+				this.$emit('filterHouseRent',this.item)
+			},
+			filterEmpty(){
+				this.$emit('filterHouseEmpty',this.item)
+			},
 			myClick(){
 				this.$emit('myClick',this.item)
 			}

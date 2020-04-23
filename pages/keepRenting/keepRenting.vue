@@ -10,7 +10,7 @@
 					<evan-form-item label="月租金" prop="rentUnitPrice">
 						<template v-slot:main>
 							<input class="form-input" type="digit" placeholder-class="form-input-placeholder" v-model="info.rentUnitPrice"
-							 placeholder="0.00" />
+							 placeholder="0.00" @input="myInput1"/>
 						</template>
 						<template v-slot:tip>
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -18,7 +18,7 @@
 					</evan-form-item>
 					<evan-form-item label="到租日期" prop="endDate" :border="false">
 						<template v-slot:main>
-							<picker class="form-input" mode="date" data-type="start" :value="endDate" :start="startDate" @change="bindDateChange">{{ endDate }}</picker>
+							<picker class="form-input" disabled="true" mode="date" data-type="start" :value="endDate" :start="startDate" @change="bindDateChange">{{ endDate }}</picker>
 						</template>
 						<template v-slot:tip>
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -46,7 +46,7 @@
 					<evan-form-item label="续约租金" prop="keepRentPrice" :border="false">
 						<template v-slot:main>
 							<input class="form-input" type="digit" placeholder-class="form-input-placeholder" v-model="info.keepRentPrice"
-							 placeholder="0.00" />
+							 placeholder="0.00" @input="myInput2" />
 						</template>
 						<template v-slot:tip>
 							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -61,7 +61,7 @@
 
 <script>
 	import {
-		dateForm
+		dateForm,moneyLimit
 	} from '../../util/index.js';
 	import evanFormItem from '../../components/evan-form/evan-form-item.vue';
 	import evanForm from '../../components/evan-form/evan-form.vue';
@@ -129,11 +129,16 @@
 			this.getRenterInfo(this.id)
 		},
 		methods: {
+			myInput1(e){
+				this.info.rentUnitPrice = moneyLimit(e.detail.value)
+			},
+			myInput2(e){
+				this.info.keepRentPrice = moneyLimit(e.detail.value)
+			},
 			getRenterInfo(id) {
 				this.$request.post('/roomUser/findByTenantId', {
 					tenantId: id
 				}).then((res) => {
-					console.log(res)
 					let data = res.data.data;
 					this.renterInfo = data;
 					this.info.rentUnitPrice = data.rentPrice;
@@ -146,7 +151,6 @@
 				let _this = this;
 				this.$refs.form.validate(res => {
 					if (res) {
-						
 						_this.renterInfo.rentMonthNum = _this.rentMonthNum;
 						_this.renterInfo.rentPrice = _this.info.keepRentPrice;
 						_this.renterInfo.endDate = _this.keepEndDate + ' 00:00:00';
@@ -205,7 +209,18 @@
 				}
 			},
 			bindDateChange(e) {
-				this.endDate = e.detail.value
+				//比较到租日期和今天的大小
+				let time1 = new Date((this.endDate).replace(/\-/g, '/'))
+				let maxDate = Date.parse(time1) > Date.parse(new Date()) ? Date.parse(time1) : Date.parse(new Date())
+				if(maxDate >  Date.parse(new Date((e.detail.value).replace(/\-/g, '/')))){
+					uni.showToast({
+						title:'续租日期不能小于到租日期和当前日期',
+						icon:'none',
+						duration:1500
+					})
+				}else{
+					this.keepEndDate = e.detail.value
+				}
 			}
 		}
 	}

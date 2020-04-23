@@ -7,7 +7,7 @@
 				<cover-view class="btnBox" v-if="!oneButton">
 					<cover-view class="btnDivide"></cover-view>
 					<cover-view class="modalSure" @click="sure()">{{leftBtn}}</cover-view>
-					<cover-view class="modalCancel" @click="cancel()">取消</cover-view>
+					<cover-view class="modalCancel" @click="cancel()">{{rightBtn}}</cover-view>
 				</cover-view>
 				<cover-view class="btnBox1" v-else>
 					<cover-view class="modalSure1" @click="cancel()">我知道了</cover-view>
@@ -36,6 +36,10 @@
 			leftBtn:{
 				type:String,
 				default:'删除'
+			},
+			rightBtn:{
+				type:String,
+				default:'取消'
 			}
 		},
 		data() {
@@ -128,7 +132,7 @@
 		height: 100vh;
 		background:rgba(0,0,0,0.3);
 		position: fixed;
-		z-index: 99;
+		z-index: 999;
 		top: 0;
 		left: 0;
 		right: 0;

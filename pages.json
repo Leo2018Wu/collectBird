@@ -242,6 +242,12 @@
 				"navigationBarTitleText": "使用协议及隐私政策"
 			}
         }
+        ,{
+            "path" : "pages/inviRent/inviRent",
+            "style" : {
+				"navigationBarTitleText": "招租"
+			}
+        }
     ],
 	"permission": {
 		"scope.userLocation": {

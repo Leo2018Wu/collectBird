@@ -14,7 +14,7 @@
 			<tip-modal v-if="bindTip" :title="'提示'" :oneButton="true" :describition="'该租客尚未绑定账号，请先去租客页面邀请绑定'" v-on:emitCancel="hideTipModal"></tip-modal>
 			<view v-if="fromShare" class="houseAddr">{{titleContent}}</view>
 			<view v-else>
-				<view v-if="billType == 0" class="houseAddr">{{ houseAddrInfo.communityName }}-{{ houseAddrInfo.houseNo }}-{{ houseAddrInfo.roomNo }}
+				<view v-if="billType == 0" class="houseAddr">{{ houseAddrInfo.communityName }}-{{ houseAddrInfo.houseNo }}-卧{{ houseAddrInfo.roomNo }}
 					<span v-if="billInfo.billStatus != 4" class="rentPromotion" @click="rentPromot()">催租</span><span :class="{myLeft: billInfo.billStatus == 4}"
 					 class="editMybill" @click="editBill">修改</span></view>
 				<view v-else class="houseAddr">{{ ownerInfo.communityName }}-{{ ownerInfo.houseNo }}<span :class="{myLeft: true}"
@@ -121,7 +121,7 @@
 					<image class="sendIcon" src="../../static/eleWater.png" mode="aspectFit"></image>
 					<!-- <view>抄表</view> -->
 				</view>
-				<button class="sendBillBox" open-type="share" hover-class="btnHoverClass">
+				<button class="sendBillBox" open-type="share" hover-class="btnHoverClass" v-if="billType != 1">
 					<image class="sendIcon" src="../../static/sendBill.png" mode="aspectFit"></image>
 					<!-- <span>发送账单</span> -->
 				</button>
@@ -133,7 +133,7 @@
 			<view v-else>
 				<view v-if="billType == 1">
 					<view class="sureBtn" v-if="billInfo.billStatus != 4" @click="checkMoney">交租</view>
-					<view class="sureBtn" v-else>已交租</view>
+					<view class="sureBtnSuc" v-else>已交租</view>
 				</view>
 				<view v-if="billType == 0">
 					<view v-if="billInfo.billStatus !=4" class="sureBtn" @click="checkMoney">到账</view>
@@ -226,6 +226,7 @@
 		},
 		onShow() {
 			this.getBillDetail(this.billId);
+			uni.hideHomeButton()
 		},
 		onLoad(option) {
 			if (option.messageId) {
@@ -302,7 +303,7 @@
 				}
 			},
 			editBill() {
-				let titleContent = this.billType == 0 ? this.houseAddrInfo.communityName + '-' + this.houseAddrInfo.houseNo + '-' +
+				let titleContent = this.billType == 0 ? this.houseAddrInfo.communityName + '-' + this.houseAddrInfo.houseNo + '-' +'卧'+
 					this.houseAddrInfo.roomNo : this.ownerInfo.communityName + '-' + this.ownerInfo.houseNo
 				uni.navigateTo({
 					url: '../editBill/editBill?billId=' + this.billId + '&billType=' + this.billType + '&titleContent=' +
@@ -469,6 +470,13 @@
 					}
 				}
 				par.billStatus = 4
+				par.items.forEach((item,index)=>{
+					if (item.itemName == '1') {
+						par.items[index].noteDate = item.noteDate + ' 00:00:00';
+					} else if(item.itemName == '2'){
+						par.items[index].noteDate = item.noteDate + ' 00:00:00';
+					}
+				})
 				_this.$request
 					.post('/bill/update', par)
 					.then(res => {
@@ -764,6 +772,17 @@
 		text-align: center;
 		line-height: 92rpx;
 		/* margin-left: 82rpx; */
+	}
+	.sureBtnSuc{
+		background-color: #CFCFCF;
+		color: #FFFFFF;
+		width: 228rpx;
+		height: 76rpx;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border-radius: 18rpx;
+		font-size: 34rpx;
 	}
 
 	.sureBtnNew {

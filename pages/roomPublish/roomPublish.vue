@@ -1,26 +1,27 @@
 <template>
 	<view class="roomPublish">
 		<view>
+			<tip-modal v-if="isShowTipModal" :title="'提醒'" :describition="'上传房源图片将有效提高出租率，是否上传？'" :leftBtn="'否'" :rightBtn="'是'" v-on:emitCancel="returnCancel" v-on:emitSure="returnSure"></tip-modal>
 			<choose-list v-if="listShow" v-on:close="hideList" :currentChooseIndex="chooseIndex" :list="list" :title="listTitle" v-on:emitClick = "returnEmit"></choose-list>
 			<view class="bannerBox">
 				<!-- roomImgs -->
-				<view v-if="tempUrls.length == 0" class="mask"></view>
-				<swiper v-if="tempUrls.length !=0" class="swiper" :indicator-dots="false" autoplay="true" interval="5000" duration="1000" @change="swiperChange">
-					<block v-for="(item, index) in tempUrls" :key="index">
-						<swiper-item >
+				<view v-if="imgUrl.length == 0" class="mask"></view>
+				<swiper v-if="imgUrl.length !=0" class="swiper" :indicator-dots="false" autoplay="true" interval="5000" duration="1000" @change="swiperChange">
+					<block v-for="(item, index) in imgUrl" :key="index">
+						<swiper-item>
 							<image :src="item" class="slide-image" mode="aspectFill"/>
 						</swiper-item>
 					</block>
 				</swiper>
-				<view v-if="tempUrls.length !=0" class="dots">
-					{{swiperCurrent}}/{{tempUrls.length}}
+				<view v-if="imgUrl.length !=0" class="dots">
+					{{swiperCurrent}}/{{imgUrl.length}}
 				</view>
 				<view v-else>
 					<span class="babb">上传图片</span>
 					<image class="bannerImg" src="https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/el.jpg" mode="aspectFill"></image>
 					<image class="uploadimg" src="../../static/upload1.png" mode="aspectFit" @click="chooseImg"></image>
 				</view>
-				<view class="changeBtn" @click="deleteImg">修改</view>
+				<view class="changeBtn" @click="deleteImg" v-if="imgUrl.length !=0">修改</view>
 			</view>
 			<view class="section1">
 				<view class="infoItem">
@@ -81,7 +82,7 @@
 					</view>
 					<view class="listBox" style="border-bottom: 1rpx solid #EBEBEB;">
 						<view class="liName">租期</view>
-						<view class="liInner">
+						<view class="liInner1">
 							<view :class="{liActive:item.isChecked == 1}" class="li" v-for="(item,index) in rentDateList" @click="chooseKeepDate(index)" :key="index">{{item.name}}</view>
 						</view>
 					</view>
@@ -114,6 +115,12 @@
 							<view :class="{liActive:item.isChecked == 1}" class="li" v-for="(item,index) in labels" @click="chooseLabel(index)" :key="index">{{item.name}}</view>
 						</view>
 					</view>
+					<view class="listBox newListBox">
+						<view class="liName">中介费</view>
+						<view class="liInner">
+							<view :class="{liActive:feeIndex == index}" class="li" v-for="(item,index) in agencyFee" @click="chooseFee(index)" :key="index">{{item}}</view>
+						</view>
+					</view>
 					<evan-form-item label="联系人" prop="landlordName" :fontBold="true" :border="false">
 							<template v-slot:main>
 								<input  class="form-input" placeholder-class="form-input-placeholder"  v-model="info.landlordName" placeholder="请输入"/>
@@ -121,18 +128,17 @@
 					</evan-form-item>
 					<view class="listBox" style="border-bottom: 1rpx solid #EBEBEB;">
 						<view class="liName">称呼</view>
-						<view class="liInner">
+						<view class="liInner1">
 							<view :class="{liActive:sexIndex == index}" class="li" v-for="(item,index) in sexList" @click="chooseSex(index)" :key="index">{{item}}</view>
 						</view>
 					</view>
 					<view v-if="landladyInfo.phoneNumber">
 						<evan-form-item label="联系电话" prop="landlordPhone" :fontBold="true" :border="false">
 								<template v-slot:main>
-									<input disabled="true"  class="form-input" placeholder-class="form-input-placeholder"  v-model="info.landlordPhone" placeholder="请输入"/>
+									<input  class="form-input" type="number" maxlength="11" placeholder-class="form-input-placeholder"  v-model="info.landlordPhone" placeholder="请输入"/>
 								</template>
 						</evan-form-item>
 					</view>
-					
 					<view v-else>
 						<evan-form-item label="联系电话" prop="landlordPhone" :fontBold="true" :border="false">
 								<template v-slot:main>
@@ -146,8 +152,9 @@
 				</view>
 			</evan-form>
 			<view class="remarks">
+				<view class="remarkNum">{{remarks.length}}/200</view>
 				<view class="remarksDivide">描述</view>
-				<textarea class="secTip textOverFlow" v-model="remarks"
+				<textarea class="secTip textOverFlow" v-model="remarks" maxlength="500"
 				 placeholder-class="textPlaceholder"></textarea></view>
 			</view>
 			<cover-view class="btnBox" v-if="roomInfo.rentStatus == 0">
@@ -166,6 +173,7 @@
 		mapState,
 		mapMutations
 	} from "vuex";
+	import tipModal from '../../components/tipModal.vue'
 	import mUpload from '../../util/test.js'
 	import evanFormItem from '../../components/evan-form/evan-form-item.vue'
 	import evanForm from '../../components/evan-form/evan-form.vue'
@@ -174,25 +182,28 @@
 		components:{
 			evanFormItem,
 			evanForm,
-			chooseList
+			chooseList,
+			tipModal
 		},
 		data() {
 			const currentDate = this.$getDate();
 			return {
+				isCanPub:false,
+				isShowTipModal:false,
 				swiperCurrent:1,
-				tempUrls:[],
 				parOriIndex:null,
 				parSeeIndex:null,
 				hasEleFloor:1,
 				sexIndex:0,
 				descIndex:2,
+				feeIndex:0,
 				remarks:'',
 				seeList:['随时看房','周末看房','工作日看房'],
 				// checkInList:['随时入住','周末入住','工作日入住'],
 				labels:[
-					{name:'近地铁',isChecked:1},
-					{name:'独卫',isChecked:1},
-					{name:'精装修',isChecked:1}
+					{name:'近地铁',isChecked:0},
+					{name:'独卫',isChecked:0},
+					{name:'精装修',isChecked:0}
 				],
 				facilities:[
 					{name:'洗衣机',isChecked:1},
@@ -202,7 +213,7 @@
 					{name:'冰箱',isChecked:1},
 					{name:'热水器',isChecked:1},
 					{name:'床',isChecked:1},
-					{name:'桌子',isChecked:0},
+					{name:'书桌',isChecked:0},
 					{name:'宽带',isChecked:0},
 					{name:'天然气',isChecked:1},
 				],
@@ -210,6 +221,7 @@
 				listTitle:'选择房屋朝向',
 				sexList:['先生','女士'],
 				drawStyleList:['毛坯','简装修','精装修'],
+				agencyFee:['面议','35%','50%'],
 				rentDateList:[
 					{name:'可短租',isChecked:0},
 					{name:'1年以上',isChecked:1}
@@ -253,6 +265,20 @@
 						required:true,
 						message:'请输入联系人姓名'
 					},
+					landlordPhone: [{
+							required: true,
+							message: '请输入联系人电话'
+						},
+						{
+							validator: (rules, landlordPhone, callback) => {
+								if (this.$validate.isMobilePhone(landlordPhone)) {
+									callback();
+								} else {
+									callback(new Error('手机号格式不正确'));
+								}
+							}
+						}
+					],
 				},
 				roomId:'',
 				roomInfo:{}
@@ -283,6 +309,14 @@
 			}
 		},
 		methods: {
+			returnCancel(){
+				this.chooseImg()
+				this.isShowTipModal = false;
+			},
+			returnSure(){
+				this.isShowTipModal = false;
+				this.isCanPub = true;
+			},
 			// 获取手机号方法
 			getTelNum(res) {
 				this.$request
@@ -366,6 +400,10 @@
 			},
 			publish(){
 				let _this = this
+				if(this.imgUrl.length == 0 && !this.isCanPub){
+					this.isShowTipModal = true
+					return
+				}
 				if(!this.getFloor())return
 				if(!_this.info.floor){
 					uni.showToast({
@@ -396,11 +434,12 @@
 										break;
 								}
 							}
-							par.landlordPhone= _this.$store.state.landladyInfo.phoneNumber;
+							par.landlordPhone= _this.info.landlordPhone;
 							par.landlordId = _this.$store.state.landladyInfo.id;
 							par.landlordSex = _this.sexIndex;
 							par.elevator = _this.hasEleFloor == 1 ? 1 : 2
 							par.decoration = parseInt(_this.descIndex) +1
+							par.intermePrice = parseInt(_this.feeIndex) +1
 							par.tenancyTerm = JSON.stringify(_this.rentDateList) 
 							par.roomConfigure = JSON.stringify(_this.facilities)
 							par.label = JSON.stringify(_this.labels)
@@ -426,6 +465,9 @@
 			},
 			chooseLabel(index){
 				this.labels[index].isChecked = this.labels[index].isChecked == 1 ? 0 : 1
+			},
+			chooseFee(index){
+				this.feeIndex = index
 			},
 			changeType(e){
 				this.hasEleFloor = Number(e.detail.value)
@@ -475,17 +517,16 @@
 				}
 				
 			},
-			chooseImg(){
+			chooseImg(num){
 				let myUpload = new mUpload
-				myUpload.choose_and_upload(5).then(res=>{
-					console.log(res)
-					this.imgUrl = res.uploadedFiles
-					this.tempUrls = res.tempFiles
+				num = num || 5
+				myUpload.choose_and_upload(num).then(res=>{
+					this.imgUrl = this.imgUrl.concat(res.uploadedFiles)
 				})
 			},
 			deleteImg(){
-				this.imgUrl = [];
-				this.tempUrls = [];
+				this.imgUrl.splice(this.swiperCurrent - 1,1)
+				this.chooseImg(1)
 			},
 			getRoomInfo(id){
 				let _this = this
@@ -493,7 +534,7 @@
 					id
 				}).then(res => {
 					_this.roomInfo = res.data.data
-					if(_this.roomInfo.rentStatus == 2){
+					// if(_this.roomInfo.rentStatus == 2){
 						for(let key in _this.info){
 							switch (key){
 								case 'seeTheApartment':
@@ -504,6 +545,9 @@
 									_this.info[key] = _this.list[parseInt(_this.roomInfo[key])]
 									_this.parOriIndex = parseInt(_this.roomInfo[key])
 									break;
+								case 'checkInTime':
+									_this.info[key] = _this.roomInfo[key] ? _this.roomInfo[key] : _this.info[key]
+									break;
 								default:
 									_this.info[key] = _this.roomInfo[key]
 									break;
@@ -511,21 +555,20 @@
 						}
 						if(_this.roomInfo.roomImgs){
 							_this.imgUrl = _this.roomInfo.roomImgs.split(',')
-							_this.tempUrls = _this.roomInfo.roomImgs.split(',')
 						}else{
 							_this.imgUrl = []
-							_this.tempUrls = []
 						}
 						_this.landlordPhone = _this.roomInfo.landlordPhone
 						_this.sexIndex = _this.roomInfo.landlordSex
 						let delNum = _this.roomInfo.elevator == 1 ? 1 : 0
 						_this.changeType({detail:{value:delNum}})
-						_this.descIndex = parseInt(_this.roomInfo.decoration) - 1
-						_this.rentDateList = JSON.parse(_this.roomInfo.tenancyTerm)
-						_this.facilities = JSON.parse(_this.roomInfo.roomConfigure)
-						_this.labels = JSON.parse(_this.roomInfo.label)
-						_this.remarks = _this.roomInfo.remarks
-					}
+						_this.descIndex = _this.roomInfo.decoration ? parseInt(_this.roomInfo.decoration) - 1 : _this.descIndex
+						_this.feeIndex = _this.roomInfo.intermePrice ? parseInt(_this.roomInfo.intermePrice) - 1 : _this.roomInfo.intermePrice
+						_this.rentDateList = JSON.parse(_this.roomInfo.tenancyTerm) ?  JSON.parse(_this.roomInfo.tenancyTerm) : _this.rentDateList
+						_this.facilities = JSON.parse(_this.roomInfo.roomConfigure) ?  JSON.parse(_this.roomInfo.roomConfigure) : _this.facilities
+						_this.labels = JSON.parse(_this.roomInfo.label) ? JSON.parse(_this.roomInfo.label) : _this.labels
+						_this.remarks = _this.roomInfo.remarks ? _this.roomInfo.remarks : ''
+					// }
 				})
 			},
 			getHouseInfo(id){
@@ -533,6 +576,7 @@
 					id
 				}).then(res=>{
 					this.houseInfo = res.data.data
+					this.info.floor = this.houseInfo.houseNo.substr(0,1)
 				})
 			}
 		}
@@ -549,7 +593,7 @@
 	}
 	.bannerBox{
 		width: 100%;
-		height: 324rpx;
+		height: 434rpx;
 		position: relative;
 		color: #FFFFFF;
 		font-size: 30rpx;
@@ -560,6 +604,10 @@
 		left: 50%;
 		transform: translateX(-50%);
 	}
+	.swiper{
+		height: 434rpx;
+		width: 100%;
+	}
 	.mask{
 		position: absolute;
 		left: 0;
@@ -568,12 +616,12 @@
 		background-color: #000000;
 		opacity: 0.6;
 		width: 100%;
-		height: 324rpx;
+		height: 434rpx;
 		z-index: 99;
 	}
 	.bannerImg{
 		width: 100%;
-		height: 324rpx;
+		height: 434rpx;
 	}
 	.uploadimg{
 		width: 128rpx;
@@ -670,11 +718,15 @@
 		color: #333333;
 		border-top: 1rpx solid #EBEBEB;
 	}
+	.newListBox{
+		border-top:none;
+		border-bottom: 1rpx solid #EBEBEB;
+	}
 	.liName{
 		font-weight: bold;
 		font-size: 34rpx;
 	}
-	.liInner{
+	.liInner,.liInner1{
 		width: 494rpx;
 		display: flex;
 		align-items: center;
@@ -682,6 +734,9 @@
 		flex-wrap: wrap;
 	}
 	.liInner .li:not(:nth-child(3n)){
+		margin-right: 22rpx;
+	}
+	.liInner1 .li:not(:nth-child(2n)){
 		margin-right: 22rpx;
 	}
 	
@@ -737,6 +792,12 @@
 		font-size: 30rpx;
 		background-color: #ffffff;
 		border-radius: 5rpx;
+		position: relative;
+	}
+	.remarkNum{
+		position: absolute;
+		right: 30rpx;
+		bottom: 30rpx;
 	}
 	.textPlaceholder {
 		padding: 20rpx 0;
@@ -745,10 +806,10 @@
 	}
 	.secTip{
 		width: 100%;
-		height: 180rpx;
+		height: 240rpx;
 		font-size: 32rpx;
 		color: #333333;
-		padding-bottom: 30rpx;
+		padding-bottom: 50rpx;
 	}
 	.btnBox{
 		height: 128rpx;
@@ -811,8 +872,8 @@
 	}
 	.dots{
 		position: absolute;
-		right: 20rpx;
-		bottom: 50rpx;
+		right: 50rpx;
+		bottom: 38rpx;
 		font-size: 30rpx;
 		color: #FFFFFF;
 	}

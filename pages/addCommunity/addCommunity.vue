@@ -218,7 +218,7 @@ export default {
 							communityAddress: _this.myAddr,
 							communityName: _this.myName
 					  };
-				postPar.communityImgs = _this.communityImg ? _this.communityImg : 'https://funnyduck.raysler.com/uploadFile/huyue/article/images/20190704/1562239924231ZGZQuw.jpeg';
+				postPar.communityImgs = _this.communityImg ? _this.communityImg : 'https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/defaultBg.jpg';
 				_this.$request.post(postUrl, postPar).then(data => {
 					uni.hideLoading();
 					if (this.isEdit) {
@@ -233,6 +233,9 @@ export default {
 							duration: 1500
 						});
 					}
+					setTimeout(()=>{
+						uni.navigateBack()
+					},1800)
 					this.$store.commit('chooseLocationInfo', {});
 				});
 			}

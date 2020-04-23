@@ -7,7 +7,7 @@
 				<image v-else class="renterAvatar" src="../static/defaultMale.png" mode="aspectFill"></image>
 			</view>
 			
-			<view class="renterInfo">
+			<view class="renterInfo textOverFlow">
 				<view class="infoTop">
 					<span>{{userInfo.tenantName}}</span>
 					<image class="renterSex" v-if="userInfo.tenantSex == 0" src="../static/male.png" mode="aspectFit"></image>
@@ -69,7 +69,7 @@
 	}
 	.renterInfo{
 		width: fit-content;
-		max-width: 300rpx;
+		max-width: 400rpx;
 		margin-right: auto;
 		display: flex;
 		flex-direction: column;

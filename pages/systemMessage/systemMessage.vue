@@ -1,9 +1,11 @@
 <template>
 	<view class="system">
 		<view v-if="msgList.length != 0" :class="{myPadding:msgList.length == 0}"></view>
-		<mescroll-empty v-if="msgList.length == 0 && messageType ==1" :option="optEmpty1"></mescroll-empty>
-		<mescroll-empty v-if="msgList.length == 0 && messageType ==2" :option="optEmpty2"></mescroll-empty>
-		<mescroll-empty v-if="msgList.length == 0 && messageType ==3" :option="optEmpty3"></mescroll-empty>
+		<view v-if="loadEnd">
+			<mescroll-empty v-if="msgList.length == 0 && messageType ==1" :option="optEmpty1"></mescroll-empty>
+			<mescroll-empty v-if="msgList.length == 0 && messageType ==2" :option="optEmpty2"></mescroll-empty>
+			<mescroll-empty v-if="msgList.length == 0 && messageType ==3" :option="optEmpty3"></mescroll-empty>
+		</view>
 		<mescroll-uni  :down="downOption" @down="downCallback" :up="upOption" @up="upCallback" :fixed="false" @init="init">
 			<view v-if="messageType == 3">
 				<view class="msgContainer" v-for="(item, index) in msgList" :key="index" @click="showDetail(item.messageContent,item.id,item.addresseeId)">
@@ -43,6 +45,7 @@
 			</view>
 			<view v-if="messageType == 1">
 				<view class="msgContainer" v-for="(item, index) in msgList" :key="index">
+					<view class="dateDivide">{{item.showDate}}</view>
 					<view class="messageBox1 whiteBg">
 						<view style="padding: 0 26rpx;">
 							<view class="msgTop">
@@ -50,8 +53,8 @@
 								<view class="msgTip" :class="{grayTip : item.billStatus == 4}">{{item.billStatus == 4 ? '已确认' :'未确认'}}</view>
 								<view class="msgPrice"><span>{{item.messageData.totalAmount}}</span>元</view>
 							</view>
-							<view class="billTime">{{item.showDate[0]}}年{{item.showDate[1]}}月{{item.showDate[2]}}日生成</view>
-							<view class="billLocation">{{item.messageData.roomNo}}</view>
+							<view class="billTime">{{item.dateForm[0]}}年{{item.dateForm[1]}}月{{item.dateForm[2]}}日生成</view>
+							<view class="billLocation">{{item.messageData.tenantName}}-{{item.messageData.roomNo}}</view>
 							<view class="rentCycle">收租周期：{{item.messageData.startDate}} ~ {{item.messageData.endDate}}</view>
 						</view>
 						<view v-if="item.billStatus != 4" class="operatBtn" @click="checkBill(item.addresseeId,item.id,item.messageData)">去确认</view>
@@ -77,6 +80,7 @@
 		},
 		data() {
 			return {
+				loadEnd:false,
 				para: {
 					addresseeId: "",
 					pageNum: 1,
@@ -168,16 +172,25 @@
 			/*上拉加载的回调*/
 			async upCallback(mescroll) {
 				let _this = this;
+				_this.loadEnd = false;
 				// 此时mescroll会携带page的参数:
 				let pageNum = mescroll.num; // 页码, 默认从1开始
 				let pageSize = mescroll.size; // 页长, 默认每页10条
 				if (mescroll.num == 1) _this.msgList = []; //如果是第一页需手动置空列表
 				let res = await _this.getMessage(pageNum);
+				console.log(res)
 				let curPageData = res;
 				_this.msgList = _this.msgList.concat(curPageData); //追加新数据
-				_this.$nextTick(() => {
-					mescroll.endSuccess(curPageData.length, res.hasNextPage);
-				});
+				_this.loadEnd = true
+				if(res.length !=0){
+					_this.$nextTick(() => {
+						mescroll.endSuccess(curPageData.length, res[0].hasNextPage);
+					});
+				}else{
+					_this.$nextTick(() => {
+						mescroll.endSuccess(curPageData.length,false);
+					});
+				}
 			},
 			async getMessage(pageNum) {
 				let _this = this;
@@ -186,25 +199,26 @@
 				try {
 					const response = await _this.$request.post('/userMessage/messageList', _this.para);
 					let arr = [];
-					console.log(response.data.data.list)
-					let curArr = _this.messageType == 1 ? response.data.data.billList.list : (_this.messageType == 2 ? response.data.data
-						.tenantList.list : response.data.data.systemList.list)
-					curArr.forEach((item, index) => {
+					let curArr = _this.messageType == 1 ? response.data.data.billList : (_this.messageType == 2 ? response.data.data
+						.tenantList : response.data.data.systemList)
+					curArr.list.forEach((item, index) => {
 						item.messageData = JSON.parse(item.messageData)
 						if(_this.messageType == 2 && item.specialType != 2){
 							item.messageData.startDate = item.messageData.startDate.split('T')[0]
 							item.messageData.endDate = item.messageData.endDate.split('T')[0]
 						}
 						if(_this.messageType == 1){
-							item.showDate = (item.createTime.split(" ")[0].toString()).split('-')
+							item.dateForm = (item.createTime.split(" ")[0].toString()).split('-')
 							item.messageData.startDate = item.messageData.startDate.split('T')[0]
 							item.messageData.endDate = item.messageData.endDate.split('T')[0]
 							console.log(item.messageData)
-						}else{
-							item.showDate = dateDiff(Date.parse(new Date((item.createTime).replace(/\-/g, '/'))))
 						}
+						item.showDate = dateDiff(Date.parse(new Date((item.createTime).replace(/\-/g, '/'))))
 						arr.push(item)
 					})
+					if(arr.length !=0){
+						arr[0].hasNextPage = curArr.hasNextPage
+					}
 					return arr;
 				} catch (e) {
 					console.log(e);
@@ -217,7 +231,7 @@
 <style scoped>
 	.system {
 		width: 100%;
-		height: 100%;
+		/* height: 100%; */
 		min-height: 100vh;
 		background-color: #FAFAFA;
 		/* text-align: center; */
@@ -302,7 +316,6 @@
 		margin-left: 30rpx;
 		padding-top: 25rpx;
 		border-radius: 10rpx;
-		margin-top: 30rpx;
 	}
 
 	.msgTop {

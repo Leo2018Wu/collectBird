@@ -5,7 +5,7 @@
 			<evan-form class="evanForm" :hide-required-asterisk="hideRequiredAsterisk" ref="form1" :model="info1">
 				<evan-form-item label="姓名" prop="name" :fontBold="true">
 					<template v-slot:main>
-						<input class="form-input" placeholder-class="form-input-placeholder" v-model="info1.name" placeholder="租客姓名" />
+						<input class="form-input" maxlength="10" placeholder-class="form-input-placeholder" v-model="info1.name" placeholder="租客姓名" @input="getName" />
 					</template>
 					<template v-slot:tip>
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -123,19 +123,19 @@
 				<evan-form-item label="电费(1元/度)" prop="eleCost" :fontBold="true">
 					<template v-slot:main>
 						<input class="form-input inputColor" type="digit" maxlength="5" placeholder-class="form-input-placeholder"
-						 v-model="info3.eleCost" placeholder="请输入初始刻度" />
+						 v-model="info3.eleCost" placeholder="请输入初始刻度" @input="myInput1"/>
 					</template>
 				</evan-form-item>
 				<evan-form-item label="水费(元/月)" prop="waterCost" :fontBold="true">
 					<template v-slot:main>
 						<input class="form-input inputColor" type="digit" placeholder-class="form-input-placeholder" v-model="info3.waterCost"
-						 placeholder="请输入水费" />
+						 placeholder="请输入水费" @input="myInput2"/>
 					</template>
 				</evan-form-item>
 				<evan-form-item label="宽带(元/月)" prop="netCost" :border="false" :fontBold="true">
 					<template v-slot:main>
 						<input class="form-input inputColor" type="digit" placeholder-class="form-input-placeholder" v-model="info3.netCost"
-						 placeholder="请输入宽带费" />
+						 placeholder="请输入宽带费" @input="myInput3"/>
 					</template>
 				</evan-form-item>
 			</evan-form>
@@ -149,7 +149,7 @@
 				<evan-form-item label="电费(1元/度)" prop="commonEleNum">
 					<template v-slot:main>
 						<input class="form-input inputColor" type="digit" placeholder-class="form-input-placeholder" v-model="commonEleNum"
-						 placeholder="请输入初始刻度" />
+						 placeholder="请输入初始刻度" @input="myInput4"/>
 					</template>
 				</evan-form-item>
 				<view class="eleCommonBottom">
@@ -192,6 +192,7 @@
 </template>
 
 <script>
+	import {moneyLimit,filterEmoji} from '../../util/index.js'
 	import numberBox from '../../components/numberBox.vue';
 	import tipModal from '../../components/tipModal.vue';
 	import myUploadImg from '../../util/myUpload.js';
@@ -385,6 +386,9 @@
 			}
 		},
 		methods: {
+			getName(e){
+				this.info1.name = filterEmoji(e.detail.value)
+			},
 			returnVal(e) {
 				console.log('woshifanhuide')
 				this.tenantNum = e;
@@ -697,7 +701,6 @@
 			chooseImg(type) {
 				this.isChooseReverseImg = type
 				let returnUrl = myUploadImg.upload().then((res) => {
-					console.log(res)
 					if (this.isChooseReverseImg) {
 						this.imgOtherSideUrl = res;
 					} else {
@@ -705,12 +708,21 @@
 					}
 				})
 			},
+			myInput1(e) {
+				this.info3.eleCost = moneyLimit(e.detail.value)
+			},
+			myInput2(e) {
+				this.info3.waterCost = moneyLimit(e.detail.value)
+			},
+			myInput3(e) {
+				this.info3.netCost = moneyLimit(e.detail.value)
+			},
+			myInput4(e) {
+				this.info3.commonEleNum = moneyLimit(e.detail.value)
+			},
 			espInput(e) {
-				console.log(this.rentCycleList)
+				this.info2.rentUnitPrice = moneyLimit(e.detail.value)
 				this.info2.deposit = this.info2.rentUnitPrice
-				// if(this.rentCycleList.length != 0 && this.info2.rentUnitPrice / this.rentCycleList[0] !=0){
-				// 	this.info2.deposit = Math.ceil((this.info2.rentUnitPrice / this.rentCycleList[0]))
-				// }
 			},
 			blur() {
 				this.listShow = false

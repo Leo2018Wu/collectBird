@@ -56,7 +56,9 @@
 		},
 		onShow() {
 			this.para.landlordId = this.$store.state.landladyInfo.id
-			this.downCallback(this.mescroll);
+			setTimeout(()=>{
+				this.downCallback(this.mescroll);
+			},400)
 		},
 		methods: {
 			sucCallBack(){

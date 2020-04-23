@@ -1,7 +1,8 @@
 // import config from "../config.js";
 let config = {
     // 上传图片的API
-    upload_img_url:'https://funnyduck.raysler.com/rentbird/util/uploadByPath'
+    upload_img_url:'https://funnyduck.raysler.com/rentbird/util/uploadByPath',
+	// upload_img_url:'https://funnyduck.raysler.com/rentbird_test/util/uploadByPath'
 }
 class Uploader {
     constructor() {
@@ -22,7 +23,6 @@ class Uploader {
                 }
             })
         })
-
     }
     upload_one(path) {
         return new Promise((resolve, reject) => {
@@ -35,7 +35,8 @@ class Uploader {
 				name: "file",
 				formData:{
 					parentPath:'house',
-					fileType:"images"
+					fileType:"images",
+					word: "收 租 鸟"
 				},
                 success: (uploadFileRes) => {
 					console.log(uploadFileRes)

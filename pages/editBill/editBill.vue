@@ -27,7 +27,7 @@
 						<evan-form-item label="月租金" prop="rentUnitPrice" :border="billInfo.depositAmount">
 							<template v-slot:main>
 								<input class="form-input" type="digit" placeholder-class="form-input-placeholder" v-model="info.rentUnitPrice"
-								 placeholder="0.00" />
+								 placeholder="0.00" @input="checkInput"/>
 							</template>
 							<template v-slot:tip>
 								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -38,7 +38,7 @@
 						<evan-form-item :label="billInfo.billStatus == 5 ? '应退押金' : '押金'" prop="deposit"  :border="fales">
 							<template v-slot:main>
 								<input class="form-input"  type="digit" placeholder-class="form-input-placeholder" v-model="info.deposit"
-								 placeholder="0.00" />
+								 placeholder="0.00" @input="checkInput1" />
 							</template>
 							<template v-slot:tip>
 								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -78,6 +78,7 @@
 </template>
 
 <script>
+	import {moneyLimit} from '../../util/index.js'
 	import moment from 'moment'
 	import evanFormItem from '../../components/evan-form/evan-form-item.vue';
 	import evanForm from '../../components/evan-form/evan-form.vue';
@@ -141,6 +142,12 @@
 			
 		},
 		methods: {
+			checkInput(e){
+				this.info.rentUnitPrice = moneyLimit(e.detail.value)
+			},
+			checkInput1(e){
+				this.info.deposit = moneyLimit(e.detail.value)
+			},
 			getValue(e){
 				console.log(e)
 				let type = e.currentTarget.dataset.type

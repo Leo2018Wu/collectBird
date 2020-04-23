@@ -2,7 +2,7 @@
 	<view class="houseDetail">
 		<view class="houseSkuBox">
 			<!-- <house-sku :houseInfoList="communityInfo" v-on:myClick="returnClick"></house-sku> -->
-			<house-sku-new :item="communityInfo" :paddingSelf="100" v-on:myClick="returnClick"></house-sku-new>
+			<house-sku-new :item="communityInfo" :btnContent1="'管理房源'" :paddingSelf="100" v-on:myClick="returnClick" v-on:filterHouseRent="returnFilterRent" v-on:filterHouseEmpty="returnFilterEmpty" v-on:resetHouse="resetHouse"></house-sku-new>
 			<image class="houseRightIcon" src="../../static/right_arrow.png" mode="aspectFit"></image>
 		</view>
 		<view class="addBarBox">
@@ -18,7 +18,7 @@
 		</view>
 		<view class="section">
 			<!-- @click="toEditHouse(item)" -->
-			<view class="houseLi" v-for="(item,index) in houseInfo" :key="index">
+			<view class="houseLi" v-for="(item,index) in houseInfo" :key="index" v-if="item.roomList.length != 0">
 				<view class="tips" v-if="item.rentType == 0">整租</view>
 				<view class="content">
 					<view class="liNumber" @click="toEditHouse(item.id)">
@@ -46,7 +46,6 @@
 						</view>
 					</scroll-view>
 				</view>
-
 			</view>
 		</view>
 	</view>
@@ -68,20 +67,36 @@
 			return {
 				communityInfo: {},
 				houseInfo: [],
-				houseId: '',
-				landlordId: ''
+				par:{
+					id: '',
+					landlordId: '',
+				},
+				houseId:''
 			}
 		},
 		onLoad(option) {
 			console.log(option)
 			this.houseId = option.id
-			this.landlordId = option.landlordId
+			this.par.id = option.id
+			this.par.landlordId = option.landlordId
 		},
 		onShow() {
 			this.getCommuny(this.houseId)
-			this.getHouseInfo(this.houseId, this.landlordId)
+			this.getHouseInfo()
 		},
 		methods: {
+			resetHouse(e){
+				console.log(e)
+				this.getHouseInfo()
+			},
+			returnFilterRent(e){
+				console.log(e)
+				this.getHouseInfo('1')
+			},
+			returnFilterEmpty(e){
+				console.log(e)
+				this.getHouseInfo('02')
+			},
 			showCommForm(){
 				uni.navigateTo({
 					url:'../houseReportForm/houseReportForm?communityId='+this.houseId
@@ -135,12 +150,14 @@
 					console.log(err)
 				})
 			},
-			getHouseInfo(id, landlordId) {
+			getHouseInfo(rentStatus) {
 				let _this = this;
-				_this.$request.post("/house/myHouse", {
-					id,
-					landlordId
-				}).then((res) => {
+				if(rentStatus){
+					this.par.rentStatus = rentStatus
+				}else{
+					delete this.par.rentStatus
+				}
+				_this.$request.post("/house/myHouse", _this.par).then((res) => {
 					console.log(res)
 					_this.houseInfo = res.data.data
 				}).catch(err => {

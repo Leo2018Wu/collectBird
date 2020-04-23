@@ -59,8 +59,8 @@
 				</evan-form-item>
 				<evan-form-item label="月租金" prop="rentUnitPrice" :fontBold="true">
 					<template v-slot:main>
-						<input class="form-input" type="digit" placeholder-class="form-input-placeholder" v-model="info2.rentUnitPrice"
-						 placeholder="0.00" />
+						<input class="form-input" type="digit" maxlength="6" placeholder-class="form-input-placeholder" v-model="info2.rentUnitPrice"
+						 placeholder="0.00" @input="checkInput"/>
 					</template>
 					<template v-slot:tip>
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -68,8 +68,8 @@
 				</evan-form-item>
 				<evan-form-item label="押金" prop="deposit" :border="false" :fontBold="true">
 					<template v-slot:main>
-						<input class="form-input" type="digit" placeholder-class="form-input-placeholder" v-model="info2.deposit"
-						 placeholder="0.00" />
+						<input class="form-input" type="digit" maxlength="6" placeholder-class="form-input-placeholder" v-model="info2.deposit"
+						 placeholder="0.00"  @input="checkInput1"/>
 					</template>
 					<template v-slot:tip>
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -88,6 +88,7 @@
 </template>
 
 <script>
+	import {moneyLimit} from '../../util/index.js'
 	import moment from 'moment';
 	import chooseList from '../../components/chooseList.vue';
 	import evanFormItem from '../../components/evan-form/evan-form-item.vue';
@@ -206,6 +207,12 @@
 			this.getEndDate()
 		},
 		methods: {
+			checkInput(e){
+				this.info2.rentUnitPrice = moneyLimit(e.detail.value)
+			},
+			checkInput1(e){
+				this.info2.deposit = moneyLimit(e.detail.value)
+			},
 			chooseLi(index,isEdit){
 				if(isEdit){
 					this.currentLiIndex = index == 36 ? 0 : (index == 60 ? 1 : (index == 96 ? 2 : 3))

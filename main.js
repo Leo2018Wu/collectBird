@@ -7,8 +7,8 @@ import validate from './util/validate.js'
 import debounce from './util/debounce.js'
 import {getDate} from 'util/index.js'
 
-// wxRequest.defaults.baseURL = "https://funnyduck.raysler.com/rentbird";
-wxRequest.defaults.baseURL = "https://funnyduck.raysler.com/rentbird_test"; //测试地址
+wxRequest.defaults.baseURL = "https://funnyduck.raysler.com/rentbird";
+// wxRequest.defaults.baseURL = "https://funnyduck.raysler.com/rentbird_test"; //测试地址
 // wxRequest.defaults.baseURL = "http://192.168.10.120:8889";
 wxRequest.defaults.headers.post['Content-Type'] = 'application/json';
 Vue.prototype.$baseUrl = "https://funnyduck.raysler.com/rentbird";

@@ -40,10 +40,10 @@
 							</view>
 						</view>
 						<view class="itemBottom itemFlex">
-							<view v-if="para.billType == 0" class="bottomNo">{{ item.roomNo }}</view>
-							<view v-if="para.billType == 1" class="bottomNo">{{ item.communityName }}-{{item.houseNo}}</view>
-							<view v-if="para.billType == 0" class="bottomName">{{item.tenantName}}</view>
-							<view v-if="para.billType == 1" class="bottomName">{{item.ownerName}}</view>
+							<view v-if="para.billType == 0" class="bottomNo textOverFlow">{{ item.roomNo }}</view>
+							<view v-if="para.billType == 1" class="bottomNo textOverFlow">{{ item.communityName }}-{{item.houseNo}}</view>
+							<view v-if="para.billType == 0" class="bottomName textOverFlow">{{item.tenantName}}</view>
+							<view v-if="para.billType == 1" class="bottomName textOverFlow">{{item.ownerName}}</view>
 						</view>
 					</view>
 				</view>
@@ -330,6 +330,9 @@
 
 	.bottomNo {
 		max-width: 450rpx;
+	}
+	.bottomName{
+		max-width: 180rpx;
 	}
 
 	.myOverDueNum {
