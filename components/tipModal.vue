@@ -6,7 +6,7 @@
 				<cover-view class="modalContent">{{describition}}</cover-view>
 				<cover-view class="btnBox" v-if="!oneButton">
 					<cover-view class="btnDivide"></cover-view>
-					<cover-view class="modalSure" @click="sure()">{{leftBtn}}</cover-view>
+					<cover-view class="modalSure" @click.stop="sure()">{{leftBtn}}</cover-view>
 					<cover-view class="modalCancel" @click="cancel()">{{rightBtn}}</cover-view>
 				</cover-view>
 				<cover-view class="btnBox1" v-else>

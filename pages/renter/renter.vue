@@ -7,7 +7,6 @@
 				<view class="detailTop">
 					<span class="houseNum">{{ communityInfo.houseNo }}</span>
 					{{ communityInfo.bedroomNum }} {{ '室' | addSpace }}{{ communityInfo.livingroomNum }}{{ '厅' | addSpace }} {{ communityInfo.toiletNum }}{{ '卫' | addSpace }}
-					<icon-bar class="iconBar" :title="'卧室' + communityInfo.roomNo" :bgColor="'#FFF2E5'" :fontColor="'#FFA344'"></icon-bar>
 				</view>
 				<view class="detailBottom">
 					<span class="housePrice">{{ communityInfo.roomPrice ? communityInfo.roomPrice : 0 }}元/月</span>
@@ -24,7 +23,6 @@
 			</view>
 		</view>
 		<view class="renterTitle">租客信息</view>
-		<!-- v-if="isShowAddBtn" -->
 		<view class="section3" v-for="(item, index) in roomInfo.tenants" :key="index">
 			<renter-info-bar :userInfo="item" v-on:emitFillInfo="fillInfo" v-on:emitUserId="getEmit" :showFillBtn="roomInfo.tenantStatus == 2"></renter-info-bar>
 		</view>
@@ -52,8 +50,6 @@
 				<view>续租</view>
 			</view>
 			<view class="inviteBind" :class="{ hasBind: hasBind }" @click="bindOffical">{{ hasBind ? '解除' : '邀请' }}账号绑定</view>
-			<!-- <view class="operationBtn keepRenting" @click="endRenting">退租</view>
-			<view class="operationBtn endRenting" @click="keepRenting">续租</view> -->
 		</view>
 		<tip-modal
 			v-if="isShowUnBindModal"
@@ -74,11 +70,9 @@
 
 <script>
 import tipModal from '../../components/tipModal.vue';
-import iconBar from '../../components/iconBar.vue';
 import renterInfoBar from '../../components/renterInfoBar.vue';
 export default {
 	components: {
-		'icon-bar': iconBar,
 		renterInfoBar,
 		tipModal
 	},
@@ -222,7 +216,7 @@ export default {
 			if (this.roomInfo.unPayBill >= 1) {
 				this.isShowTipModal = true;
 			} else {
-				let houseAddr = this.communityInfo.name + '-' + this.communityInfo.houseNo + '-' + this.communityInfo.roomNo;
+				let houseAddr = this.communityInfo.name + '-' + this.communityInfo.houseNo + '-' +'卧'+ this.communityInfo.roomNo;
 				uni.navigateTo({
 					url: '../endRenting/endRenting?tenantId=' + this.roomInfo.tenants[0].id + '&houseAddr=' + houseAddr
 				});
@@ -287,7 +281,7 @@ export default {
 		},
 		showBill() {
 			if (this.roomInfo.billStatus == 5) {
-				let houseAddr = this.communityInfo.name + '-' + this.communityInfo.houseNo + '-' + this.communityInfo.roomNo;
+				let houseAddr = this.communityInfo.name + '-' + this.communityInfo.houseNo + '-'+ '卧' + this.communityInfo.roomNo;
 				uni.navigateTo({
 					url: '../endRenting/endRenting?billId=' + this.roomInfo.billId + '&houseAddr=' + houseAddr
 				});

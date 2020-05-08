@@ -7,9 +7,6 @@
 					<template v-slot:main>
 						<input class="form-input" maxlength="10" placeholder-class="form-input-placeholder" v-model="info1.name" placeholder="租客姓名" @input="getName" />
 					</template>
-					<template v-slot:tip>
-						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
-					</template>
 				</evan-form-item>
 				<evan-form-item label="性别" prop="sex" :fontBold="true">
 					<template v-slot:main>
@@ -29,17 +26,11 @@
 						<input class="form-input" type="number" maxlength="11" placeholder-class="form-input-placeholder" v-model="info1.tel"
 						 placeholder="租客电话" @input="getPhone" />
 					</template>
-					<template v-slot:tip>
-						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
-					</template>
 				</evan-form-item>
 				<evan-form-item label="身份证号" prop="IDNum" :fontBold="true">
 					<template v-slot:main>
 						<input class="form-input" type="idcard" placeholder-class="form-input-placeholder" maxlength="18" v-model="info1.IDNum"
 						 placeholder="身份证号" @input="getID" />
-					</template>
-					<template v-slot:tip>
-						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 					</template>
 				</evan-form-item>
 			</evan-form>
@@ -65,9 +56,6 @@
 						<input v-show="false" class="form-input" placeholder-class="form-input-placeholder" v-model="info2.startDate"
 						 placeholder="请选择" />
 					</template>
-					<template v-slot:tip>
-						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
-					</template>
 				</evan-form-item>
 				<evan-form-item label="租期" prop="keepDate" :border="false" :fontBold="true">
 					<template v-slot:main>
@@ -75,9 +63,6 @@
 						 @change="bindKeepDateChange">{{ pickerKeepDate }}</picker>
 						<input v-show="false" class="form-input" placeholder-class="form-input-placeholder" v-model="info2.keepDate"
 						 placeholder="请选择" />
-					</template>
-					<template v-slot:tip>
-						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 					</template>
 				</evan-form-item>
 				<view class="keepDateList">
@@ -93,26 +78,17 @@
 						<input class="form-input" disabled="true" placeholder-class="form-input-placeholder" v-model="info2.rentCycle"
 						 placeholder="请选择收租周期" @click="showList" />
 					</template>
-					<template v-slot:tip>
-						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
-					</template>
 				</evan-form-item>
 				<evan-form-item label="月租金" prop="rentUnitPrice" :fontBold="true">
 					<template v-slot:main>
 						<input class="form-input" type="number" :disabled="isEdit && !isChangeDateDue" placeholder-class="form-input-placeholder"
 						 v-model="info2.rentUnitPrice" placeholder="请输入" @input="espInput" />
 					</template>
-					<template v-slot:tip>
-						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
-					</template>
 				</evan-form-item>
 				<evan-form-item label="押金" prop="deposit" :border="false" :fontBold="true">
 					<template v-slot:main>
 						<input class="form-input" :disabled="isEdit && !isChangeDateDue" placeholder-class="form-input-placeholder"
 						 v-model="info2.deposit" placeholder="请输入" />
-					</template>
-					<template v-slot:tip>
-						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 					</template>
 				</evan-form-item>
 			</evan-form>

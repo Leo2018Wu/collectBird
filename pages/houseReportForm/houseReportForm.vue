@@ -9,7 +9,7 @@
 					<view class="cost" :class="{active : index == curIndex}" v-for="(item,index) in typeList" :key="index" @click="chooseType(index)">{{item}}</view>
 				</view>
 			</view>
-			<view class="costNum" v-if="curIndex != 2">共{{curIndex == 0 ? '收入' :'支出'}} <span v-if="curCost">{{curIndex == 1 ? curCost[0].payBillCount : curCost[0].amountBillCount}}</span>
+			<view class="costNum" v-if="curIndex != 2">共{{curIndex == 0 ? '收入' :'支出'}} <span v-if="curCost">{{curIndex == 1 ? curCost[0].expendCount : curCost[0].incomeCount}}</span>
 				<span v-if="!curCost">--</span>笔,
 				合计</view>
 			<view class="costNum" v-if="curIndex == 2">合计</view>
@@ -111,15 +111,14 @@
 				if (this.communityData.length != 0) {
 					if (this.communityData.filter(item => item.month == this.curMonth).length == 0) {
 						return [{
-							billCount: 0,
-							payBillCount: 0,
-							amountBillCount: 0,
+							accCount: 0,
+							expendCount: 0,
+							incomeCount: 0,
 							totalAmount: 0,
 							totalPay: 0,
 							monthIncome: 0
 						}]
 					} else {
-						console.log('wozaozhe1')
 						return this.communityData.filter(item => item.month == this.curMonth)
 					}
 				}
@@ -131,8 +130,8 @@
 			this.cWidth = uni.upx2px(750);
 			this.cHeight = uni.upx2px(500);
 			this.getReportData();
-			this.getHouseData();
-			_self.housePar.id = _self.$store.state.landladyInfo.id
+			// this.getHouseData();
+			_self.housePar.landlordId = _self.$store.state.landladyInfo.id
 			_self.housePar.communityId = _self.communityId
 		},
 		methods: {
@@ -140,7 +139,7 @@
 				_self.housePar.year = _self.curYear;
 				_self.housePar.month = _self.curMonth;
 				_self.housePar.countType = _self.curIndex == 0 ? 1 : (_self.curIndex == 1 ? 2 : 3);
-				_self.$request.post('/report/reportQueryByHouse', _self.housePar).then((res) => {
+				_self.$request.post('/report/groupHouse', _self.housePar).then((res) => {
 					_self.houseDataList = res.data.data;
 				})
 			},
@@ -235,13 +234,12 @@
 				canvaColumn.addEventListener('renderComplete', () => {
 					uni.hideLoading()
 				});
+				_self.getHouseData()
 			},
 			getReportData() {
-				_self.$request.post('/report/reportQueryByCommunity', {
-					"id": _self.$store.state.landladyInfo.id,
+				_self.$request.post('/report/groupCommunity', {
+					"landlordId": _self.$store.state.landladyInfo.id,
 					"communityId": _self.communityId,
-					// "id": '18437cc7-8b20-47e0-9f0e-225c3832608d',
-					// "communityId": 'd94c0ea4-92fe-46d5-af47-accffa93cbf7',
 				}).then((res) => {
 					_self.communityData = res.data.data;
 					if (_self.communityData.length == 0) return
@@ -249,6 +247,7 @@
 						_self.chartData.categories.push(item.year.substr(2, 2) + '年' + item.month + '月')
 					})
 					_self.chooseType(0)
+					_self.getHouseData()
 				})
 			},
 			showColumn(canvasId, chartData, min, max) {

@@ -4,55 +4,67 @@
 			<view class="background"></view>
 			<view class="houseTotalMsg">
 				<view class="leftMsg">
-					<view class="leftMsgTitle">{{para.billType == 0 ? '未收金额' : '未付金额'}}</view>
-					<view class="leftMsgValue"><span v-if="para.billType == 1 && unIncome != 0">-</span>{{ unIncome | thousandsPoints}}</view>
+					<view class="leftMsgTitle">{{para.billType == 0 ? '未收金额' : '收入金额'}}</view>
+					<view class="leftMsgValue">{{ unIncome | thousandsPoints}}</view>
 				</view>
 				<view class="line"></view>
 				<view class="rightMsg">
-					<view class="rightMsgTitle">{{para.billType == 0 ? '已收金额' : '已付金额'}}</view>
+					<view class="rightMsgTitle">{{para.billType == 0 ? '已收金额' : '支出金额'}}</view>
 					<view class="rightMsgValue"><span v-if="para.billType == 1 && income != 0">-</span>{{ income | thousandsPoints}}</view>
 				</view>
 			</view>
 		</view>
-		<view class="billBar">
+		<view class="billBar" :class="{needBottom:currentIndex == 2 && para.billType == 1}">
 			<view class="billBaritem" @click="changeIndex(index)" v-for="(item, index) in arr" :key="index" :class="{ active: currentIndex == index }">{{ item }}</view>
 		</view>
 		<view class="billList">
-			<!-- <mescroll-empty v-if="billListInfo.length==0" v-on:emptyNavi="returnEmit"></mescroll-empty> -->
 			<mescroll-uni :down="downOption" @down="downCallback" :up="upOption" @up="upCallback" :fixed="false" @init="init" v-on:emptyclick="emptyclick">
-				<view v-for="(item, idx) in billListInfo" :key="idx" @click="showBill(item)">
-					<view class="myBillItem">
-						<view class="itemFlex itemTop">
-							<view class="myBillName">{{item.billStatus == 5 ? '退租账单' : "租金账单"}}</view>
-							<view class="topRight">￥<span v-if="(item.billStatus == 5 || para.billType == 1) && item.totalAmount != 0">-</span>{{ item.totalAmount | thousandsPoints}}<span class="reminder" v-if="item.depositAmount && item.sortNo == 1">(含押金)</span></view>
-						</view>
-						<view class="itemFlex itemMiddle">
-							<view class="myBillDate">{{ item.payRentDate.substr(0, 10) }}</view>
-							<!-- <view class="myOverDueNum" v-if="currentIndex != 3 && currentIndex != 2">
-								<span v-if="currentIndex == 0">逾期{{ item.overdueDays }}天</span>
-								<span v-if="currentIndex == 1 && item.overdueDays < 0">{{ -item.overdueDays }}天后交租</span>
-								<span v-if="currentIndex == 1 && item.overdueDays == 0">当天交租</span>
-							</view> -->
-							<view class="myOverDueNum" v-if="item.billStatus != 4">
-								<span v-if="item.overdueDays > 0">逾期{{ item.overdueDays }}天</span>
-								<span v-if="item.overdueDays < 0">{{ -item.overdueDays }}天后交租</span>
-								<span v-if="item.overdueDays == 0">当天交租</span>
+				<view  v-if="para.billType == 1 && currentIndex == 2">
+					<view class="aaa" v-for="(item,index) in billListInfo" :key="index">
+						<view class="liShowDate">{{item[0].showDate[1]}}月{{item[0].showDate[2]}}日</view>
+						<view class="flowLi" v-for="(p, idx) in item" :key="idx" @click="showDetail(p.id)">
+							<view class="liIcon" :class="{liIcon1:p.accType == 2}">
+								<image :src="'../../static/billFlowIcon0'+p.conType+'.png'" mode="aspectFit"></image>
+							</view>
+							<view class="liRight">
+								<view class="liName">{{p.billName}}</view>
+								<view>{{p.accType == "1" ? '+' : '-' }}{{p.amount}}</view>
 							</view>
 						</view>
-						<view class="itemBottom itemFlex">
-							<view v-if="para.billType == 0" class="bottomNo textOverFlow">{{ item.roomNo }}</view>
-							<view v-if="para.billType == 1" class="bottomNo textOverFlow">{{ item.communityName }}-{{item.houseNo}}</view>
-							<view v-if="para.billType == 0" class="bottomName textOverFlow">{{item.tenantName}}</view>
-							<view v-if="para.billType == 1" class="bottomName textOverFlow">{{item.ownerName}}</view>
+					</view>
+				</view>
+				<view v-if="!(para.billType == 1 && currentIndex == 2)">
+					<view v-for="(item, idx) in billListInfo" :key="idx" @click="showBill(item)">
+						<view class="myBillItem">
+							<view class="itemFlex itemTop">
+								<view class="myBillName">{{item.billStatus == 5 ? '退租账单' : "租金账单"}}</view>
+								<view class="topRight">￥<span v-if="(item.billStatus == 5 || para.billType == 1) && item.totalAmount != 0">-</span>{{ item.totalAmount | thousandsPoints}}<span class="reminder" v-if="item.depositAmount && item.sortNo == 1">(含押金)</span></view>
+							</view>
+							<view class="itemFlex itemMiddle">
+								<view class="myBillDate">{{ item.payRentDate }}</view>
+								<view class="myOverDueNum" v-if="item.billStatus != 4">
+									<span v-if="item.overdueDays > 0">逾期{{ item.overdueDays }}天</span>
+									<span v-if="item.overdueDays < 0">{{ -item.overdueDays }}天后交租</span>
+									<span v-if="item.overdueDays == 0">当天交租</span>
+								</view>
+							</view>
+							<view class="itemBottom itemFlex">
+								<view v-if="para.billType == 0" class="bottomNo textOverFlow">{{ item.roomNo }}</view>
+								<view v-if="para.billType == 1" class="bottomNo textOverFlow">{{ item.communityName }}-{{item.houseNo}}</view>
+								<view v-if="para.billType == 0" class="bottomName textOverFlow">{{item.tenantName}}</view>
+								<view v-if="para.billType == 1" class="bottomName textOverFlow">{{item.ownerName}}</view>
+							</view>
 						</view>
 					</view>
 				</view>
 			</mescroll-uni>
 		</view>
+		<image v-if="currentIndex == 2 && para.billType == 1" @click="bookBill" class="bookBtn" src="../../static/bookBtn.png" mode="aspectFit"></image>
 	</view>
 </template>
 
 <script>
+	import { thousandsPoints } from '../../util/index.js'
 	import MescrollEmpty from '@/components/mescroll-uni/components/mescroll-empty.vue';
 	import MescrollUni from '../../components/mescroll-uni/mescroll-uni.vue';
 	export default {
@@ -63,8 +75,28 @@
 		},
 		data() {
 			return {
+				flowType:[
+					{name:'租金',num:1},
+					{name:'租金',num:2},
+					{name:'租金',num:3},
+					{name:'押金',num:4},
+					{name:'电费',num:5},
+					{name:'公摊电费',num:6},
+					{name:'水费',num:7},
+					{name:'网费',num:8},
+					{name:'装修',num:9},
+					{name:'维修',num:10},
+					{name:'家电',num:11},
+					{name:'中介费',num:12},
+					{name:'推广费',num:13},
+					{name:'工资',num:14},
+					{name:'定金',num:15},
+					{name:'物业费',num:16},
+					{name:'停车费',num:17},
+					{name:'退租',num:18},
+					{name:'其他',num:99},
+				],
 				billListInfo: [],
-				// billStatus: '3', // 默认展示已逾期
 				billStatus: '3', // 默认展示已逾期
 				userId: '',
 				// arr: ['已逾期', '未收款', '已收款', '全部'],
@@ -97,14 +129,13 @@
 					empty: {
 						use: true,
 						tip: '暂无相关数据',
-						// helpText:'如何查看账单?'
 					}
 				}
 			};
 		},
 		computed: {
 			arr() {
-				let list = this.para.billType == 0 ? ['已逾期', '未收款', '已收款', '全部'] : ['已逾期', '未付款', '已付款', '全部'];
+				let list = this.para.billType == 0 ? ['已逾期', '未收款', '已收款', '全部'] : ['已逾期', '未付款', '明细'];
 				return list
 			},
 		},
@@ -115,42 +146,61 @@
 			this.para.billType = options.billType
 			if (options.billType == 1) {
 				uni.setNavigationBarTitle({
-					title: '房东账单'
+					title: '账单'
 				})
 			}
 		},
 		methods: {
+			showDetail(id){
+				uni.navigateTo({
+					url:'../postDetail/postDetail?id='+id
+				})
+			},
+			bookBill(){
+				uni.navigateTo({
+					url:'../addPosting/addPosting'
+				})
+			},
 			emptyclick(){
 				uni.navigateTo({
 					url: '../helpDetail/helpDetail?title=' + '如何查看账单？' + '&index=' + 3 + '&idx=' + 0
 				})
 			},
 			updateData() {
-				console.log('wwww');
 				this.downCallback(this.mescroll);
 			},
 			getMoney() {
 				let _this = this;
-				_this.$request
-					.post('/bill/money', {
-						id: this.$store.state.landladyInfo.id,
-						billType: this.para.billType
-					})
-					.then(res => {
-						console.log(res);
-						_this.unIncome = res.data.data.unIncome;
-						_this.income = res.data.data.income;
-					})
-					.catch(err => {
-						console.log(err);
-					});
+				if(this.para.billType == 0){
+					_this.$request
+						.post('/bill/money', {
+							id: this.$store.state.landladyInfo.id,
+							billType: this.para.billType
+						})
+						.then(res => {
+							_this.unIncome = res.data.data.unIncome;
+							_this.income = res.data.data.income;
+						})
+						.catch(err => {
+						});
+				}else{
+					_this.$request
+						.post('/account/money', {
+							landlordId: this.$store.state.landladyInfo.id
+						})
+						.then(res => {
+							_this.unIncome = res.data.data.incomeAmount;
+							_this.income = res.data.data.expendAmount;
+						})
+						.catch(err => {
+						});
+				}
+				
 			},
 			changeIndex(index) {
-				console.log(index);
 				this.currentIndex = index;
 				switch (index) {
 					case 0:
-						// this.billStatus = '3';
 						this.billStatus = '3';
 						this.downCallback(this.mescroll);
 						break;
@@ -171,7 +221,6 @@
 				}
 			},
 			showBill(item) {
-				console.log(item);
 				if(item.billStatus == 5){
 					uni.navigateTo({
 						url:'../endRenting/endRenting?billId='+item.id+'&houseAddr='+item.roomNo
@@ -191,36 +240,48 @@
 			init(e) {
 				this.mescroll = e;
 			},
+			Group(arr = [], key) {
+			    return key ? arr.reduce((t, v) => (!t[v[key]] && (t[v[key]] = []), t[v[key]].push(v), t), {}) : {};
+			},
 			async getBillList(pageNum, billStatus) {
 				let _this = this;
-				_this.para.pageNum = pageNum;
-				_this.para.landlordId = _this.$store.state.landladyInfo.id;
-				_this.para.billStatus = this.billStatus;
-				console.log(_this.para);
-				try {
-					const response = await _this.$request.post('/bill/billList', _this.para);
-					let arr = [];
-					console.log(response.data.data);
-					if (response.data.data.list.length > 0) {
-						response.data.data.list.forEach((item, index) => {
-							if (item.communityImgs == null) {
-								item.communityImgs = [];
-								item.communityImgs.push(
-									'https://funnyduck.raysler.com/uploadFile/huyue/article/images/20190704/1562239924231ZGZQuw.jpeg');
-							} else {
-								item.communityImgs = item.communityImgs.split(',');
+				if(this.currentIndex == 2 && this.para.billType == 1){
+					try {
+						const response = await _this.$request.post('/account/findList', {landlordId:_this.$store.state.landladyInfo.id,pageNum,pageSize:20});
+						let arr = []
+						if(response.data.data.list.length !=0){
+							response.data.data.list.map((item) =>{
+								item.tempDate = item.accTime.split(" ")[0]
+								item.showDate = item.accTime.split(" ")[0].split("-")
+								item.billName = _this.flowType.filter(p=>p.num == item.conType)[0].name
+								item.amount = thousandsPoints(item.amount)
+							})
+							response.data.data.list = _this.Group(response.data.data.list,"tempDate")
+							for(let key in response.data.data.list){
+								arr.push(response.data.data.list[key])
 							}
-							arr.push(item);
-						});
+						}
+						return arr;
+					} catch (e) {
+						console.log(e);
 					}
-
-					response.data.data.list = arr;
-					return response.data.data.list;
-				} catch (e) {
-					console.log(e);
+				}else{
+					_this.para.pageNum = pageNum;
+					_this.para.landlordId = _this.$store.state.landladyInfo.id;
+					_this.para.billStatus = this.billStatus;
+					try {
+						const response = await _this.$request.post('/bill/billList', _this.para);
+						if(response.data.data.list.length !=0){
+							response.data.data.list.map((item) =>{
+								item.payRentDate = item.payRentDate.substr(0,10)
+							})
+						}
+						return response.data.data.list;
+					} catch (e) {
+						console.log(e);
+					}
 				}
 			},
-
 			/*下拉刷新的回调, 有三种处理方式: */
 			downCallback(mescroll) {
 				let _this = this;
@@ -235,18 +296,9 @@
 				if (mescroll.num == 1) _this.billListInfo = []; //如果是第一页需手动置空列表
 				let res = await _this.getBillList(pageNum, _this.billStatus);
 				let curPageData = res;
-				console.log(curPageData);
+				console.log(res)
 				_this.billListInfo = _this.billListInfo.concat(curPageData); //追加新数据
-				console.log(_this.billListInfo);
-				let arryNew = [];
-				_this.billListInfo.map((item, index) => {
-					let countTotal = parseInt(item.depositAmount) + parseInt(item.total);
-					arryNew.push(Object.assign({}, item, {
-						countTotal: countTotal
-					}));
-				});
-				console.log(arryNew);
-				_this.billListInfo = arryNew;
+				console.log(_this.billListInfo)
 				_this.$nextTick(() => {
 					mescroll.endSuccess(curPageData.length, res.hasNextPage);
 				});
@@ -423,8 +475,9 @@
 	.line {
 		height: 61rpx;
 		/* border: 1rpx solid rgba(190, 190, 190, 1); */
-		width: 1rpx;
+		width: 2rpx;
 		background-color: rgba(190, 190, 190, 1);
+		transform: scaleX(0.5);
 		position: absolute;
 		top: 57rpx;
 		left: 50%;
@@ -524,5 +577,62 @@
 		font-weight: 500;
 		color: #eb5e61;
 		margin-top: 30rpx;
+	}
+	.flowLi{
+		width: 100%;
+		height: 110rpx;
+		padding: 0 30rpx;
+		display: flex;
+		align-items: center;
+		background-color: #FFFFFF;
+		font-size: 30rpx;
+		color: #333333;
+	}
+	.liRight{
+		width: calc(100% - 100rpx);
+		height: 100%;
+		display: flex;
+		align-items: center;
+		border-bottom: 1rpx solid #F5F5F5;
+	}
+	.liIcon{
+		width: 70rpx;
+		height: 70rpx;
+		background-color: #5396FF;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-right: 30rpx;
+	}
+	.liIcon1{
+		background-color: #EB5E61;
+	}
+	.liIcon image{
+		width: 46rpx;
+		height: 46rpx;
+	}
+	.liName{
+		margin-right: auto;
+	}
+	.liShowDate{
+		background-color: #FFFFFF;
+		padding: 42rpx 30rpx 22rpx 30rpx;
+		color: #9A9A9A;
+		font-size: 26rpx;
+		border-bottom: 1rpx solid #F5F5F5;
+	}
+	.needBottom{
+		border-bottom: 1rpx solid #F5F5F5;
+	}
+	.aaa .flowLi:last-of-type{
+		border-bottom: 0;
+	}
+	.bookBtn{
+		width: 146rpx;
+		height: 146rpx;
+		position: fixed;
+		bottom: 194rpx;
+		right: 0rpx;
 	}
 </style>

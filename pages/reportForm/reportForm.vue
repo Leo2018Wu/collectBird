@@ -33,10 +33,10 @@
 			<view class="sectionFour">
 				<view class="secForItem" v-for="(item,index) in itemProfitList" :key="index">
 					<view class="itemName">
-						{{item.name}}<span v-if="item.price != 0">{{item.percentNum}}%</span>
+						{{item.name}}<span v-if="item.data != 0">{{item.percentNum}}%</span>
 					</view>
 					<view class="itemPrice">
-						￥<span>{{item.price | thousandsPoints}}</span>
+						￥<span>{{item.data | thousandsPoints}}</span>
 					</view>
 				</view>
 			</view>
@@ -143,9 +143,10 @@
 				curDateType: 3,
 				monthIncome: '',
 				params: {
-					id: '',
+					landlordId: '',
 					"communityId": "",
 					"houseId": "",
+					"accType": "1",
 					/**
 					 * 1-年 2-季 3-月
 					 * 年：只传startDate，格式为"yyyy"
@@ -188,21 +189,42 @@
 				chartData: {
 					"series": [{
 						"name": "租金",
-						"data": 122
+						"data": 0
 					}, {
 						"name": "押金",
-						"data": 122
+						"data": 0
 					}, {
 						"name": "宽带",
-						"data": 50
+						"data": 0
 					}, {
 						"name": "水费",
-						"data": 20
+						"data": 0
 					}, {
 						"name": "电费",
-						"data": 18
+						"data": 0
 					}]
 				},
+				flowType:[
+					{name:'租金',num:1},
+					{name:'租金',num:2},
+					{name:'租金',num:3},
+					{name:'押金',num:4},
+					{name:'电费',num:5},
+					{name:'公摊电费',num:6},
+					{name:'水费',num:7},
+					{name:'网费',num:8},
+					{name:'装修',num:9},
+					{name:'维修',num:10},
+					{name:'家电',num:11},
+					{name:'中介费',num:12},
+					{name:'推广费',num:13},
+					{name:'工资',num:14},
+					{name:'定金',num:15},
+					{name:'物业费',num:16},
+					{name:'停车费',num:17},
+					{name:'退租',num:18},
+					{name:'其他',num:99},
+				],
 				pixelRatio: 1,
 				choosedCommunity: '',
 				choosedHouse: '',
@@ -236,9 +258,8 @@
 			_this.cHeight = uni.upx2px(500);
 			_this.getSeasonIndex()
 			_this.seasonValue = [(_this.year - 2018) * 4 + _this.seasonIndex];
-			console.log(this.seasonValue)
 			_this.getReportPickerList(this.landladyInfo.id)
-			_this.params.id = this.landladyInfo.id;
+			_this.params.landlordId = this.landladyInfo.id;
 			_this.params.dateType = this.curDateType;
 			_this.params.startDate = _this.$getDate(null, true);
 			this.getReportFormData(this.params)
@@ -246,33 +267,57 @@
 		methods: {
 			getReportFormData(par) {
 				let _this = this;
-
 				_this.$request.post('report/reportQuery', par).then((res) => {
-					console.log(res.data)
 					let data = res.data.data
-					_this.monthIncome = data.monthIncome;
-					_this.chartData.series[0].data = parseInt(data.total)
-					_this.chartData.series[1].data = parseInt(data.depositAmount)
-					_this.chartData.series[2].data = parseInt(data.netAmount)
-					_this.chartData.series[3].data = parseInt(data.waterAmount)
-					_this.chartData.series[4].data = parseInt(data.totalEleAmount)
-					let chartData = _this.chartData
-					_this.showRing("canvasRing", chartData, _this, data.totalAmount);
+					let arr=[],totalAmount
+					if(data.length != 0){
+						data.forEach((item,index) =>{
+							if(item.conType === "00"){
+								totalAmount = item.amount
+							}
+							if(item.conType === "01"){
+								_this.monthIncome = item.amount
+							}else{
+								const findItem = _this.flowType.filter(p=>p.num == item.conType)
+								if(findItem.length != 0){
+									let ele = {
+										name:findItem[0].name,
+										data:parseInt(item.amount)
+									}
+									arr.push(ele)
+								}
+							}
+						})
+						_this.chartData.series = arr
+						_this.showRing("canvasRing", _this.chartData, _this, totalAmount);
+						arr.forEach((p)=>{
+							p.percentNum = (Number(p.data).toFixed(0)/totalAmount * 100).toFixed(2);
+						})
+						_this.itemProfitList = arr
+					}else{
+						_this.chartData.series = [{
+						"name": "租金",
+						"data": 0
+					}, {
+						"name": "押金",
+						"data": 0
+					}, {
+						"name": "宽带",
+						"data": 0
+					}, {
+						"name": "水费",
+						"data": 0
+					}, {
+						"name": "电费",
+						"data": 0
+					}];
+						_this.itemProfitList = [];
+						_this.monthIncome = ""
+						_this.showRing("canvasRing", _this.chartData, _this, 0);
+					}
 					setTimeout(()=>{
 						_this.showTime = true
 					},200)
-					
-					_this.itemProfitList[0].price = Number(data.total).toFixed(0);
-					_this.itemProfitList[1].price = Number(data.depositAmount).toFixed(0);
-					_this.itemProfitList[2].price = Number(data.netAmount).toFixed(0);
-					_this.itemProfitList[3].price = Number(data.waterAmount).toFixed(0);
-					_this.itemProfitList[4].price = Number(data.totalEleAmount).toFixed(0);
-					
-					_this.itemProfitList[0].percentNum = (Number(data.total).toFixed(0)/data.totalAmount * 100).toFixed(2);
-					_this.itemProfitList[1].percentNum = (Number(data.depositAmount).toFixed(0)/data.totalAmount * 100).toFixed(2);
-					_this.itemProfitList[2].percentNum = (Number(data.netAmount).toFixed(0)/data.totalAmount * 100).toFixed(2);
-					_this.itemProfitList[3].percentNum = (Number(data.waterAmount).toFixed(0)/data.totalAmount * 100).toFixed(2);
-					_this.itemProfitList[4].percentNum = (Number(data.totalEleAmount).toFixed(0)/data.totalAmount * 100).toFixed(2);
 				})
 			},
 			getReportPickerList(id) {
@@ -280,7 +325,6 @@
 				this.$request.post('report/findCommunityAndHouse', {
 					id
 				}).then((res) => {
-					console.log(res)
 					_this.communityList = res.data.data;
 					_this.communityList.unshift({
 						communityName: '全部房产'
@@ -346,7 +390,6 @@
 				});
 			},
 			chooseCommuinty() {
-				console.log('nihao')
 				this.pickerTypeCurIndex = 3
 				this.showPicker()
 			},

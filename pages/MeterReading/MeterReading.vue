@@ -6,9 +6,6 @@
 					<template v-slot:main>
 						<picker class="form-input" mode="date" data-type="start" :value="readDate" :start="startDate" @change="bindDateChange">{{ readDate }}</picker>
 					</template>
-					<template v-slot:tip>
-						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
-					</template>
 				</evan-form-item>
 			</view>
 			<view class="divideBar">个人电费</view>
@@ -16,29 +13,20 @@
 				<view class="formOuter">
 					<evan-form-item label="上期读数" prop="preNum">
 						<template v-slot:main>
-							<input class="form-input inputColor" type="digit"  placeholder-class="form-input-placeholder" v-model="info.preNum"
+							<input class="form-input inputColor" type="digit" maxlength="6"  placeholder-class="form-input-placeholder" v-model="info.preNum"
 							 placeholder="0.00" />
-						</template>
-						<template v-slot:tip>
-							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 						</template>
 					</evan-form-item>
 					<evan-form-item label="本期读数" prop="curNum">
 						<template v-slot:main>
-							<input class="form-input inputColor" type="digit" placeholder-class="form-input-placeholder" @input="inputChangeHandle"  v-model="info.curNum"
+							<input class="form-input inputColor" maxlength="6" type="digit" placeholder-class="form-input-placeholder" @input="inputChangeHandle"  v-model="info.curNum"
 							 placeholder="0.00" />
-						</template>
-						<template v-slot:tip>
-							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 						</template>
 					</evan-form-item>
 					<evan-form-item label="费用" prop="eleCost" :border="false">
 						<template v-slot:main>
 							<input class="form-input inputColor" disabled="true" type="digit" placeholder-class="form-input-placeholder" v-model="amount"
 							 placeholder="0.00" />
-						</template>
-						<template v-slot:tip>
-							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 						</template>
 					</evan-form-item>
 				</view>
@@ -50,29 +38,20 @@
 					<view class="formOuter">
 						<evan-form-item label="上期读数" prop="commPreNum">
 							<template v-slot:main>
-								<input class="form-input inputColor" type="digit" maxlength="7"  placeholder-class="form-input-placeholder" v-model="info.commPreNum"
+								<input class="form-input inputColor" type="digit" maxlength="6"  placeholder-class="form-input-placeholder" v-model="info.commPreNum"
 								 placeholder="0.00" />
-							</template>
-							<template v-slot:tip>
-								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 							</template>
 						</evan-form-item>
 						<evan-form-item label="本期读数" prop="commCurNum">
 							<template v-slot:main>
-								<input class="form-input inputColor" type="digit" maxlength="7" placeholder-class="form-input-placeholder" @input="inputChangeHandleComm"  v-model="info.commCurNum"
+								<input class="form-input inputColor" type="digit" maxlength="6" placeholder-class="form-input-placeholder" @input="inputChangeHandleComm"  v-model="info.commCurNum"
 								 placeholder="0.00" />
-							</template>
-							<template v-slot:tip>
-								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 							</template>
 						</evan-form-item>
 						<evan-form-item label="总电费" prop="commEleCost">
 							<template v-slot:main>
 								<input class="form-input inputColor" disabled="true" type="digit" placeholder-class="form-input-placeholder" v-model="commEleCost"
 								 placeholder="0.00" />
-							</template>
-							<template v-slot:tip>
-								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 							</template>
 						</evan-form-item>
 						<view class="eleCommonBottom">
@@ -85,9 +64,6 @@
 							<template v-slot:main>
 								<input class="form-input inputColor" disabled="true" type="digit" placeholder-class="form-input-placeholder" v-model="commEleCostPer"
 								 placeholder="0.00" />
-							</template>
-							<template v-slot:tip>
-								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 							</template>
 						</evan-form-item>
 					</view>

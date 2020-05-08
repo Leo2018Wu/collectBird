@@ -248,6 +248,18 @@
 				"navigationBarTitleText": "招租"
 			}
         }
+        ,{
+            "path" : "pages/addPosting/addPosting",
+            "style" : {
+				"navigationBarTitleText": "记账"
+			}
+        }
+        ,{
+            "path" : "pages/postDetail/postDetail",
+            "style" : {
+				"navigationBarTitleText": "详情"
+			}
+        }
     ],
 	"permission": {
 		"scope.userLocation": {

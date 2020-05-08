@@ -147,11 +147,25 @@ const filterEmoji = function(name) {
 	return str.replace(/\s+/g, '');
 
 }
+const thousandsPoints = function (value, unit) { //  '--'  ''  null  '333'
+  if (!value || typeof(value)=="undefined") {
+    return '--'
+  }
+  if (isNaN(parseFloat(value))) return value
+  var str = value.toString()
+  if (str.indexOf('.') > -1) {
+    str = str.split('.')
+    str[0] = str[0].replace(/(?=(?!^)(\d{3})+$)/g, ',')
+    return unit ? str.join('.') + unit : str.join('.')
+  }
+  return unit ? value.toString().replace(/(?=(?!^)(\d{3})+$)/g, ',') + unit : value.toString().replace(/(?=(?!^)(\d{3})+$)/g, ',')
+}
 module.exports = {
 	chnToNumber,
 	dateForm,
 	getDate,
 	dateDiff,
 	moneyLimit,
-	filterEmoji
+	filterEmoji,
+	thousandsPoints
 }

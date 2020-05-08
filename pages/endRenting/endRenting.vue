@@ -70,25 +70,11 @@
 			</view>
 		</view>
 		<view class="section2" v-else>
-			<!-- <view class="leftBtnBox">
-				<view class="sendBillBox" @click="deleteBill">
-					<image class="sendIcon" src="../../static/delete_btn.png" mode="aspectFit"></image>
-					<view>删除</view>
-				</view>
-				<view class="sendBillBox" @click="openMeterRead">
-					<image class="sendIcon" src="../../static/eleWater.png" mode="aspectFit"></image>
-					<view>抄表</view>
-				</view>
-				<view class="sendBillBox">
-					<image class="sendIcon" src="../../static/sendBill.png" mode="aspectFit"></image>
-					<view>发送账单</view>
-				</view>
-			</view> -->
 			<view class="sureBtn" @click="checkMoney">清算退租</view>
 			<cover-view v-if="isShowSureModal" class="modalMask" @click="gotIt()" @catchtouchmove='true'>
 				<cover-view class="modelContainer">
 					<cover-view class="modalSureTitle">电费详情</cover-view>
-					<cover-view class="modalContent">单价：{{ electricityInfo.unitPrice }}元/度</cover-view>
+					<cover-view class="modalContent">单价：{{ electricityInfo.unitPrice  ? electricityInfo.unitPrice : '1'}}元/度</cover-view>
 					<cover-view class="modalContent">度数：{{ quantity ? quantity : 0 }}<span>度</span>({{ electricityInfo.currentNum ? electricityInfo.currentNum : '0' }}~{{
 									electricityInfo.prevNum ? electricityInfo.prevNum : '0'
 								}}）</cover-view>
@@ -102,7 +88,7 @@
 			<cover-view v-if="isShowSureModal1" class="modalMask" @click="gotIt()" @catchtouchmove='true'>
 				<cover-view class="modelContainer">
 					<cover-view class="modalSureTitle">均摊电费详情</cover-view>
-					<cover-view class="modalContent">单价：{{ commEleCost.unitPrice }}元/度</cover-view>
+					<cover-view class="modalContent">单价：{{ commEleCost.unitPrice ? commEleCost.unitPrice : '1' }}元/度</cover-view>
 					<cover-view class="modalContent">度数：{{ commonQuantity ? commonQuantity : 0}}<span>度</span>({{ commEleCost.currentNum ? commEleCost.currentNum : '0' }}~{{
 									commEleCost.prevNum ? commEleCost.prevNum : '0'
 								}}）</cover-view>

@@ -8,7 +8,7 @@
 				<view v-if="imgUrl.length == 0" class="mask"></view>
 				<swiper v-if="imgUrl.length !=0" class="swiper" :indicator-dots="false" autoplay="true" interval="5000" duration="1000" @change="swiperChange">
 					<block v-for="(item, index) in imgUrl" :key="index">
-						<swiper-item>
+						<swiper-item @click="prviewImg">
 							<image :src="item" class="slide-image" mode="aspectFill"/>
 						</swiper-item>
 					</block>
@@ -83,7 +83,7 @@
 					<view class="listBox" style="border-bottom: 1rpx solid #EBEBEB;">
 						<view class="liName">租期</view>
 						<view class="liInner1">
-							<view :class="{liActive:item.isChecked == 1}" class="li" v-for="(item,index) in rentDateList" @click="chooseKeepDate(index)" :key="index">{{item.name}}</view>
+							<view :class="{liActive:rentDateIndex == index}" class="li" v-for="(item,index) in rentDateList" @click="chooseKeepDate(index)" :key="index">{{item}}</view>
 						</view>
 					</view>
 					<evan-form-item label="看房时间" prop="seeTheApartment" :fontBold="true">
@@ -193,6 +193,7 @@
 				swiperCurrent:1,
 				parOriIndex:null,
 				parSeeIndex:null,
+				rentDateIndex:0,
 				hasEleFloor:1,
 				sexIndex:0,
 				descIndex:2,
@@ -222,10 +223,7 @@
 				sexList:['先生','女士'],
 				drawStyleList:['毛坯','简装修','精装修'],
 				agencyFee:['面议','35%','50%'],
-				rentDateList:[
-					{name:'可短租',isChecked:0},
-					{name:'1年以上',isChecked:1}
-				],
+				rentDateList:['可短租','一年以上'],
 				listShow:false,
 				list: ['东','南','西','北'],
 				imgUrl:[],
@@ -297,7 +295,6 @@
 			}
 		},
 		onLoad(options) {
-			console.log(options)
 			this.roomId = options.roomId
 			this.getHouseInfo(options.houseId)
 			this.getRoomInfo(this.roomId)
@@ -309,11 +306,20 @@
 			}
 		},
 		methods: {
+			prviewImg(){
+				let _this = this
+				uni.previewImage({
+					urls:_this.imgUrl,
+					current:Number(_this.swiperCurrent) - 1
+				})
+			},
 			returnCancel(){
+				console.log('emitfail')
 				this.chooseImg()
 				this.isShowTipModal = false;
 			},
 			returnSure(){
+				console.log('emitSuc')
 				this.isShowTipModal = false;
 				this.isCanPub = true;
 			},
@@ -350,10 +356,11 @@
 				this.swiperCurrent = e.detail.current +1;
 			},
 			bindDateChange(e){
-				let curDate = this.$getDate().split('-')
-				let temp = e.detail.value.split('-')
-				if(parseInt(curDate[0]) <= parseInt(temp[0]) && parseInt(curDate[1]) <= parseInt(temp[1]) && parseInt(curDate[2]) <= parseInt(temp[2])){
-					this.info.checkInTime = e.detail.value;
+				let _this = this
+				let curDate = this.$getDate()
+				let temp = e.detail.value
+				if(Date.parse(new Date(curDate.replace(/\-/g, '/'))) <= Date.parse(new Date(temp.replace(/\-/g, '/')))){
+					_this.info.checkInTime = e.detail.value;
 				}else{
 					uni.showToast({
 						title:'入住时间不能小于当前日期',
@@ -440,7 +447,7 @@
 							par.elevator = _this.hasEleFloor == 1 ? 1 : 2
 							par.decoration = parseInt(_this.descIndex) +1
 							par.intermePrice = parseInt(_this.feeIndex) +1
-							par.tenancyTerm = JSON.stringify(_this.rentDateList) 
+							par.tenancyTerm = _this.rentDateIndex 
 							par.roomConfigure = JSON.stringify(_this.facilities)
 							par.label = JSON.stringify(_this.labels)
 							par.rentStatus = 2
@@ -473,7 +480,8 @@
 				this.hasEleFloor = Number(e.detail.value)
 			},
 			chooseKeepDate(index){
-				this.rentDateList[index].isChecked = this.rentDateList[index].isChecked == 1 ? 0 : 1
+				this.rentDateIndex = index
+				// this.rentDateList[index].isChecked = this.rentDateList[index].isChecked == 1 ? 0 : 1
 			},
 			chooseDec(index){
 				this.descIndex = index
@@ -564,7 +572,8 @@
 						_this.changeType({detail:{value:delNum}})
 						_this.descIndex = _this.roomInfo.decoration ? parseInt(_this.roomInfo.decoration) - 1 : _this.descIndex
 						_this.feeIndex = _this.roomInfo.intermePrice ? parseInt(_this.roomInfo.intermePrice) - 1 : _this.roomInfo.intermePrice
-						_this.rentDateList = JSON.parse(_this.roomInfo.tenancyTerm) ?  JSON.parse(_this.roomInfo.tenancyTerm) : _this.rentDateList
+						_this.rentDateIndex = _this.roomInfo.tenancyTerm ?  _this.roomInfo.tenancyTerm : _this.rentDateIndex
+						// _this.rentDateList = JSON.parse(_this.roomInfo.tenancyTerm) ?  JSON.parse(_this.roomInfo.tenancyTerm) : _this.rentDateList
 						_this.facilities = JSON.parse(_this.roomInfo.roomConfigure) ?  JSON.parse(_this.roomInfo.roomConfigure) : _this.facilities
 						_this.labels = JSON.parse(_this.roomInfo.label) ? JSON.parse(_this.roomInfo.label) : _this.labels
 						_this.remarks = _this.roomInfo.remarks ? _this.roomInfo.remarks : ''

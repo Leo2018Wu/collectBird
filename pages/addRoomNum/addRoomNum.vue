@@ -13,17 +13,11 @@
 						<input class="form-input" type="number" maxlength="3" placeholder-class="form-input-placeholder" v-model="info.houseNo"
 						 @input="inputTip" placeholder="请输入楼栋号" />
 					</template>
-					<template v-slot:tip>
-						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
-					</template>
 				</evan-form-item>
 				<evan-form-item label="房号" prop="roomNo" :fontBold="true">
 					<template v-slot:main>
 						<input class="form-input" type="number" maxlength="4" placeholder-class="form-input-placeholder" v-model="info.roomNo"
 						 placeholder="请输入房号" />
-					</template>
-					<template v-slot:tip>
-						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 					</template>
 				</evan-form-item>
 				<evan-form-item label="户型" prop="houseType" :fontBold="true">
@@ -51,9 +45,10 @@
 		</view> -->
 		<view class="section3">
 			<view v-if="isWholeRent" class="inputContainer" @click="goRoomDetail">
-				<view class="inputBarBox">
-					<input-bar :disabled="true">整租</input-bar>
+				<view class="inputBarBox" :class="{marginR : tempRoomList[0].roomPrice}">
+					<view>整租</view>
 				</view>
+				<view v-if="!tempRoomList[0].roomPrice" class="notFinish">待完善</view>
 				<view style="display: flex; align-items: center; color: #999999;fontSize:32rpx">
 					<span>编辑</span>
 					<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
@@ -61,7 +56,7 @@
 			</view>
 			<view v-else class="inputContainer" @click="goRoomDetail(item)" v-for="(item,index) in roomList" :key="index">
 				<view class="inputBarBox" :class="{marginR : tempRoomList[index].roomPrice}">
-					<input-bar :disabled="true">卧室{{item}}</input-bar>
+					<view>卧室{{item}}</view>
 				</view>
 				<view v-if="!tempRoomList[index].roomPrice" class="notFinish">待完善</view>
 				<view style="display: flex; align-items: center; color: #999999;fontSize:32rpx">
@@ -150,6 +145,8 @@
 				uni.setNavigationBarTitle({
 					title: '编辑房号'
 				})
+			}
+			if(this.houseId){
 				this.getHouseInfo(this.houseId)
 			}
 		},
@@ -164,7 +161,6 @@
 			if (options.houseId) {
 				this.inEdit = true;
 				this.houseId = options.houseId;
-
 			}
 		},
 		methods: {
@@ -242,7 +238,6 @@
 				this.$request.post('/house/findById', {
 					id
 				}).then(res => {
-					console.log(res)
 					this.houseInfo = res.data.data
 					this.tempRoomList = res.data.data.roomList
 					this.info.houseNo = res.data.data.buildingNo;
@@ -257,7 +252,6 @@
 						newVal: res.data.data.bedroomNum + '室1厅1卫'
 					}
 					let index = parseInt(res.data.data.bedroomNum) - 1;
-
 					_this.returnEmit(temp)
 					_this.isWholeRent = this.rentType == '0' ? 1 : 0;
 				})
@@ -311,6 +305,7 @@
 								houseInfo.communityName = _this.communityName;
 								houseInfo.communityId = _this.communityId;
 								houseInfo.houseId = _this.returnHouseId;
+								_this.houseId = _this.returnHouseId;
 								uni.navigateTo({
 									url: `../roomDetail/roomDetail?isWholeRent=${_this.isWholeRent}` + `&roomNo=` + `${item}` + '&houseInfo=' +
 										`${JSON.stringify(houseInfo)}`,
@@ -431,7 +426,7 @@
 		height: 100%;
 	}
 	.marginR{
-		margin-right: auto;
+		margin-right: auto !important;
 	}
 	.notFinish{
 		width: fit-content;

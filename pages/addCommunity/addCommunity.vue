@@ -12,7 +12,7 @@
 						<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 					</template>
 				</evan-form-item>
-				<evan-form-item label="详细地址" prop="addr" :fontBold="true">
+				<evan-form-item label="详细地址" prop="addr" :fontBold="true" :border="false">
 					<template v-slot:main>
 						<view @click="chooseLocation(true)" class="form-input form-input-placeholder">{{ myAddr }}</view>
 						<!-- <input @click="chooseLocation(true)" class="form-input" placeholder-class="form-input-placeholder" :value="info.addr"  placeholder="请填写" /> -->
@@ -22,13 +22,13 @@
 					</template>
 				</evan-form-item>
 			</evan-form>
-			<view class="uploadBlock">
+			<!-- <view class="uploadBlock">
 				<view>房源照片</view>
 				<view class="uploadImg">
 					<image v-if="!communityImg" src="../../static/upload.png" mode="aspectFill" @click="chooseImg"></image>
 					<image v-else :src="communityImg" mode="aspectFit" @click="chooseImg"></image>
 				</view>
-			</view>
+			</view> -->
 		</view>
 		<view class="btnBox" v-if="!isEdit">
 			<view class="btnSave" @click="save()">保存</view>
@@ -191,17 +191,12 @@ export default {
 			let _this = this;
 			this.$refs.form.validate(res => {
 				if (res) {
-					_this.submitData();
+					_this.submitData(true);
 				}
 			});
 		},
-		submitData() {
+		submitData(jumpAddRoom) {
 			let _this = this;
-			if(this.addCommunityInfo.id){
-				uni.navigateTo({
-					url: '../addRoomNum/addRoomNum?communityId=' + this.addCommunityInfo.id + '&communityName=' + this.addCommunityInfo.communityName
-				});
-			}else{
 				uni.showLoading({
 					title: '正在加载...'
 				});
@@ -232,13 +227,18 @@ export default {
 							title: '添加成功',
 							duration: 1500
 						});
+						if(jumpAddRoom){
+							uni.navigateTo({
+								url: '../addRoomNum/addRoomNum?communityId=' + _this.addCommunityInfo.id + '&communityName=' + _this.addCommunityInfo.communityName
+							});
+							return
+						}
 					}
 					setTimeout(()=>{
 						uni.navigateBack()
 					},1800)
 					this.$store.commit('chooseLocationInfo', {});
 				});
-			}
 		}
 	}
 };
@@ -300,8 +300,12 @@ export default {
 }
 
 .btnBox {
-	width: 100%;
-	padding-left: 65rpx;
+	width: calc(100% - 130rpx);
+	margin-left: 65rpx;
+	height: 74rpx;
+	display: flex;
+	justify-content: space-between;
+	margin-top: 160rpx;
 }
 
 .btnSave,
@@ -317,16 +321,10 @@ export default {
 .btnSave {
 	color: #ffa344;
 	border: 2rpx solid #ffa344;
-	position: absolute;
-	bottom: 120rpx;
-	left: 65rpx;
 }
 
 .addNext {
 	background: linear-gradient(-90deg, rgba(243, 182, 73, 1) 0%, rgba(240, 154, 66, 1) 100%);
 	color: #ffffff;
-	position: absolute;
-	bottom: 120rpx;
-	right: 65rpx;
 }
 </style>

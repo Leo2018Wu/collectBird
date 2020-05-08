@@ -12,16 +12,10 @@
 							<input class="form-input" type="digit" placeholder-class="form-input-placeholder" v-model="info.rentUnitPrice"
 							 placeholder="0.00" @input="myInput1"/>
 						</template>
-						<template v-slot:tip>
-							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
-						</template>
 					</evan-form-item>
 					<evan-form-item label="到租日期" prop="endDate" :border="false">
 						<template v-slot:main>
 							<picker class="form-input" disabled="true" mode="date" data-type="start" :value="endDate" :start="startDate" @change="bindDateChange">{{ endDate }}</picker>
-						</template>
-						<template v-slot:tip>
-							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 						</template>
 					</evan-form-item>
 				</view>
@@ -39,17 +33,11 @@
 						<template v-slot:main>
 							<picker class="form-input" mode="date" data-type="start" :value="keepEndDate" :start="startDate" @change="bindDateChange">{{ keepEndDate }}</picker>
 						</template>
-						<template v-slot:tip>
-							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
-						</template>
 					</evan-form-item>
 					<evan-form-item label="续约租金" prop="keepRentPrice" :border="false">
 						<template v-slot:main>
 							<input class="form-input" type="digit" placeholder-class="form-input-placeholder" v-model="info.keepRentPrice"
 							 placeholder="0.00" @input="myInput2" />
-						</template>
-						<template v-slot:tip>
-							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 						</template>
 					</evan-form-item>
 				</view>

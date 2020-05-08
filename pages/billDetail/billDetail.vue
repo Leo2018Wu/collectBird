@@ -458,6 +458,7 @@
 			},
 			submit(e) {
 				this.isShowMeterRead = false;
+				
 				this.openMeterRead()
 			},
 			ll() {
@@ -469,12 +470,13 @@
 						par.items.push(this.commEleCost)
 					}
 				}
+				
 				par.billStatus = 4
 				par.items.forEach((item,index)=>{
-					if (item.itemName == '1') {
-						par.items[index].noteDate = item.noteDate + ' 00:00:00';
-					} else if(item.itemName == '2'){
-						par.items[index].noteDate = item.noteDate + ' 00:00:00';
+					if (item.itemName == '1' || item.itemName == '2') {
+						if(item.noteDate){
+							par.items[index].noteDate = item.noteDate + ' 00:00:00';
+						}
 					}
 				})
 				_this.$request

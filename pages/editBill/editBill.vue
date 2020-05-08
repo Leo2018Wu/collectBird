@@ -8,17 +8,11 @@
 						<template v-slot:main>
 							<picker class="form-input" disabled="true" mode="date" data-type="start" :value="date" :start="startDate" @change="bindDateChange">{{ date }}</picker>
 						</template>
-						<template v-slot:tip>
-							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
-						</template>
 					</evan-form-item>
 					<evan-form-item :label="billInfo.billStatus == 5 ? '清算日期':'缴费周期'" prop="rentCycle" :border="fales">
 						<template v-slot:main>
 							<view  class="form-input" v-if="billInfo.billStatus == 5">{{nowDate}}</span></view>
 							<view  v-else class="form-input"><span>{{date}}</span>~<span>{{endCycleDate}}</span></view>
-						</template>
-						<template v-slot:tip>
-							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 						</template>
 					</evan-form-item>
 				</view>
@@ -29,9 +23,6 @@
 								<input class="form-input" type="digit" placeholder-class="form-input-placeholder" v-model="info.rentUnitPrice"
 								 placeholder="0.00" @input="checkInput"/>
 							</template>
-							<template v-slot:tip>
-								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
-							</template>
 						</evan-form-item>
 					</view>
 					<view v-if="billInfo.depositAmount != 0">
@@ -39,9 +30,6 @@
 							<template v-slot:main>
 								<input class="form-input"  type="digit" placeholder-class="form-input-placeholder" v-model="info.deposit"
 								 placeholder="0.00" @input="checkInput1" />
-							</template>
-							<template v-slot:tip>
-								<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 							</template>
 						</evan-form-item>
 					</view>
@@ -54,9 +42,6 @@
 								<template v-slot:main>
 									<input class="form-input" :disabled="item.itemName == '1' || item.itemName== '2'" @click="goMeterRead(item)" type="digit" placeholder-class="form-input-placeholder" v-model="item.amount" :data-type="item.itemName" @input="getValue" 
 									 placeholder="0.00" />
-								</template>
-								<template v-slot:tip>
-									<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
 								</template>
 							</evan-form-item>
 						</view>

@@ -1,8 +1,6 @@
 <template>
 	<view class="shareFriend">
 		<canvas canvas-id="myCanvas"></canvas>
-		<!-- <posters-layer :postersData="postersData" @success="onSuccessCreatePosters" @error="onPostersError">
-		</posters-layer> -->
 		<image class="bannerImg" src="../../static/shareBanner.jpg" mode="aspectFit"></image>
 		<view class="content">
 			<view class="titleBar">活动规则</view>
@@ -20,7 +18,6 @@
 </template>
 
 <script>
-	import postersLayer from '../../components/posters-layer';
 	import {
 		mapState,
 		mapMutations,
@@ -34,9 +31,6 @@
 				ctx: {},
 				bgUrl: "https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/shareFriend.jpg",
 			};
-		},
-		components: {
-			postersLayer
 		},
 		computed: {
 			...mapState(['landladyInfo'])

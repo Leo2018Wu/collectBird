@@ -75,9 +75,6 @@
 				</view>
 				<view class="loginTxt">授权登录体验完整功能</view>
 				<view class="loginImg">
-					<!-- <view class="notLogin" @click="cancleLogin">
-						<image src="../../static/notLogin.png" mode=""></image>
-					</view> -->
 					<button class="loginButton"  open-type="getUserInfo" @getuserinfo="getUserInfo">授权微信登录</button>
 				</view>
 			</view>
@@ -86,19 +83,19 @@
 		<!-- 新手指引 -->
 		<view class="guideMask" @catchtouchmove="true" v-if="stepOne || stepTwo || stepThree || stepFour"></view>
 		<view v-if="stepOne">
-			<image class="guide1" src="../../static/guide1.png" mode="aspectFit"></image>
-			<image class="guide2" src="../../static/guide2.png" mode="aspectFit" @click="showNextOne"></image>
+			<image class="guide1" src="https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/guide1.png" mode="aspectFit"></image>
+			<image class="guide2" src="https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/guide2.png" mode="aspectFit" @click="showNextOne"></image>
 		</view>
 		<view v-if="stepTwo">
-			<image class="guide6" src="../../static/guide6.png" mode="aspectFit"></image>
-			<image class="guide3" src="../../static/guide3.png" mode="aspectFit" @click="showNextTwo"></image>
+			<image class="guide6" src="https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/guide6.png" mode="aspectFit"></image>
+			<image class="guide3" src="https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/guide3.png" mode="aspectFit" @click="showNextTwo"></image>
 		</view>
 		<view v-if="stepThree">
-			<image class="guide4" src="../../static/guide4.png" mode="aspectFit" @click="showNextThree"></image>
+			<image class="guide4" src="https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/guide4.png" mode="aspectFit" @click="showNextThree"></image>
 			<image class="guide5" src="../../static/homeIcon4.png" mode="aspectFit"></image>
 		</view>
 		<view v-if="stepFour">
-			<image class="guide7" src="../../static/guide5.png" mode="aspectFit" @click="showNextFour"></image>
+			<image class="guide7" src="https://funnyduck.raysler.com/uploadFile/rentbird/banner/images/guide5.png" mode="aspectFit" @click="showNextFour"></image>
 			<image class="guide8" src="../../static/homeIcon6.png" mode="aspectFit"></image>
 		</view>
 	</view>
@@ -114,22 +111,32 @@
 				stepTwo: false,
 				stepThree: false,
 				stepFour: false,
-				contentList: [{
-					text1: '支持手动生成最新账单',
-					text2: '账单明细支持编辑'
-				}, {
-					text1: '租客支持退租、续租',
-					text2: '支持均摊电费'
-				}, {
-					text1: '新增收支报表，便于横向比对',
-					text2: '新增记事入口，记录收租琐事'
-				}, {
-					text1: '新增房东列表，查看房东信息',
-					text2: '更新帮助手册，便于检索帮助'
-				}, {
-					text1: '关注收租鸟服务号，及时接收相关信息',
-					text2: ''
-				}],
+				contentList: [
+					{
+						text1:'支持发布招租信息，实时推送合作中介',
+						text2:'支持手动记账，记录收支流水'
+					},
+					{
+						text1:'支持一键催租，提醒租客交租',
+						text2:'关注收租鸟服务号，及时接受相关信息'
+					}
+				// 	{
+				// 	text1: '支持手动生成最新账单',
+				// 	text2: '账单明细支持编辑'
+				// }, {
+				// 	text1: '租客支持退租、续租',
+				// 	text2: '支持均摊电费'
+				// }, {
+				// 	text1: '新增收支报表，便于横向比对',
+				// 	text2: '新增记事入口，记录收租琐事'
+				// }, {
+				// 	text1: '新增房东列表，查看房东信息',
+				// 	text2: '更新帮助手册，便于检索帮助'
+				// }, {
+				// 	text1: '关注收租鸟服务号，及时接收相关信息',
+				// 	text2: ''
+				// },
+				],
 				mouthIncome: '0', //本月净收入
 				billDuein: '0', //本月账单待收
 				billReceived: '0', //本月账单已收
@@ -173,7 +180,7 @@
 						url: '../reportForm/reportForm',
 						icon:false
 					}, {
-						title: '房东账单',
+						title: '记账',
 						imgUrl: '../../static/homeIcon5.png',
 						url: '../billManage/billManage?billType=' + 1,
 						icon:false

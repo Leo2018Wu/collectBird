@@ -8,7 +8,6 @@
 			</view>
 			<view class="loginTxt">授权登录体验完整功能</view>
 			<view class="loginImg">
-				<!-- <view class="notLogin" @click="cancleLogin"><image src="../static/notLogin.png" mode=""></image></view> -->
 				<button class="loginButton" open-type="getUserInfo" @getuserinfo="getUserInfo" withCredentials="true">授权微信登录</button>
 			</view>
 		</view>

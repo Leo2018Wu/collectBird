@@ -10,9 +10,6 @@
 						<template v-slot:main>
 							<input class="form-input" type="number" placeholder-class="form-input-placeholder" v-model="info.rentPrice" placeholder="元/月" @input="myInput1"/>
 						</template>
-						<template v-slot:tip>
-							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
-						</template>
 					</evan-form-item>
 					<evan-form-item label="收租周期" prop="rentCycle" :fontBold="true">
 						<template v-slot:main>
@@ -34,26 +31,17 @@
 				<view class="section2">
 					<evan-form-item label="电费(元/度)" prop="elecCost" :fontBold="true">
 						<template v-slot:main>
-							<input class="form-input" type="number" placeholder-class="form-input-placeholder" v-model="info.elecCost" placeholder="元/度" @input="myInput2" />
-						</template>
-						<template v-slot:tip>
-							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
+							<input class="form-input" type="number" maxlength="4" placeholder-class="form-input-placeholder" v-model="info.elecCost" placeholder="元/度" @input="myInput2" />
 						</template>
 					</evan-form-item>
 					<evan-form-item label="水费(元/月)" prop="waterCost" :fontBold="true">
 						<template v-slot:main>
-							<input class="form-input" type="number" placeholder-class="form-input-placeholder" v-model="info.waterCost" placeholder="元/月" @input="myInput3" />
-						</template>
-						<template v-slot:tip>
-							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
+							<input class="form-input" type="number" maxlength="4" placeholder-class="form-input-placeholder" v-model="info.waterCost" placeholder="元/月" @input="myInput3" />
 						</template>
 					</evan-form-item>
 					<evan-form-item label="宽带费(元/月)" prop="netCost" :fontBold="true" :border="false">
 						<template v-slot:main>
-							<input class="form-input" type="number" placeholder-class="form-input-placeholder" v-model="info.netCost" placeholder="元/月" @input="myInput4" />
-						</template>
-						<template v-slot:tip>
-							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
+							<input class="form-input" type="number" maxlength="4" placeholder-class="form-input-placeholder" v-model="info.netCost" placeholder="元/月" @input="myInput4" />
 						</template>
 					</evan-form-item>
 				</view>
@@ -73,9 +61,6 @@
 						<template v-slot:main>
 							<input class="form-input" placeholder-class="form-input-placeholder" v-model="info.rentPrice" placeholder="元/月" @input="myInput1" />
 						</template>
-						<template v-slot:tip>
-							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
-						</template>
 					</evan-form-item>
 					<evan-form-item label="收租周期" prop="rentCycle" :fontBold="true">
 						<template v-slot:main>
@@ -89,7 +74,6 @@
 							/>
 						</template>
 						<template v-slot:tip>
-							<!-- <image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image> -->
 							<view class="inputSpan"></view>
 						</template>
 					</evan-form-item>
@@ -97,36 +81,23 @@
 				<view class="section2">
 					<evan-form-item label="电费(元/度)" prop="elecCost" :fontBold="true">
 						<template v-slot:main>
-							<input class="form-input" placeholder-class="form-input-placeholder" v-model="info.elecCost" placeholder="元/度" @input="myInput2" />
-						</template>
-						<template v-slot:tip>
-							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
+							<input class="form-input" maxlength="4" placeholder-class="form-input-placeholder" v-model="info.elecCost" placeholder="元/度" @input="myInput2" />
 						</template>
 					</evan-form-item>
 					<evan-form-item label="水费(元/月)" prop="waterCost" :fontBold="true">
 						<template v-slot:main>
-							<input class="form-input" placeholder-class="form-input-placeholder" v-model="info.waterCost" placeholder="元/月" @input="myInput3" />
-						</template>
-						<template v-slot:tip>
-							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
+							<input class="form-input" maxlength="4" placeholder-class="form-input-placeholder" v-model="info.waterCost" placeholder="元/月" @input="myInput3" />
 						</template>
 					</evan-form-item>
 					<evan-form-item label="宽带费(元/月)" prop="netCost" :fontBold="true">
 						<template v-slot:main>
-							<input class="form-input" placeholder-class="form-input-placeholder" v-model="info.netCost" placeholder="元/月" @input="myInput4" />
-						</template>
-						<template v-slot:tip>
-							<image class="inpArrow" src="../../static/right_arrow.png" mode="aspectFit"></image>
+							<input class="form-input" maxlength="4" placeholder-class="form-input-placeholder" v-model="info.netCost" placeholder="元/月" @input="myInput4" />
 						</template>
 					</evan-form-item>
 				</view>
 			</evan-form>
 			<view class="operationBox" :class="{ oneButton: newHouseInfo.roomList[0].rentStatus == 1 }">
 				<view class="saveBtn" @click="save(false)">保存</view>
-				<!-- <view v-if="newHouseInfo.roomList[0].rentStatus != 1">
-					<view class="saveBtn1" @click="showPublishInfo" v-if="newHouseInfo.roomList[0].rentStatus == 2">招租信息</view>
-					<view class="saveBtn1" v-else @click="save(true)">保存并发布</view>
-				</view> -->
 			</view>
 		</view>
 	</view>
@@ -248,10 +219,11 @@ export default {
 				.then(res => {
 					if (res.data.data.roomList) {
 						let arr = [];
-						// if(!_this.isWholeRent){
+						if(_this.isWholeRent == 0){
 							res.data.data.roomList =  res.data.data.roomList.filter(item => item.roomNo == _this.bedRoomNo)
-						// }
-						console.log(res.data.data.roomList)
+						}else{
+							res.data.data.roomList =  res.data.data.roomList.filter(item => item.roomNo == 'A'.toUpperCase())
+						}
 						if (res.data.data.roomList.length != 0) {
 							//处于编辑房间状态
 							let depositNumIndex = parseInt(res.data.data.roomList[0].rentNum) - 1;
@@ -261,7 +233,6 @@ export default {
 							this.info.rentPrice = res.data.data.roomList[0].roomPrice;
 							this.rentCycleList[0] = res.data.data.roomList[0].rentNum; //付月租数量
 							this.rentCycleList[1] = res.data.data.roomList[0].depositNum; //押金数量
-							// this.initValue = this.list[res.data.data.roomList[0].depositNum - 1];
 							this.info.elecCost = res.data.data.roomList[0].eleUnitPrice ? res.data.data.roomList[0].eleUnitPrice : 1;
 							this.info.waterCost = res.data.data.roomList[0].waterUnitPrice ? res.data.data.roomList[0].waterUnitPrice : 30;
 							this.info.netCost = res.data.data.roomList[0].netCost ? res.data.data.roomList[0].netCost : 30;
@@ -294,7 +265,6 @@ export default {
 		change(e) {
 			this.rentCycleList = chnToNumber.chnToNumber(e.newVal);
 			this.info.rentCycle = e.newVal;
-			// console.log(this.rentCycleList)
 		},
 		showPublishInfo() {
 			uni.navigateTo({
@@ -302,25 +272,7 @@ export default {
 			});
 		},
 		save(isPublish) {
-			// 请求参数
-
-			// let updatePar = {
-			// houseId:this.houseInfo.houseId,
-			// landlordId:this.$store.state.landladyInfo.id,
-			// communityName:this.houseInfo.communityName,
-			// roomNo:this.bedRoomNo,
-			// rentStatus:"0",
-			// 	roomPrice:this.info.rentPrice,
-			// 	eleMeterReading:"0",
-			// 	waterMeterReading:"0",
-			// 	eleUnitPrice:this.info.elecCost,
-			// 	waterUnitPrice:this.info.waterCost,
-			// 	netCost:this.info.netCost,
-			// 	depositNum:this.rentCycleList[1],
-			// 	rentNum:this.rentCycleList[0]
-			// };
 			let par = this.newHouseInfo.roomList[0];
-			
 			par.roomPrice = this.info.rentPrice;
 			par.eleMeterReading = '0';
 			par.waterMeterReading = '0';
@@ -329,11 +281,6 @@ export default {
 			par.netCost = this.info.netCost;
 			par.depositNum = this.rentCycleList[1];
 			par.rentNum = this.rentCycleList[0];
-			if(this.isEditRoom){
-				this.id
-				// const arr =  this.newHouseInfo.roomList.filter(item => item.roomNo == this.bedRoomNo)
-				// par.id = arr[0].id
-			}
 			let urlPar = this.isEditRoom ? 'room/update' : '/room/addRoom';
 			let _this = this;
 			this.$refs.form.validate(res => {
