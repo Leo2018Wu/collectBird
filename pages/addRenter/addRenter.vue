@@ -188,6 +188,7 @@
 		data() {
 			const currentDate = this.$getDate();
 			return {
+				tempUserInfo:{},
 				historyData:'',
 				tenantNum: 2,
 				commonEleNum: '',
@@ -436,11 +437,9 @@
 				this.$request.post('roomUser/findByTenantId', {
 					tenantId: id
 				}).then((res) => {
-					console.log('用户信息', res)
 					let data = res.data.data
-					console.log(data.tenantIdNumber)
 					let rentIndex = parseInt(data.payRentCycle) - 1;
-					console.log(rentIndex)
+					this.tempUserInfo = data
 					this.chooseIndex = rentIndex;
 					// this.radioChange({
 					// 	target: {
@@ -487,9 +486,7 @@
 				this.listShow = false;
 			},
 			returnEmit(e) {
-				console.log(e);
 				this.rentCycleList = chnToNumber.chnToNumber(e.newVal);
-				console.log('大家好啊', this.rentCycleList);
 				this.info2.rentCycle = e.newVal;
 				this.chooseIndex = e.index;
 				this.listShow = false;
@@ -501,7 +498,6 @@
 						break;
 					}
 				}
-				// this.currentSex = evt.target.value;
 			},
 			sure() {
 				let _this = this;
@@ -549,6 +545,9 @@
 				if (this.isFillStatus) {
 					par.tenantImg = this.tenantImg
 					par.id = this.commInfo.renterId
+					par.communityId = this.tempUserInfo.communityId
+					par.communityName = this.tempUserInfo.communityName
+					par.houseId = this.tempUserInfo.houseId
 				}
 				_this.$request.post(postUrl, par).then(responce => {
 					console.log(responce)

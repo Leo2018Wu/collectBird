@@ -35,8 +35,8 @@
 			<view class="addNext" @click="addRoom()">继续添加房号</view>
 		</view>
 		<view class="btnBox" v-else>
+			<view class="btnSave" @click="deleteComm">删除</view>
 			<view class="addNext" @click="save()">保存</view>
-			<view class="btnSave" @click="deleteComm">删除小区</view>
 		</view>
 	</view>
 </template>
